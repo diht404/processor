@@ -8,6 +8,6 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wshadow -Winit-self -Wredundant-decls -
 add_executable(stack stack/main.cpp stack/stack.cpp stack/stack_logs.cpp stack/stack_verification.cpp)
 
 add_executable(main main.cpp stack/stack.cpp stack/stack_logs.cpp stack/stack_verification.cpp)
-add_executable(assembler assembler.cpp stack/stack.cpp stack/stack_logs.cpp stack/stack_verification.cpp)
-add_executable(disassembler disassembler.cpp stack/stack.cpp stack/stack_logs.cpp stack/stack_verification.cpp)
-add_executable(cpu cpu.cpp stack/stack.cpp stack/stack_logs.cpp stack/stack_verification.cpp)
+add_executable(assembler assembler.cpp utils.cpp stack/stack.cpp stack/stack_logs.cpp stack/stack_verification.cpp)
+add_executable(disassembler disassembler.cpp utils.cpp stack/stack.cpp stack/stack_logs.cpp stack/stack_verification.cpp)
+add_executable(cpu cpu.cpp stack/stack.cpp utils.cpp stack/stack_logs.cpp stack/stack_verification.cpp)

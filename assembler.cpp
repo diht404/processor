@@ -1,64 +1,5 @@
 #include "assembler.h"
 
-int openFile(const char *filename, const char *mode, FILE **fp)
-{
-    assert(filename != nullptr);
-    assert(mode != nullptr);
-    assert(fp != nullptr);
-
-    *fp = fopen(filename, "r");
-    if (*fp == nullptr)
-    {
-        return CANT_OPEN_FILE;
-    }
-    return NO_ERRORS;
-}
-
-int getLenOfFile(FILE *fp, size_t *lenOfFile)
-{
-    assert(fp != nullptr);
-    assert(lenOfFile != nullptr);
-
-    struct stat buff = {};
-    if (fstat(fileno(fp), &buff) != 0)
-        return CANT_GET_FILE_INFO;
-
-    *lenOfFile = buff.st_size;
-    return NO_ERRORS;
-}
-
-int readFileToBuf(FILE *fp, size_t *lenOfFile, char **txt)
-{
-    assert(fp != nullptr);
-    assert(lenOfFile != nullptr);
-    assert(txt != nullptr);
-
-    int error = getLenOfFile(fp, lenOfFile);
-    if (error)
-        return error;
-
-    *txt = (char *) calloc(*lenOfFile + 1, sizeof(char));
-    if (*txt == nullptr)
-    {
-        return CANT_ALLOCATE_MEMORY_FOR_FILE;
-    }
-    fread(*txt, sizeof(char), *lenOfFile, fp);
-    return error;
-}
-
-size_t countLines(const char *txt, size_t lenOfFile)
-{
-    assert(txt != nullptr);
-
-    size_t numLines = 1;
-    for (size_t i = 0; i < lenOfFile; i++)
-    {
-        if (txt[i] == '\n')
-            numLines++;
-    }
-    return numLines;
-}
-
 int readFile(FILE *fp, Text *text)
 {
     assert(fp != nullptr);
@@ -113,128 +54,108 @@ int readFile(FILE *fp, Text *text)
     return error;
 }
 
-size_t compile(Text *text, Stack *stack)
+int *compile(Text *text, size_t *error)
 {
     size_t line = 0;
     char cmd[128] = "";
     int commandSize = 0;
-    size_t stackError = 0;
+
+    size_t constLen = sizeof(COMPILATION_CONST);
+
+    int *code =
+        (int *) calloc(
+            constLen * 3 + 2 * text->length * sizeof(code[0]), 1);
+
+    if (code == nullptr)
+        *error |= CANT_ALLOCATE_MEMORY_FOR_PROGRAMM;
+
+    *(size_t *) code = COMPILATION_CONST;
+    code = (int *) ((size_t *) code + 1);
+    *(size_t *) code = VERSION;
+    code = (int *) ((size_t *) code + 1);
+
+    size_t lenOfCode = 0;
+    code = (int *) ((size_t *) code + 1);
+
     while (line < text->length)
     {
         if (!sscanf(text->lines[line].str,
                     "%s%n",
                     cmd,
                     &commandSize))
-            return COMPILATION_FAILED;
+            *error |= COMPILATION_FAILED;
         if (stricmp(cmd, "push") == 0)
         {
             int value = 0;
             if (!sscanf(text->lines[line].str + commandSize,
                         "%d",
                         &value))
-                return COMPILATION_FAILED;
-            stackError |= stackPush(stack, value);
-            if (stackError)
-                return stackError;
+                *error |= COMPILATION_FAILED;
+            code[lenOfCode++] = COMMAND_CODES::PUSH;
+            code[lenOfCode++] = value;
         }
         else if (stricmp(cmd, "add") == 0)
         {
-            int firstValue = 0;
-            int secondValue = 0;
-
-            stackError |= stackPop(stack, &secondValue);
-            if (stackError)
-                return stackError;
-
-            stackError |= stackPop(stack, &firstValue);
-            if (stackError)
-                return stackError;
-
-            stackError |= stackPush(stack, firstValue + secondValue);
-            if (stackError)
-                return stackError;
+            code[lenOfCode++] = COMMAND_CODES::ADD;
         }
         else if (stricmp(cmd, "sub") == 0)
         {
-            int firstValue = 0;
-            int secondValue = 0;
-
-            stackError |= stackPop(stack, &secondValue);
-            if (stackError)
-                return stackError;
-
-            stackError |= stackPop(stack, &firstValue);
-            if (stackError)
-                return stackError;
-
-            stackError |= stackPush(stack, firstValue - secondValue);
-            if (stackError)
-                return stackError;
+            code[lenOfCode++] = COMMAND_CODES::SUB;
         }
         else if (stricmp(cmd, "mul") == 0)
         {
-            int firstValue = 0;
-            int secondValue = 0;
-
-            stackError |= stackPop(stack, &secondValue);
-            if (stackError)
-                return stackError;
-
-            stackError |= stackPop(stack, &firstValue);
-            if (stackError)
-                return stackError;
-            stackError |= stackPush(stack, firstValue * secondValue);
-            if (stackError)
-                return stackError;
+            code[lenOfCode++] = COMMAND_CODES::MUL;
         }
         else if (stricmp(cmd, "div") == 0)
         {
-            int firstValue = 0;
-            int secondValue = 0;
-
-            stackError |= stackPop(stack, &secondValue);
-            if (stackError)
-                return stackError;
-
-            stackError |= stackPop(stack, &firstValue);
-            if (stackError)
-                return stackError;
-
-            stackError |= stackPush(stack, firstValue / secondValue);
-            if (stackError)
-                return stackError;
+            code[lenOfCode++] = COMMAND_CODES::DIV;
         }
-        else if (stricmp(cmd, "out") == 0)
+        else if (stricmp(cmd, "OUT") == 0)
         {
-            int value = 0;
-
-            stackError |= stackPop(stack, &value);
-            if (stackError)
-                return stackError;
-
-            printf("ANSWER = %d\n", value);
+            code[lenOfCode++] = COMMAND_CODES::OUT;
         }
         else if (stricmp(cmd, "hlt") == 0)
         {
-            return stackError;
+            code[lenOfCode++] = COMMAND_CODES::HLT;
         }
         else if (stricmp(cmd, "dump") == 0)
         {
-//          TODO: processor dump
-            return stackError;
+            code[lenOfCode++] = COMMAND_CODES::DUMP;
         }
         else if (stricmp(cmd, "in") == 0)
         {
-            int value = 0;
-            if (!scanf("%d", &value))
-                return READ_FAILED;
-            stackError |= stackPush(stack, value);
-            if (stackError)
-                return stackError;
+            code[lenOfCode++] = COMMAND_CODES::IN;
         }
         line++;
     }
 
+    *((size_t *) code - 1) = lenOfCode;
+    code = (int *) ((size_t *) code - 3);
+
+    int *newMemory = (int *) realloc(code,
+                                     constLen * 3 + lenOfCode
+                                         * sizeof(newMemory[0]));
+    if (newMemory == nullptr)
+        return code;
+
+    return code;
+}
+
+size_t saveFile(int *code, const char *filename)
+{
+    assert(code != nullptr);
+    assert(filename != nullptr);
+
+    FILE *fp = nullptr;
+    openFile(filename, "w", &fp);
+
+    size_t numElements =
+        3 * sizeof(size_t) / sizeof(int) + *((size_t *) (code) + 2);
+
+    fwrite(code, sizeof(int), numElements, fp);
+
+    fclose(fp);
+    return PROCESSOR_ERRORS::NO_ERRORS;
 }
 
 int main()
@@ -249,8 +170,11 @@ int main()
     size_t error = 0;
     stackCtor(&stack, 1, &error)
 
-    compile(&text, &stack);
+    int *code = compile(&text, &error);
 
+    saveFile(code, "1.code");
+
+    free(code);
     fclose(fp);
     return 0;
 }
