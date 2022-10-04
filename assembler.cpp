@@ -161,7 +161,7 @@ size_t saveFile(int *code, const char *filename)
 int main()
 {
     FILE *fp = nullptr;
-    openFile("1.asm", "r", &fp);
+    openFile("data.asm", "r", &fp);
 
     Text text = {};
     readFile(fp, &text);
@@ -172,7 +172,7 @@ int main()
 
     int *code = compile(&text, &error);
 
-    saveFile(code, "1.code");
+    saveFile(code, "data.code");
 
     free(code);
     fclose(fp);

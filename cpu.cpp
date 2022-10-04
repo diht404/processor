@@ -37,14 +37,14 @@ size_t run(Code *code, Stack *stack)
     size_t stackError = 0;
     while (ip < code->len)
     {
-//        printf("IP: %zu COMMAND: %d \n", ip, code->code[ip]);
         if (code->code[ip] == COMMAND_CODES::PUSH)
         {
             ip++;
             stackError |= stackPush(stack, code->code[ip]);
+            ip++;
+
             if (stackError)
                 return stackError;
-            ip++;
         }
         else if (code->code[ip] == COMMAND_CODES::ADD)
         {
@@ -140,11 +140,13 @@ size_t run(Code *code, Stack *stack)
         else if (code->code[ip] == COMMAND_CODES::DUMP)
         {
 //          TODO: processor dump
+            ip++;
             return stackError;
         }
         else if (code->code[ip] == COMMAND_CODES::IN)
         {
             int value = 0;
+            printf("Enter number: \n");
             if (!scanf("%d", &value))
                 return CPU_ERRORS::CPU_READ_FAILED;
             stackError |= stackPush(stack, value);
@@ -154,6 +156,7 @@ size_t run(Code *code, Stack *stack)
         }
         else
         {
+            ip++;
             return CPU_ERRORS::CPU_UNKNOWN_COMMAND;
         }
     }
@@ -162,8 +165,10 @@ size_t run(Code *code, Stack *stack)
 
 int main()
 {
+    setbuf(stdout, NULL);
+    printf("Starting CPU...\n\n");
     FILE *fp = nullptr;
-    openFile("1.code", "rb", &fp);
+    openFile("data.code", "rb", &fp);
 
     Stack stack = {};
     size_t error = 0;
@@ -180,4 +185,5 @@ int main()
         printf("Stack size: %zu\n", stack.size);
     }
     fclose(fp);
+    printf("\nStopping CPU...");
 }
