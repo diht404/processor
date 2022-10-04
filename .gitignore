@@ -7,3 +7,5 @@
 /build.ninja
 /.cmake/
 /CMakeCache.txt
+/cmake_install.cmake
+/Testing/Temporary/LastTest.log
