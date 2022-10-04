@@ -1,0 +1,4 @@
+#ifndef STACK__ASSEMBLER_H
+#define STACK__ASSEMBLER_H
+
+#endif //STACK__ASSEMBLER_H
