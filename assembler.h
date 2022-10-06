@@ -12,7 +12,7 @@ enum ASSEMBLER_ERRORS
 };
 
 const size_t COMPILATION_CONST = 0xDEADF00D;
-const size_t VERSION = 0;
+const size_t VERSION           = 0;
 
 /**
  * @brief Struct for storing array of strings, its' length and pointer
@@ -20,7 +20,7 @@ const size_t VERSION = 0;
  */
 struct Program
 {
-    char **lines = nullptr;
+    char **lines  = nullptr;
     size_t length = 0;
 };
 
