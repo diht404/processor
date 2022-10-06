@@ -1,5 +1,4 @@
 #include "assembler.h"
-#include "disassembler.h"
 
 size_t readFile(FILE *fp, Program *program)
 {
@@ -43,6 +42,8 @@ size_t readFile(FILE *fp, Program *program)
 
 void addInfo(int **code)
 {
+    assert(code != nullptr);
+    assert(*code != nullptr);
 
     *(size_t *) *code = COMPILATION_CONST;
     *code = (int *) ((size_t *) *code + 1);
@@ -55,6 +56,9 @@ void addInfo(int **code)
 
 int *compile(Program *program, size_t *error)
 {
+    assert(program != nullptr);
+    assert(error != nullptr);
+
     size_t line = 0;
     char cmd[128] = "";
     int commandSize = 0;

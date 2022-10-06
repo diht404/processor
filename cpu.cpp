@@ -2,6 +2,13 @@
 
 void applyOperator(Stack *stack, char operation, size_t *error)
 {
+    assert(stack != nullptr);
+    size_t no_errors = 0;
+
+    if (error == nullptr)
+    {
+        error = &no_errors;
+    }
 
     int firstValue = 0;
     int secondValue = 0;
@@ -16,23 +23,67 @@ void applyOperator(Stack *stack, char operation, size_t *error)
 
     switch (operation)
     {
-        case '+':*error |= stackPush(stack, firstValue + secondValue);
+        case '+':
+        {
+            *error |= stackPush(stack, firstValue + secondValue);
             break;
-        case '-':*error |= stackPush(stack, firstValue - secondValue);
+        }
+        case '-':
+        {
+            *error |= stackPush(stack, firstValue - secondValue);
             break;
-        case '*':*error |= stackPush(stack, firstValue * secondValue);
+        }
+        case '*':
+        {
+            *error |= stackPush(stack, firstValue * secondValue);
             break;
-        case '/':*error |= stackPush(stack, firstValue / secondValue);
+        }
+        case '/':
+        {
+            *error |= stackPush(stack, firstValue / secondValue);
             break;
-        default:*error |= CPU_UNKNOWN_COMMAND;
+        }
+        default:
+        {
+            *error |= CPU_UNKNOWN_COMMAND;
+            return;
+        }
     }
+}
+
+void processorDump(FILE *fp, Code *code, size_t ip)
+{
+    if (fp == nullptr)
+        fp = stderr;
+
+    if (code == nullptr)
+        return;
+
+    for (size_t i = 0; i < code->len; i++)
+    {
+        if (ip == i)
+        {
+            fprintf(fp, "{{{ %d }}} ", code->code[i]);
+            continue;
+        }
+        fprintf(fp, "%d ", code->code[i]);
+    }
+    fprintf(fp, "\n");
 }
 
 size_t run(Code *code, Stack *stack)
 {
-    size_t ip = 0;
+    assert(code != nullptr);
+    Stack stack_run = {};
     size_t stackError = 0;
 
+    if (stack == nullptr)
+    {
+        stack = &stack_run;
+        stackCtor(stack, 1, &stackError)
+    }
+
+    size_t ip = 0;
     while (ip < code->len)
     {
         if (code->code[ip] == COMMAND_CODES::PUSH)
@@ -81,7 +132,8 @@ size_t run(Code *code, Stack *stack)
         }
         else if (code->code[ip] == COMMAND_CODES::DUMP)
         {
-//          TODO: processor dump
+            stackDump(stack, &stack->info, stackError);
+            processorDump(stdout, code, ip);
             ip++;
         }
         else if (code->code[ip] == COMMAND_CODES::IN)
