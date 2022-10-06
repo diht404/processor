@@ -55,4 +55,13 @@ int *compile(Program *program, size_t *error);
  */
 size_t saveFile(int *code, const char *filename);
 
+/**
+ * @brief Saves array with compiled code to txt file
+ *
+ * @param code code to write to file
+ * @param filename name of file to write
+ * @return error code
+ */
+size_t saveFileTxt(int *code, const char *filename);
+
 #endif //STACK__ASSEMBLER_H
