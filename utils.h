@@ -20,20 +20,20 @@ enum COMMAND_CODES
 enum UTILS_ERRORS
 {
     NO_ERRORS                     = 0,
-    CANT_OPEN_FILE                = 1 << 1,
-    CANT_GET_FILE_INFO            = 1 << 2,
-    CANT_ALLOCATE_MEMORY_FOR_FILE = 1 << 3,
+    CANT_GET_FILE_INFO            = 1 << 1,
+    CANT_ALLOCATE_MEMORY_FOR_FILE = 1 << 2,
+    NOT_EXECUTABLE_FILE           = 1 << 3,
+    INCORRECT_VERSION             = 1 << 4,
 };
 
-/**
- * @brief opens file
- *
- * @param filename name of the file to open
- * @param mode mode to open the file
- * @param fp file
- * @return error code
- */
-int openFile(const char *filename, const char *mode, FILE **fp);
+const size_t COMPILATION_CONST = 0xDEADF00D;
+const size_t VERSION = 0;
+
+struct Code
+{
+    int *code;
+    size_t len;
+};
 
 /**
  * @brief return length of file in bytes
@@ -51,7 +51,7 @@ int getLenOfFile(FILE *fp, size_t *lenOfFile);
  * @param txt - array storing file
  * @return error code
  */
-int readFileToBuf(FILE *fp, size_t *lenOfFile, char **txt);
+size_t readFileToBuf(FILE *fp, size_t *lenOfFile, char **txt);
 
 /**
  * @brief counts lines in buffer
@@ -60,5 +60,14 @@ int readFileToBuf(FILE *fp, size_t *lenOfFile, char **txt);
  * @return number of lines in buffer
  */
 size_t countLines(const char *txt, size_t lenOfFile);
+
+/**
+ * @brief Reads code from binary file
+ *
+ * @param fp file to read from
+ * @param code struct to read code
+ * @return
+ */
+size_t readCode(FILE *fp, Code *code);
 
 #endif //STACK__UTILS_H

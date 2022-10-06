@@ -11,9 +11,6 @@ enum ASSEMBLER_ERRORS
     ASSEMBLER_CANT_SHRINK_TO_FIT               = 1 << 7,
 };
 
-const size_t COMPILATION_CONST = 0xDEADF00D;
-const size_t VERSION           = 0;
-
 /**
  * @brief Struct for storing array of strings, its' length and pointer
  * to memory block with not sorted text(array of string)

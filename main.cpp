@@ -8,9 +8,12 @@ int main()
 {
     system("g++ " flags "assembler.cpp utils.cpp stack/stack.cpp "
            "stack/stack_logs.cpp stack/stack_verification.cpp -o asm");
+    system("g++ " flags "disassembler.cpp utils.cpp stack/stack.cpp "
+           "stack/stack_logs.cpp stack/stack_verification.cpp -o disasm");
     system("g++ " flags "cpu.cpp utils.cpp stack/stack.cpp "
            "stack/stack_logs.cpp stack/stack_verification.cpp -o cpu");
     system("asm");
+    system("disasm");
     system("cpu");
     system("rm data.code");
     system("rm *.exe");

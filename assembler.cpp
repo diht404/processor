@@ -156,8 +156,7 @@ size_t saveFile(int *code, const char *filename)
     assert(code != nullptr);
     assert(filename != nullptr);
 
-    FILE *fp = nullptr;
-    openFile(filename, "w", &fp);
+    FILE *fp = fopen(filename, "w");
 
     size_t numElements =
         3 * sizeof(size_t) / sizeof(int) + *((size_t *) (code) + 2);
@@ -168,10 +167,27 @@ size_t saveFile(int *code, const char *filename)
     return NO_ERRORS;
 }
 
+//size_t saveFileTxt(int *code, const char *filename)
+//{
+//    assert(code != nullptr);
+//    assert(filename != nullptr);
+//
+//    FILE *fp = fopen("data.code", "wb");
+//    if (fp == nullptr)
+//        return 1;
+//
+//    size_t numElements =
+//        3 * sizeof(size_t) / sizeof(int) + *((size_t *) (code) + 2);
+//
+//    //TODO:: write disassembler
+//
+//    fclose(fp);
+//    return NO_ERRORS;
+//}
+
 int main()
 {
-    FILE *fp = nullptr;
-    openFile("data.asm", "r", &fp);
+    FILE *fp = fopen("data.asm", "r");
 
     Program text = {};
     readFile(fp, &text);
@@ -182,6 +198,7 @@ int main()
     if (error)
         printf("compile error: %zu\n", error);
     saveFile(code, "data.code");
+//    saveFileTxt(code, "data.txt");
 
     free(code);
     fclose(fp);

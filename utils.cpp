@@ -1,19 +1,5 @@
 #include "utils.h"
 
-int openFile(const char *filename, const char *mode, FILE **fp)
-{
-    assert(filename != nullptr);
-    assert(mode != nullptr);
-    assert(fp != nullptr);
-
-    *fp = fopen(filename, mode);
-    if (*fp == nullptr)
-    {
-        return CANT_OPEN_FILE;
-    }
-    return NO_ERRORS;
-}
-
 int getLenOfFile(FILE *fp, size_t *lenOfFile)
 {
     assert(fp != nullptr);
@@ -27,13 +13,13 @@ int getLenOfFile(FILE *fp, size_t *lenOfFile)
     return NO_ERRORS;
 }
 
-int readFileToBuf(FILE *fp, size_t *lenOfFile, char **txt)
+size_t readFileToBuf(FILE *fp, size_t *lenOfFile, char **txt)
 {
     assert(fp != nullptr);
     assert(lenOfFile != nullptr);
     assert(txt != nullptr);
 
-    int error = getLenOfFile(fp, lenOfFile);
+    size_t error = getLenOfFile(fp, lenOfFile);
     if (error)
         return error;
 
@@ -57,4 +43,46 @@ size_t countLines(const char *txt, size_t lenOfFile)
             numLines++;
     }
     return numLines;
+}
+
+size_t verifyCode(char **buf)
+{
+    size_t compilationConst = *(size_t *) (*buf);
+
+    if (compilationConst != COMPILATION_CONST)
+    {
+        printf("Expected: %zu Got: %zu\n",
+               COMPILATION_CONST,
+               compilationConst);
+        return NOT_EXECUTABLE_FILE;
+    }
+
+    size_t version = *((size_t *) (*buf) + 1);
+
+    if (version != VERSION)
+        return INCORRECT_VERSION;
+
+    return NO_ERRORS;
+}
+
+size_t readCode(FILE *fp, Code *code)
+{
+    assert(fp != nullptr);
+    assert(code != nullptr);
+
+    size_t lenOfFile = 0;
+    char *buf = nullptr;
+    size_t error = readFileToBuf(fp, &lenOfFile, &buf);
+
+    if (error)
+        return error;
+
+    error = verifyCode(&buf);
+    if (error)
+        return error;
+
+    code->len = *((size_t *) (buf) + 2);
+    code->code = (int *) ((size_t *) (buf) + 3);
+
+    return NO_ERRORS;
 }
