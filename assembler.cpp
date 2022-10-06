@@ -60,9 +60,8 @@ int *compile(Program *program, size_t *error)
 
     size_t constLen = sizeof(COMPILATION_CONST);
 
-    int *code =
-        (int *) calloc(
-            constLen * 3 + 2 * program->length * sizeof(code[0]), 1);
+    int *code = (int *) calloc(constLen * 3 +
+        2 * program->length * sizeof(code[0]), 1);
     if (code == nullptr)
     {
         *error |= ASSEMBLER_CANT_ALLOCATE_MEMORY_FOR_PROGRAM;
