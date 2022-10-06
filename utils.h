@@ -4,17 +4,25 @@
 #include "stack/stack.h"
 #include <sys/stat.h>
 
-enum PROCESSOR_ERRORS
+enum COMMAND_CODES
 {
-    NO_ERRORS = 0,
-    CANT_GET_FILE_INFO = 1,
-    CANT_ALLOCATE_MEMORY_FOR_FILE = 2,
-    CANT_OPEN_FILE = 3,
-    CANT_ALLOCATE_MEMORY_FOR_PROGRAMM = 4,
-    CANT_ALLOCATE_MEMORY_FOR_STRINGS = 5,
-    CANT_ALLOCATE_MEMORY_FOR_STRINGS_LENGTH = 6,
-    COMPILATION_FAILED = 7,
-    READ_FAILED = 8,
+    HLT  = 0,
+    PUSH = 1,
+    ADD  = 2,
+    SUB  = 3,
+    MUL  = 4,
+    DIV  = 5,
+    OUT  = 6,
+    DUMP = 7,
+    IN   = 8,
+};
+
+enum UTILS_ERRORS
+{
+    NO_ERRORS                     = 0,
+    CANT_OPEN_FILE                = 1 << 1,
+    CANT_GET_FILE_INFO            = 1 << 2,
+    CANT_ALLOCATE_MEMORY_FOR_FILE = 1 << 3,
 };
 
 /**

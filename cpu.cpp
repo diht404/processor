@@ -10,7 +10,7 @@ size_t readCode(FILE *fp, Code *code)
 
     size_t lenOfFile = 0;
     char *buf = nullptr;
-    int error = readFileToBuf(fp, &lenOfFile, &buf);
+    size_t error = readFileToBuf(fp, &lenOfFile, &buf);
 
     if (error)
         return error;
@@ -18,7 +18,10 @@ size_t readCode(FILE *fp, Code *code)
     size_t compilationConst = *(size_t *) (buf);
 
     if (compilationConst != COMPILATION_CONST)
+    {
+        printf("Expected: %zu Got: %zu\n", COMPILATION_CONST, compilationConst);
         return CPU_NOT_EXECUTABLE_FILE;
+    }
 
     size_t version = *((size_t *) (buf) + 1);
 
@@ -26,15 +29,50 @@ size_t readCode(FILE *fp, Code *code)
         return CPU_INCORRECT_VERSION;
 
     code->len = *((size_t *) (buf) + 2);
-
     code->code = (int *)((size_t *) (buf) + 3);
+
     return CPU_NO_ERRORS;
 }
+
+void applyOperator(Stack *stack, char operation, size_t *error)
+{
+
+    int firstValue = 0;
+    int secondValue = 0;
+
+    *error |= stackPop(stack, &secondValue);
+    if (*error)
+        return;
+
+    *error |= stackPop(stack, &firstValue);
+    if (*error)
+        return;
+
+    switch (operation)
+    {
+        case '+':
+            *error |= stackPush(stack, firstValue + secondValue);
+            break;
+        case '-':
+            *error |= stackPush(stack, firstValue - secondValue);
+            break;
+        case '*':
+            *error |= stackPush(stack, firstValue * secondValue);
+            break;
+        case '/':
+            *error |= stackPush(stack, firstValue / secondValue);
+            break;
+        default:
+            *error |= CPU_UNKNOWN_COMMAND;
+    }
+}
+
 
 size_t run(Code *code, Stack *stack)
 {
     size_t ip = 0;
     size_t stackError = 0;
+
     while (ip < code->len)
     {
         if (code->code[ip] == COMMAND_CODES::PUSH)
@@ -48,76 +86,22 @@ size_t run(Code *code, Stack *stack)
         }
         else if (code->code[ip] == COMMAND_CODES::ADD)
         {
-            int firstValue = 0;
-            int secondValue = 0;
-
-            stackError |= stackPop(stack, &secondValue);
-            if (stackError)
-                return stackError;
-
-            stackError |= stackPop(stack, &firstValue);
-            if (stackError)
-                return stackError;
-
-            stackError |= stackPush(stack, firstValue + secondValue);
-            if (stackError)
-                return stackError;
+            applyOperator(stack, '+', &stackError);
             ip++;
         }
         else if (code->code[ip] == COMMAND_CODES::SUB)
         {
-            int firstValue = 0;
-            int secondValue = 0;
-
-            stackError |= stackPop(stack, &secondValue);
-            if (stackError)
-                return stackError;
-
-            stackError |= stackPop(stack, &firstValue);
-            if (stackError)
-                return stackError;
-
-            stackError |= stackPush(stack, firstValue - secondValue);
-            if (stackError)
-                return stackError;
+            applyOperator(stack, '-', &stackError);
             ip++;
         }
         else if (code->code[ip] == COMMAND_CODES::MUL)
         {
-            int firstValue = 0;
-            int secondValue = 0;
-
-            stackError |= stackPop(stack, &secondValue);
-            if (stackError)
-            {
-                return stackError;
-            }
-            stackError |= stackPop(stack, &firstValue);
-            if (stackError)
-            {
-                return stackError;
-            }
-            stackError |= stackPush(stack, firstValue * secondValue);
-            if (stackError)
-                return stackError;
+            applyOperator(stack, '*', &stackError);
             ip++;
         }
         else if (code->code[ip] == COMMAND_CODES::DIV)
         {
-            int firstValue = 0;
-            int secondValue = 0;
-
-            stackError |= stackPop(stack, &secondValue);
-            if (stackError)
-                return stackError;
-
-            stackError |= stackPop(stack, &firstValue);
-            if (stackError)
-                return stackError;
-
-            stackError |= stackPush(stack, firstValue / secondValue);
-            if (stackError)
-                return stackError;
+            applyOperator(stack, '/', &stackError);
             ip++;
         }
         else if (code->code[ip] == COMMAND_CODES::OUT)
@@ -133,15 +117,12 @@ size_t run(Code *code, Stack *stack)
         }
         else if (code->code[ip] == COMMAND_CODES::HLT)
         {
-//            printf("COMMAND: %d \n", code->code[ip]);
-            ip++;
             return stackError;
         }
         else if (code->code[ip] == COMMAND_CODES::DUMP)
         {
 //          TODO: processor dump
             ip++;
-            return stackError;
         }
         else if (code->code[ip] == COMMAND_CODES::IN)
         {
@@ -156,7 +137,6 @@ size_t run(Code *code, Stack *stack)
         }
         else
         {
-            ip++;
             return CPU_ERRORS::CPU_UNKNOWN_COMMAND;
         }
     }
@@ -177,11 +157,17 @@ int main()
     Code code = {};
 
     error = readCode(fp, &code);
-    error = run(&code, &stack);
+
 
     if (error)
     {
-        printf("ERROR: %zu\n", error);
+        printf("ERROR read: %zu\n", error);
+    }
+
+    error = run(&code, &stack);
+    if (error)
+    {
+        printf("ERROR run: %zu\n", error);
         printf("Stack size: %zu\n", stack.size);
     }
     fclose(fp);

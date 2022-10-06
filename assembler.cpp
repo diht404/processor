@@ -1,31 +1,21 @@
 #include "assembler.h"
 
-int readFile(FILE *fp, Text *text)
+size_t readFile(FILE *fp, Program *program)
 {
     assert(fp != nullptr);
-    assert(text != nullptr);
+    assert(program != nullptr);
 
     size_t lenOfFile = 0;
     char *txt = nullptr;
-    int error = readFileToBuf(fp, &lenOfFile, &txt);
-
+    size_t error = readFileToBuf(fp, &lenOfFile, &txt);
     if (error)
         return error;
 
     size_t numLines = countLines(txt, lenOfFile);
 
-    Line *lines = (Line *) calloc(numLines + 1, sizeof(lines[0]));
+    char **lines = (char **) calloc(numLines + 1, sizeof(lines[0]));
     if (lines == nullptr)
-    {
-        return CANT_ALLOCATE_MEMORY_FOR_STRINGS;
-    }
-    size_t *lensOfStrings =
-        (size_t *) calloc(numLines + 1, sizeof(lensOfStrings[0]));
-
-    if (lensOfStrings == nullptr)
-    {
-        return CANT_ALLOCATE_MEMORY_FOR_STRINGS_LENGTH;
-    }
+        return ASSEMBLER_CANT_ALLOCATE_MEMORY_FOR_STRINGS;
 
     size_t position = 0;
     size_t line_id = 0;
@@ -40,14 +30,13 @@ int readFile(FILE *fp, Text *text)
 
         if (txt[i] == '\n')
         {
-            lensOfStrings[line_id] = position;
             position = 0;
             txt[i] = '\0';
             line_id++;
         }
     }
+    *program = {lines, numLines};
 
-    *text = {lines, numLines};
     return error;
 }
 
@@ -63,7 +52,7 @@ void addInfo(int **code)
     *code = (int *) ((size_t *) *code + 1);
 }
 
-int *compile(Text *text, size_t *error)
+int *compile(Program *program, size_t *error)
 {
     size_t line = 0;
     char cmd[128] = "";
@@ -73,29 +62,39 @@ int *compile(Text *text, size_t *error)
 
     int *code =
         (int *) calloc(
-            constLen * 3 + 2 * text->length * sizeof(code[0]), 1);
-
+            constLen * 3 + 2 * program->length * sizeof(code[0]), 1);
     if (code == nullptr)
-        *error |= CANT_ALLOCATE_MEMORY_FOR_PROGRAMM;
+    {
+        *error |= ASSEMBLER_CANT_ALLOCATE_MEMORY_FOR_PROGRAM;
+        return nullptr;
+    }
 
     addInfo(&code);
 
     size_t lenOfCode = 0;
 
-    while (line < text->length)
+    while (line < program->length)
     {
-        if (!sscanf(text->lines[line].str,
+        if (!sscanf(program->lines[line],
                     "%s%n",
                     cmd,
                     &commandSize))
-            *error |= COMPILATION_FAILED;
+        {
+            *error |= ASSEMBLER_COMPILATION_FAILED;
+            return nullptr;
+        }
+
         if (stricmp(cmd, "push") == 0)
         {
             int value = 0;
-            if (!sscanf(text->lines[line].str + commandSize,
+            if (!sscanf(program->lines[line] + commandSize,
                         "%d",
                         &value))
-                *error |= COMPILATION_FAILED;
+            {
+                *error |= ASSEMBLER_COMPILATION_FAILED;
+                return nullptr;
+            }
+
             code[lenOfCode++] = COMMAND_CODES::PUSH;
             code[lenOfCode++] = value;
         }
@@ -131,6 +130,11 @@ int *compile(Text *text, size_t *error)
         {
             code[lenOfCode++] = COMMAND_CODES::IN;
         }
+        else
+        {
+            *error |= ASSEMBLER_COMPILATION_FAILED;
+            return nullptr;
+        }
         line++;
     }
 
@@ -141,8 +145,10 @@ int *compile(Text *text, size_t *error)
                                      constLen * 3 + lenOfCode
                                          * sizeof(newMemory[0]));
     if (newMemory == nullptr)
+    {
+        *error = ASSEMBLER_CANT_SHRINK_TO_FIT;
         return code;
-
+    }
     return code;
 }
 
@@ -160,7 +166,7 @@ size_t saveFile(int *code, const char *filename)
     fwrite(code, sizeof(int), numElements, fp);
 
     fclose(fp);
-    return PROCESSOR_ERRORS::NO_ERRORS;
+    return NO_ERRORS;
 }
 
 int main()
@@ -168,15 +174,14 @@ int main()
     FILE *fp = nullptr;
     openFile("data.asm", "r", &fp);
 
-    Text text = {};
+    Program text = {};
     readFile(fp, &text);
 
-    Stack stack = {};
     size_t error = 0;
-    stackCtor(&stack, 1, &error)
 
     int *code = compile(&text, &error);
-
+    if (error)
+        printf("compile error: %zu\n", error);
     saveFile(code, "data.code");
 
     free(code);
