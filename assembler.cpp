@@ -34,15 +34,12 @@ int readFile(FILE *fp, Text *text)
     {
         if (position == 0)
         {
-            lines[line_id] = {&txt[i], 0};
+            lines[line_id] = {&txt[i]};
         }
-
-        lines[line_id].length++;
         position++;
 
         if (txt[i] == '\n')
         {
-            lines[line_id].length = position;
             lensOfStrings[line_id] = position;
             position = 0;
             txt[i] = '\0';
@@ -50,8 +47,20 @@ int readFile(FILE *fp, Text *text)
         }
     }
 
-    *text = {lines, numLines, txt, lensOfStrings};
+    *text = {lines, numLines};
     return error;
+}
+
+void addInfo(int **code)
+{
+
+    *(size_t *) *code = COMPILATION_CONST;
+    *code = (int *) ((size_t *) *code + 1);
+
+    *(size_t *) *code = VERSION;
+    *code = (int *) ((size_t *) *code + 1);
+
+    *code = (int *) ((size_t *) *code + 1);
 }
 
 int *compile(Text *text, size_t *error)
@@ -69,13 +78,9 @@ int *compile(Text *text, size_t *error)
     if (code == nullptr)
         *error |= CANT_ALLOCATE_MEMORY_FOR_PROGRAMM;
 
-    *(size_t *) code = COMPILATION_CONST;
-    code = (int *) ((size_t *) code + 1);
-    *(size_t *) code = VERSION;
-    code = (int *) ((size_t *) code + 1);
+    addInfo(&code);
 
     size_t lenOfCode = 0;
-    code = (int *) ((size_t *) code + 1);
 
     while (line < text->length)
     {

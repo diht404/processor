@@ -25,7 +25,6 @@ const size_t VERSION = 0;
 struct Line
 {
     char *str = nullptr;
-    size_t length = 0;
 };
 
 /**
@@ -36,8 +35,6 @@ struct Text
 {
     Line *lines = nullptr;
     size_t length = 0;
-    char *txt = nullptr;
-    size_t *lensOfStrings = nullptr;
 };
 
 /**
@@ -47,6 +44,8 @@ struct Text
  * @return error code
  */
 int readFile(FILE *fp, Text *text);
+
+void addInfo(int **code);
 
 int *compile(Text *text, size_t *error);
 
