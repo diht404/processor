@@ -1,4 +1,5 @@
 #include "assembler.h"
+#include "disassembler.h"
 
 size_t readFile(FILE *fp, Program *program)
 {
@@ -167,23 +168,121 @@ size_t saveFile(int *code, const char *filename)
     return NO_ERRORS;
 }
 
-//size_t saveFileTxt(int *code, const char *filename)
-//{
-//    assert(code != nullptr);
-//    assert(filename != nullptr);
-//
-//    FILE *fp = fopen("data.code", "wb");
-//    if (fp == nullptr)
-//        return 1;
-//
-//    size_t numElements =
-//        3 * sizeof(size_t) / sizeof(int) + *((size_t *) (code) + 2);
-//
-//    //TODO:: write disassembler
-//
-//    fclose(fp);
-//    return NO_ERRORS;
-//}
+size_t print(Code *code, FILE *fp)
+{
+    assert(code != nullptr);
+    assert(fp != nullptr);
+
+    size_t ip = 0;
+    while (ip < code->len)
+    {
+        switch (code->code[ip])
+        {
+            case HLT:
+            {
+                ip = code->len;
+                fprintf(fp, "hlt");
+                break;
+            }
+            case PUSH:
+            {
+                ip++;
+                fprintf(fp, "push %d\n", code->code[ip]);
+                ip++;
+                break;
+            }
+            case ADD:
+            {
+                fprintf(fp, "add\n");
+                ip++;
+                break;
+            }
+            case SUB:
+            {
+                fprintf(fp, "sub\n");
+                ip++;
+                break;
+            }
+            case MUL:
+            {
+                fprintf(fp, "mul\n");
+                ip++;
+                break;
+            }
+            case DIV:
+            {
+                fprintf(fp, "div\n");
+                ip++;
+                break;
+            }
+            case OUT:
+            {
+                fprintf(fp, "out\n");
+                ip++;
+                break;
+            }
+            case DUMP:
+            {
+                fprintf(fp, "dump\n");
+                ip++;
+                break;
+            }
+            case IN:
+            {
+                fprintf(fp, "in\n");
+                ip++;
+                break;
+            }
+            default:
+            {
+                return UNKNOWN_COMMAND;
+            }
+        }
+    }
+    return NO_ERRORS;
+}
+
+size_t saveFileTxt(int *code, const char *filename)
+{
+    assert(code != nullptr);
+    assert(filename != nullptr);
+
+    FILE *fp = fopen(filename, "w");
+    if (fp == nullptr)
+        return 1;
+
+    size_t compilationConst = *((size_t *) code);
+    size_t version = *((size_t *) code + 1);
+    size_t length = *((size_t *) code + 2);
+    code = (int *)((size_t *) code + 3);
+
+    fprintf(fp,
+            "%zu %zu %zu\n",
+            compilationConst,
+            version,
+            length);
+
+    size_t ip = 0;
+    while (ip < length)
+    {
+        if (code[ip] == HLT)
+        {
+            fprintf(fp, "%d", code[ip]);
+            break;
+        }
+        if (code[ip] == PUSH)
+        {
+            fprintf(fp, "%d %d\n", code[ip], code[ip+1]);
+            ip+=2;
+            continue;
+        }
+        fprintf(fp, "%d\n", code[ip]);
+        ip++;
+    }
+
+    fclose(fp);
+    return NO_ERRORS;
+}
 
 int main()
 {
@@ -198,8 +297,7 @@ int main()
     if (error)
         printf("compile error: %zu\n", error);
     saveFile(code, "data.code");
-//    saveFileTxt(code, "data.txt");
-
+    error = saveFileTxt(code, "data.txt");
     free(code);
     fclose(fp);
     return 0;
