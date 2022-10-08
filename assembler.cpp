@@ -90,7 +90,7 @@ uint8_t *compile(Program *program, size_t *error)
 
         if (stricmp(cmd, "push") == 0)
         {
-            int value = 666;
+            int value = 0;
             if (!sscanf(program->lines[line] + commandSize,
                         "%d",
                         &value))
@@ -101,7 +101,6 @@ uint8_t *compile(Program *program, size_t *error)
             *code = COMMAND_CODES::PUSH;
             lenOfCode++;
             code++;
-            assert(value != 666);
             *(int *) code = value;
 
             lenOfCode += sizeof(int);
@@ -112,56 +111,48 @@ uint8_t *compile(Program *program, size_t *error)
             *code = COMMAND_CODES::ADD;
             lenOfCode++;
             code++;
-//            code[lenOfCode++] = COMMAND_CODES::ADD;
         }
         else if (stricmp(cmd, "sub") == 0)
         {
             *code = COMMAND_CODES::SUB;
             lenOfCode++;
             code++;
-//            code[lenOfCode++] = COMMAND_CODES::SUB;
         }
         else if (stricmp(cmd, "mul") == 0)
         {
             *code = COMMAND_CODES::MUL;
             lenOfCode++;
             code++;
-//            code[lenOfCode++] = COMMAND_CODES::MUL;
         }
         else if (stricmp(cmd, "div") == 0)
         {
             *code = COMMAND_CODES::DIV;
             lenOfCode++;
             code++;
-//            code[lenOfCode++] = COMMAND_CODES::DIV;
         }
         else if (stricmp(cmd, "OUT") == 0)
         {
             *code = COMMAND_CODES::OUT;
             lenOfCode++;
             code++;
-//            code[lenOfCode++] = COMMAND_CODES::OUT;
         }
         else if (stricmp(cmd, "hlt") == 0)
         {
             *code = COMMAND_CODES::HLT;
             lenOfCode++;
             code++;
-//            code[lenOfCode++] = COMMAND_CODES::HLT;
         }
         else if (stricmp(cmd, "dump") == 0)
         {
             *code = COMMAND_CODES::DUMP;
             lenOfCode++;
             code++;
-//            code[lenOfCode++] = COMMAND_CODES::DUMP;
         }
         else if (stricmp(cmd, "in") == 0)
         {
             *code = COMMAND_CODES::IN;
             lenOfCode++;
             code++;
-//            code[lenOfCode++] = COMMAND_CODES::IN;
         }
         else
         {
