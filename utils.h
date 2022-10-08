@@ -6,16 +6,22 @@
 
 enum COMMAND_CODES
 {
-    HLT  = 0,
-    PUSH = 1,
-    ADD  = 2,
-    SUB  = 3,
-    MUL  = 4,
-    DIV  = 5,
-    OUT  = 6,
-    DUMP = 7,
-    IN   = 8,
-    POP  = 9,
+    HLT  =  0,
+    PUSH =  1,
+    ADD  =  2,
+    SUB  =  3,
+    MUL  =  4,
+    DIV  =  5,
+    OUT  =  6,
+    DUMP =  7,
+    IN   =  8,
+    POP  =  9,
+    JMP  = 10,
+    JA   = 12,
+    JAE  = 13,
+    JB   = 14,
+    JE   = 15,
+    JNE  = 16,
 };
 
 const uint8_t CMD_MASK = 0x1F;
