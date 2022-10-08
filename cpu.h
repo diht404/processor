@@ -18,6 +18,7 @@ struct CPU
     Stack *stack = nullptr;
     size_t ip = 0;
     int regs[5] = {0, 0, 0, 0, 0};
+    int RAM[100] = {0};
 };
 
 /**

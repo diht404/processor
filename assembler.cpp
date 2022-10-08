@@ -96,46 +96,20 @@ uint8_t *compile(Program *program, size_t *error)
                        "%s",
                        reg))
             {
-                if (stricmp(reg, "rax") == 0)
-                {
-                    *code = COMMAND_CODES::PUSH | REG_MASK;
-                    lenOfCode++;
-                    code++;
-                    *(int *) code = 1;
-
-                    lenOfCode += sizeof(int);
-                    code += sizeof(int);
-                }
-                else if (stricmp(reg, "rbx") == 0)
-                {
-                    *code = COMMAND_CODES::PUSH | REG_MASK;
-                    lenOfCode++;
-                    code++;
-                    *(int *) code = 2;
-
-                    lenOfCode += sizeof(int);
-                    code += sizeof(int);
-                }
-                else if (stricmp(reg, "rcx") == 0)
-                {
-                    *code = COMMAND_CODES::PUSH | REG_MASK;
-                    lenOfCode++;
-                    code++;
-                    *(int *) code = 3;
-
-                    lenOfCode += sizeof(int);
-                    code += sizeof(int);
-                }
-                else if (stricmp(reg, "rdx") == 0)
-                {
-                    *code = COMMAND_CODES::PUSH | REG_MASK;
-                    lenOfCode++;
-                    code++;
-                    *(int *) code = 4;
-
-                    lenOfCode += sizeof(int);
-                    code += sizeof(int);
-                }
+#define reg_compile(cmd_arg, reg_name, number) \
+if (stricmp(reg, (reg_name)) == 0)             \
+{                                              \
+    *code = (cmd_arg) | REG_MASK;              \
+    lenOfCode++;                               \
+    code++;                                    \
+    *(int *) code = (number);                  \
+    lenOfCode += sizeof(int);                  \
+    code += sizeof(int);                       \
+}
+                reg_compile(COMMAND_CODES::PUSH, "rax", 1)
+                else reg_compile(COMMAND_CODES::PUSH, "rbx", 2)
+                else reg_compile(COMMAND_CODES::PUSH, "rcx", 3)
+                else reg_compile(COMMAND_CODES::PUSH, "rdx", 4)
                 else if (!sscanf(program->lines[line] + commandSize,
                                  "%d",
                                  &value))
@@ -154,21 +128,6 @@ uint8_t *compile(Program *program, size_t *error)
                     code += sizeof(int);
                 }
             }
-//            else if (!sscanf(program->lines[line] + commandSize,
-//                            "%d",
-//                            &value))
-//            {
-//                *error |= ASSEMBLER_COMPILATION_FAILED;
-//                return nullptr;
-//            }
-//
-//            *code = COMMAND_CODES::PUSH | IMM_MASK;
-//            lenOfCode++;
-//            code++;
-//            *(int *) code = value;
-//
-//            lenOfCode += sizeof(int);
-//            code += sizeof(int);
         }
         else if (stricmp(cmd, "add") == 0)
         {
@@ -228,47 +187,10 @@ uint8_t *compile(Program *program, size_t *error)
                 *error |= ASSEMBLER_COMPILATION_FAILED;
                 return nullptr;
             }
-
-            if (stricmp(reg, "rax") == 0)
-            {
-                *code = COMMAND_CODES::POP | REG_MASK;
-                lenOfCode++;
-                code++;
-                *(int *) code = 1;
-
-                lenOfCode += sizeof(int);
-                code += sizeof(int);
-            }
-            else if (stricmp(reg, "rbx") == 0)
-            {
-                *code = COMMAND_CODES::POP | REG_MASK;
-                lenOfCode++;
-                code++;
-                *(int *) code = 2;
-
-                lenOfCode += sizeof(int);
-                code += sizeof(int);
-            }
-            else if (stricmp(reg, "rcx") == 0)
-            {
-                *code = COMMAND_CODES::POP | REG_MASK;
-                lenOfCode++;
-                code++;
-                *(int *) code = 3;
-
-                lenOfCode += sizeof(int);
-                code += sizeof(int);
-            }
-            else if (stricmp(reg, "rdx") == 0)
-            {
-                *code = COMMAND_CODES::POP | REG_MASK;
-                lenOfCode++;
-                code++;
-                *(int *) code = 4;
-
-                lenOfCode += sizeof(int);
-                code += sizeof(int);
-            }
+            reg_compile(COMMAND_CODES::POP, "rax", 1)
+            else reg_compile(COMMAND_CODES::POP, "rbx", 2)
+            else reg_compile(COMMAND_CODES::POP, "rcx", 3)
+            else reg_compile(COMMAND_CODES::POP, "rdx", 4)
             else
             {
                 *error |= ASSEMBLER_COMPILATION_FAILED;
