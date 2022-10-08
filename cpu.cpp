@@ -54,13 +54,11 @@ size_t run(CPU *cpu)
 
     while (cpu->ip < cpu->code->len)
     {
-//        fprintf(stderr, "code: %d\n", cpu->code->code[cpu->ip]);
         uint8_t command = cpu->code->code[cpu->ip] & CMD_MASK;
         uint8_t args = cpu->code->code[cpu->ip] & ARG_MASK;
 
         if (command == COMMAND_CODES::PUSH)
         {
-//            fprintf(stderr, "args: %d command: %d \n", args, command);
             cpu->ip++;
             int arg = 0;
             if (args & IMM_MASK)
@@ -72,7 +70,6 @@ size_t run(CPU *cpu)
             if (args & RAM_MASK)
             {
                 arg = cpu->RAM[*(int *) (cpu->code->code + cpu->ip)];
-                fprintf(stderr, "RAM ARG %d\n", arg);
             }
 
             stackError |= stackPush(cpu->stack, arg);
@@ -130,11 +127,8 @@ size_t run(CPU *cpu)
             if (stackError)
                 return stackError;
 
-//            fprintf(stderr, "args: %d command: %d\n", args, command);
-//
             cpu->regs[*(int *) (cpu->code->code + cpu->ip)] = value;
             cpu->ip += sizeof(int);
-
         }
         else
         {
