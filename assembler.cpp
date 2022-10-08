@@ -113,7 +113,11 @@ void writeCommand(uint8_t **code, size_t *lenOfCode, int command)
     (*code)++;
 }
 
-void processPushArgs(uint8_t **code, char *buffer, size_t *lenOfCode, int value, size_t *error)
+void processPushArgs(uint8_t **code,
+                     char *buffer,
+                     size_t *lenOfCode,
+                     int value,
+                     size_t *error)
 {
     reg_compile(COMMAND_CODES::PUSH, "rax", 1)
     else reg_compile(COMMAND_CODES::PUSH, "rbx", 2)
@@ -138,7 +142,10 @@ void processPushArgs(uint8_t **code, char *buffer, size_t *lenOfCode, int value,
     }
 }
 
-void processPopArgs(uint8_t **code, char *buffer, size_t *lenOfCode, size_t *error)
+void processPopArgs(uint8_t **code,
+                    char *buffer,
+                    size_t *lenOfCode,
+                    size_t *error)
 {
     reg_compile(COMMAND_CODES::POP, "rax", 1)
     else reg_compile(COMMAND_CODES::POP, "rbx", 2)
@@ -149,7 +156,6 @@ void processPopArgs(uint8_t **code, char *buffer, size_t *lenOfCode, size_t *err
         *error |= ASSEMBLER_COMPILATION_FAILED;
     }
 }
-
 
 uint8_t *compile(Program *program, size_t *error)
 {
