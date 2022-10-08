@@ -64,13 +64,63 @@ void skipSpaces(Program *program, size_t line, int *commandSize)
     }
 }
 
+void detectBrackets(Program *program,
+                    uint8_t *code,
+                    int commandSize,
+                    char *buffer,
+                    size_t line,
+                    size_t *error)
+{
+    if (*(program->lines[line] + commandSize) == '[')
+    {
+        size_t bra = commandSize;
+        size_t ket = commandSize;
+        bool correct = false;
+        while (!(*(program->lines[line] + ket) != ']'
+            and *(program->lines[line] + ket) != '\0'
+            and *(program->lines[line] + ket) == '\n'))
+        {
+            if (*(program->lines[line] + ket) == ']')
+            {
+                correct = true;
+            }
+            ket++;
+        }
+        if (!correct)
+        {
+            *error |= INCORRECT_BRACKETS;
+            return;
+        }
+        memcpy(buffer,
+               program->lines[line] + bra + 1,
+               ket - bra);
+        *code |= RAM_MASK;
+        // если нашли [] то в buffer лежит внутренность
+        // ram->stack
+        // пока только [int]
+    }
+    else
+    {
+        memcpy(buffer,
+               (program->lines[line] + commandSize),
+               BUFFER_SIZE);
+    }
+}
+
+void writeCommand(uint8_t **code, size_t *lenOfCode, int command)
+{
+    **code = command;
+    (*lenOfCode)++;
+    (*code)++;
+}
+
 uint8_t *compile(Program *program, size_t *error)
 {
     assert(program != nullptr);
     assert(error != nullptr);
 
     size_t line = 0;
-    char cmd[128] = "";
+    char cmd[BUFFER_SIZE] = "";
     int commandSize = 0;
 
     size_t constLen = sizeof(COMPILATION_CONST);
@@ -100,48 +150,20 @@ uint8_t *compile(Program *program, size_t *error)
 
         if (stricmp(cmd, "push") == 0)
         {
-            char buffer[128] = "";
-//            char reg[128] = "";
+            char buffer[BUFFER_SIZE] = "";
             int value = 0;
 
             skipSpaces(program, line, &commandSize);
 
-            if (*(program->lines[line] + commandSize) == '[')
-            {
-                size_t bra = commandSize;
-                size_t ket = commandSize;
-                bool correct = false;
-                while (not
-                    (*(program->lines[line] + ket) != ']'
-                        and *(program->lines[line] + ket) != '\0'
-                        and *(program->lines[line] + ket) == '\n')
-                    )
-                {
-                    if (*(program->lines[line] + ket) == ']')
-                    {
-                        correct = true;
-                    }
-                    ket++;
-                }
-                if (!correct)
-                {
-                    *error |= INCORRECT_BRACKETS;
-                    return nullptr;
-                }
-                memcpy(buffer,
-                       program->lines[line] + bra + 1,
-                       ket - bra);
-                *code |= RAM_MASK;
-                // если нашли [] то в buffer лежит внутренность
-                // ram->stack
-                // пока только [int]
-            }
-            else
-            {
-                memcpy(buffer,
-                       (program->lines[line] + commandSize),
-                       128);
-            }
+            detectBrackets(program,
+                           code,
+                           commandSize,
+                           buffer,
+                           line,
+                           error);
+            if (*error)
+                return nullptr;
+
             reg_compile(COMMAND_CODES::PUSH, "rax", 1)
             else reg_compile(COMMAND_CODES::PUSH, "rbx", 2)
             else reg_compile(COMMAND_CODES::PUSH, "rcx", 3)
@@ -165,53 +187,21 @@ uint8_t *compile(Program *program, size_t *error)
             }
         }
         else if (stricmp(cmd, "add") == 0)
-        {
-            *code = COMMAND_CODES::ADD;
-            lenOfCode++;
-            code++;
-        }
+            writeCommand(&code, &lenOfCode, COMMAND_CODES::ADD);
         else if (stricmp(cmd, "sub") == 0)
-        {
-            *code = COMMAND_CODES::SUB;
-            lenOfCode++;
-            code++;
-        }
+            writeCommand(&code, &lenOfCode, COMMAND_CODES::SUB);
         else if (stricmp(cmd, "mul") == 0)
-        {
-            *code = COMMAND_CODES::MUL;
-            lenOfCode++;
-            code++;
-        }
+            writeCommand(&code, &lenOfCode, COMMAND_CODES::MUL);
         else if (stricmp(cmd, "div") == 0)
-        {
-            *code = COMMAND_CODES::DIV;
-            lenOfCode++;
-            code++;
-        }
+            writeCommand(&code, &lenOfCode, COMMAND_CODES::DIV);
         else if (stricmp(cmd, "OUT") == 0)
-        {
-            *code = COMMAND_CODES::OUT;
-            lenOfCode++;
-            code++;
-        }
+            writeCommand(&code, &lenOfCode, COMMAND_CODES::OUT);
         else if (stricmp(cmd, "hlt") == 0)
-        {
-            *code = COMMAND_CODES::HLT;
-            lenOfCode++;
-            code++;
-        }
+            writeCommand(&code, &lenOfCode, COMMAND_CODES::HLT);
         else if (stricmp(cmd, "dump") == 0)
-        {
-            *code = COMMAND_CODES::DUMP;
-            lenOfCode++;
-            code++;
-        }
+            writeCommand(&code, &lenOfCode, COMMAND_CODES::DUMP);
         else if (stricmp(cmd, "in") == 0)
-        {
-            *code = COMMAND_CODES::IN;
-            lenOfCode++;
-            code++;
-        }
+            writeCommand(&code, &lenOfCode, COMMAND_CODES::IN);
         else if (stricmp(cmd, "pop") == 0)
         {
             char buffer[128];

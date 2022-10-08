@@ -79,11 +79,11 @@ size_t run(CPU *cpu)
                 return stackError;
         }
 
-        applyOperation(COMMAND_CODES::ADD, +)applyOperation(
-            COMMAND_CODES::SUB,
-            -)applyOperation(COMMAND_CODES::MUL, *)applyOperation(
-            COMMAND_CODES::DIV,
-            /)
+        applyOperation(COMMAND_CODES::ADD, +)
+        applyOperation(COMMAND_CODES::SUB, -)
+        applyOperation(COMMAND_CODES::MUL, *)
+        applyOperation(COMMAND_CODES::DIV, /)
+
 #undef applyOperation
 
         else if (command == COMMAND_CODES::OUT)

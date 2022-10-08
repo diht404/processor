@@ -16,6 +16,48 @@ size_t disassemle(Code *code, FILE *fp)
                 fprintf(fp, "hlt");
                 break;
             }
+            case ADD:
+            {
+                fprintf(fp, "add\n");
+                ip++;
+                break;
+            }
+            case SUB:
+            {
+                fprintf(fp, "sub\n");
+                ip++;
+                break;
+            }
+            case MUL:
+            {
+                fprintf(fp, "mul\n");
+                ip++;
+                break;
+            }
+            case DIV:
+            {
+                fprintf(fp, "div\n");
+                ip++;
+                break;
+            }
+            case OUT:
+            {
+                fprintf(fp, "out\n");
+                ip++;
+                break;
+            }
+            case DUMP:
+            {
+                fprintf(fp, "dump\n");
+                ip++;
+                break;
+            }
+            case IN:
+            {
+                fprintf(fp, "in\n");
+                ip++;
+                break;
+            }
             case PUSH:
             {
                 uint8_t cmd = code->code[ip];
@@ -66,48 +108,6 @@ size_t disassemle(Code *code, FILE *fp)
                     }
                 }
                 ip += sizeof(int);
-                break;
-            }
-            case ADD:
-            {
-                fprintf(fp, "add\n");
-                ip++;
-                break;
-            }
-            case SUB:
-            {
-                fprintf(fp, "sub\n");
-                ip++;
-                break;
-            }
-            case MUL:
-            {
-                fprintf(fp, "mul\n");
-                ip++;
-                break;
-            }
-            case DIV:
-            {
-                fprintf(fp, "div\n");
-                ip++;
-                break;
-            }
-            case OUT:
-            {
-                fprintf(fp, "out\n");
-                ip++;
-                break;
-            }
-            case DUMP:
-            {
-                fprintf(fp, "dump\n");
-                ip++;
-                break;
-            }
-            case IN:
-            {
-                fprintf(fp, "in\n");
-                ip++;
                 break;
             }
             default:
