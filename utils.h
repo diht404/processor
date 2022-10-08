@@ -31,7 +31,7 @@ const size_t VERSION = 0;
 
 struct Code
 {
-    int *code;
+    uint8_t *code;
     size_t len;
 };
 

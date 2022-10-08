@@ -19,8 +19,8 @@ size_t disassemle(Code *code, FILE *fp)
             case PUSH:
             {
                 ip++;
-                fprintf(fp, "push %d\n", code->code[ip]);
-                ip++;
+                fprintf(fp, "push %d\n", *(int *)(code->code+ip));
+                ip += sizeof(int);
                 break;
             }
             case ADD:

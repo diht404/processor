@@ -40,21 +40,21 @@ size_t readFile(FILE *fp, Program *program)
     return error;
 }
 
-void addInfo(int **code)
+void addInfo(uint8_t **code)
 {
     assert(code != nullptr);
     assert(*code != nullptr);
 
     *(size_t *) *code = COMPILATION_CONST;
-    *code = (int *) ((size_t *) *code + 1);
+    *code = (uint8_t *) ((size_t *) *code + 1);
 
     *(size_t *) *code = VERSION;
-    *code = (int *) ((size_t *) *code + 1);
+    *code = (uint8_t *) ((size_t *) *code + 1);
 
-    *code = (int *) ((size_t *) *code + 1);
+    *code = (uint8_t *) ((size_t *) *code + 1);
 }
 
-int *compile(Program *program, size_t *error)
+uint8_t *compile(Program *program, size_t *error)
 {
     assert(program != nullptr);
     assert(error != nullptr);
@@ -65,8 +65,8 @@ int *compile(Program *program, size_t *error)
 
     size_t constLen = sizeof(COMPILATION_CONST);
 
-    int *code = (int *) calloc(constLen * 3 +
-        2 * program->length * sizeof(code[0]), 1);
+    uint8_t *code = (uint8_t *) calloc(constLen * 3 +
+        2 * program->length * sizeof(int), 1);
     if (code == nullptr)
     {
         *error |= ASSEMBLER_CANT_ALLOCATE_MEMORY_FOR_PROGRAM;
@@ -90,7 +90,7 @@ int *compile(Program *program, size_t *error)
 
         if (stricmp(cmd, "push") == 0)
         {
-            int value = 0;
+            int value = 666;
             if (!sscanf(program->lines[line] + commandSize,
                         "%d",
                         &value))
@@ -98,41 +98,70 @@ int *compile(Program *program, size_t *error)
                 *error |= ASSEMBLER_COMPILATION_FAILED;
                 return nullptr;
             }
+            *code = COMMAND_CODES::PUSH;
+            lenOfCode++;
+            code++;
+            assert(value != 666);
+            *(int *) code = value;
 
-            code[lenOfCode++] = COMMAND_CODES::PUSH;
-            code[lenOfCode++] = value;
+            lenOfCode += sizeof(int);
+            code += sizeof(int);
         }
         else if (stricmp(cmd, "add") == 0)
         {
-            code[lenOfCode++] = COMMAND_CODES::ADD;
+            *code = COMMAND_CODES::ADD;
+            lenOfCode++;
+            code++;
+//            code[lenOfCode++] = COMMAND_CODES::ADD;
         }
         else if (stricmp(cmd, "sub") == 0)
         {
-            code[lenOfCode++] = COMMAND_CODES::SUB;
+            *code = COMMAND_CODES::SUB;
+            lenOfCode++;
+            code++;
+//            code[lenOfCode++] = COMMAND_CODES::SUB;
         }
         else if (stricmp(cmd, "mul") == 0)
         {
-            code[lenOfCode++] = COMMAND_CODES::MUL;
+            *code = COMMAND_CODES::MUL;
+            lenOfCode++;
+            code++;
+//            code[lenOfCode++] = COMMAND_CODES::MUL;
         }
         else if (stricmp(cmd, "div") == 0)
         {
-            code[lenOfCode++] = COMMAND_CODES::DIV;
+            *code = COMMAND_CODES::DIV;
+            lenOfCode++;
+            code++;
+//            code[lenOfCode++] = COMMAND_CODES::DIV;
         }
         else if (stricmp(cmd, "OUT") == 0)
         {
-            code[lenOfCode++] = COMMAND_CODES::OUT;
+            *code = COMMAND_CODES::OUT;
+            lenOfCode++;
+            code++;
+//            code[lenOfCode++] = COMMAND_CODES::OUT;
         }
         else if (stricmp(cmd, "hlt") == 0)
         {
-            code[lenOfCode++] = COMMAND_CODES::HLT;
+            *code = COMMAND_CODES::HLT;
+            lenOfCode++;
+            code++;
+//            code[lenOfCode++] = COMMAND_CODES::HLT;
         }
         else if (stricmp(cmd, "dump") == 0)
         {
-            code[lenOfCode++] = COMMAND_CODES::DUMP;
+            *code = COMMAND_CODES::DUMP;
+            lenOfCode++;
+            code++;
+//            code[lenOfCode++] = COMMAND_CODES::DUMP;
         }
         else if (stricmp(cmd, "in") == 0)
         {
-            code[lenOfCode++] = COMMAND_CODES::IN;
+            *code = COMMAND_CODES::IN;
+            lenOfCode++;
+            code++;
+//            code[lenOfCode++] = COMMAND_CODES::IN;
         }
         else
         {
@@ -141,13 +170,14 @@ int *compile(Program *program, size_t *error)
         }
         line++;
     }
+    code -= lenOfCode;
 
-    *((size_t *) code - 1) = lenOfCode;
-    code = (int *) ((size_t *) code - 3);
+    *(((size_t *) code) - 1) = lenOfCode;
+    code = (uint8_t *) (((size_t *) code) - 3);
 
-    int *newMemory = (int *) realloc(code,
-                                     constLen * 3 + lenOfCode
-                                         * sizeof(newMemory[0]));
+    uint8_t *newMemory = (uint8_t *) realloc(code,
+                                             constLen * 3 + lenOfCode
+                                                 * sizeof(newMemory[0]));
     if (newMemory == nullptr)
     {
         *error = ASSEMBLER_CANT_SHRINK_TO_FIT;
@@ -156,7 +186,7 @@ int *compile(Program *program, size_t *error)
     return code;
 }
 
-size_t saveFile(int *code, const char *filename)
+size_t saveFile(uint8_t *code, const char *filename)
 {
     assert(code != nullptr);
     assert(filename != nullptr);
@@ -164,15 +194,15 @@ size_t saveFile(int *code, const char *filename)
     FILE *fp = fopen(filename, "w");
 
     size_t numElements =
-        3 * sizeof(size_t) / sizeof(int) + *((size_t *) (code) + 2);
+        3 * sizeof(size_t) + *(((size_t *) (code)) + 2);
 
-    fwrite(code, sizeof(int), numElements, fp);
+    fwrite(code, sizeof(uint8_t), numElements, fp);
 
     fclose(fp);
     return NO_ERRORS;
 }
 
-size_t saveFileTxt(int *code, const char *filename)
+size_t saveFileTxt(uint8_t *code, const char *filename)
 {
     assert(code != nullptr);
     assert(filename != nullptr);
@@ -182,9 +212,9 @@ size_t saveFileTxt(int *code, const char *filename)
         return 1;
 
     size_t compilationConst = *((size_t *) code);
-    size_t version = *((size_t *) code + 1);
-    size_t length = *((size_t *) code + 2);
-    code = (int *)((size_t *) code + 3);
+    size_t version = *(((size_t *) code) + 1);
+    size_t length = *(((size_t *) code) + 2);
+    code = (uint8_t *) (((size_t *) code) + 3);
 
     fprintf(fp,
             "%zu %zu %zu\n",
@@ -197,17 +227,20 @@ size_t saveFileTxt(int *code, const char *filename)
     {
         if (code[ip] == HLT)
         {
-            fprintf(fp, "%d", code[ip]);
+            fprintf(fp, "%hhu", code[ip]);
             break;
         }
         if (code[ip] == PUSH)
         {
-            fprintf(fp, "%d %d\n", code[ip], code[ip+1]);
-            ip+=2;
+            fprintf(fp,
+                    "%hhu %d\n",
+                    code[ip],
+                    *(int *) (code + ip + 1));
+            ip += 1 + sizeof(int);
             continue;
         }
-        fprintf(fp, "%d\n", code[ip]);
-        ip++;
+        fprintf(fp, "%hhu\n", code[ip]);
+        ip += sizeof(char);
     }
 
     fclose(fp);
@@ -223,7 +256,7 @@ int main()
 
     size_t error = 0;
 
-    int *code = compile(&text, &error);
+    uint8_t *code = compile(&text, &error);
     if (error)
         printf("compile error: %zu\n", error);
     saveFile(code, "data.code");

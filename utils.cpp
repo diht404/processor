@@ -82,7 +82,7 @@ size_t readCode(FILE *fp, Code *code)
         return error;
 
     code->len = *((size_t *) (buf) + 2);
-    code->code = (int *) ((size_t *) (buf) + 3);
+    code->code = (uint8_t *) ((size_t *) (buf) + 3);
 
     return NO_ERRORS;
 }

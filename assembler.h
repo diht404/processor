@@ -35,7 +35,7 @@ size_t readFile(FILE *fp, Program *program);
  *
  * @param code array with code
  */
-void addInfo(int **code);
+void addInfo(uint8_t **code);
 
 /**
  * @brief Compiles code
@@ -44,7 +44,7 @@ void addInfo(int **code);
  * @param error error code
  * @return compiled code
  */
-int *compile(Program *program, size_t *error);
+uint8_t *compile(Program *program, size_t *error);
 
 /**
  * @brief Saves array with compiled code to file
@@ -53,7 +53,7 @@ int *compile(Program *program, size_t *error);
  * @param filename name of file to write
  * @return error code
  */
-size_t saveFile(int *code, const char *filename);
+size_t saveFile(uint8_t *code, const char *filename);
 
 /**
  * @brief Saves array with compiled code to txt file
@@ -62,6 +62,6 @@ size_t saveFile(int *code, const char *filename);
  * @param filename name of file to write
  * @return error code
  */
-size_t saveFileTxt(int *code, const char *filename);
+size_t saveFileTxt(uint8_t *code, const char *filename);
 
 #endif //STACK__ASSEMBLER_H

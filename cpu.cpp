@@ -1,56 +1,5 @@
 #include "cpu.h"
 
-void applyOperator(Stack *stack, char operation, size_t *error)
-{
-    assert(stack != nullptr);
-    size_t no_errors = 0;
-
-    if (error == nullptr)
-    {
-        error = &no_errors;
-    }
-
-    int firstValue = 0;
-    int secondValue = 0;
-
-    *error |= stackPop(stack, &secondValue);
-    if (*error)
-        return;
-
-    *error |= stackPop(stack, &firstValue);
-    if (*error)
-        return;
-
-    switch (operation)
-    {
-        case '+':
-        {
-            *error |= stackPush(stack, firstValue + secondValue);
-            break;
-        }
-        case '-':
-        {
-            *error |= stackPush(stack, firstValue - secondValue);
-            break;
-        }
-        case '*':
-        {
-            *error |= stackPush(stack, firstValue * secondValue);
-            break;
-        }
-        case '/':
-        {
-            *error |= stackPush(stack, firstValue / secondValue);
-            break;
-        }
-        default:
-        {
-            *error |= CPU_UNKNOWN_COMMAND;
-            return;
-        }
-    }
-}
-
 void processorDump(FILE *fp, Code *code, size_t ip)
 {
     if (fp == nullptr)
@@ -71,6 +20,23 @@ void processorDump(FILE *fp, Code *code, size_t ip)
     fprintf(fp, "\n");
 }
 
+#define applyOperation(cmd_case, operation)                          \
+else if (code->code[ip] == (cmd_case))                               \
+    {                                                                \
+        int firstValue = 0;                                          \
+        int secondValue = 0;                                         \
+        error = stackPop(stack, &secondValue);                       \
+        if (error)                                                   \
+            return error;                                            \
+        error = stackPop(stack, &firstValue);                        \
+        if (error)                                                   \
+            return error;                                            \
+        error |= stackPush(stack, firstValue operation secondValue); \
+        if (error)                                                   \
+            return error;                                            \
+        ip++;                                                        \
+    }
+
 size_t run(Code *code, Stack *stack)
 {
     assert(code != nullptr);
@@ -83,38 +49,27 @@ size_t run(Code *code, Stack *stack)
         stackCtor(stack, 1, &stackError)
     }
 
+    size_t error = NO_ERRORS;
+
     size_t ip = 0;
     while (ip < code->len)
     {
         if (code->code[ip] == COMMAND_CODES::PUSH)
         {
             ip++;
-            stackError |= stackPush(stack, code->code[ip]);
-            ip++;
+            stackError |= stackPush(stack, *(int *) (code->code + ip));
+            ip += sizeof(int);
 
             if (stackError)
                 return stackError;
         }
-        else if (code->code[ip] == COMMAND_CODES::ADD)
-        {
-            applyOperator(stack, '+', &stackError);
-            ip++;
-        }
-        else if (code->code[ip] == COMMAND_CODES::SUB)
-        {
-            applyOperator(stack, '-', &stackError);
-            ip++;
-        }
-        else if (code->code[ip] == COMMAND_CODES::MUL)
-        {
-            applyOperator(stack, '*', &stackError);
-            ip++;
-        }
-        else if (code->code[ip] == COMMAND_CODES::DIV)
-        {
-            applyOperator(stack, '/', &stackError);
-            ip++;
-        }
+
+        applyOperation(COMMAND_CODES::ADD, +)
+        applyOperation(COMMAND_CODES::SUB, -)
+        applyOperation(COMMAND_CODES::MUL, *)
+        applyOperation(COMMAND_CODES::DIV, /)
+#undef applyOperation
+
         else if (code->code[ip] == COMMAND_CODES::OUT)
         {
             int value = 0;
