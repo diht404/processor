@@ -7,6 +7,8 @@ pop rbx
 push rbx
 div
 add
+push 42
+pop [5]
 push [5]
 sub
 out

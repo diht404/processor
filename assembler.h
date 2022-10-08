@@ -101,9 +101,10 @@ void processPushArgs(uint8_t **code, char *buffer, size_t *lenOfCode, int value,
  * @param code array with code
  * @param buffer buffer for storing code extracted from []
  * @param lenOfCode length of array with code
+ * @param value value to push
  * @param error error code
  */
-void processPopArgs(uint8_t **code, char *buffer, size_t *lenOfCode, size_t *error);
+void processPopArgs(uint8_t **code, char *buffer, size_t *lenOfCode, int value, size_t *error);
 
 /**
  * @brief Compiles code

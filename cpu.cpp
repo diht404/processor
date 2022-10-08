@@ -20,26 +20,25 @@ void processorDump(FILE *fp, CPU *cpu)
     fprintf(fp, "\n");
 }
 
-#define applyOperation(cmd_case, operation)                               \
-(command == (cmd_case))                                                   \
-    {                                                                     \
-        int firstValue = 0;                                               \
-        int secondValue = 0;                                              \
-                                                                          \
-        error = stackPop(cpu->stack, &secondValue);                       \
-        if (error)                                                        \
-            return error;                                                 \
-                                                                          \
-        error = stackPop(cpu->stack, &firstValue);                        \
-        if (error)                                                        \
-            return error;                                                 \
-                                                                          \
-        error |= stackPush(cpu->stack,                                    \
-                           firstValue operation secondValue);             \
-        if (error)                                                        \
-            return error;                                                 \
-                                                                          \
-        cpu->ip++;                                                        \
+#define applyOperation(cmd_case, operation)                   \
+(command == (cmd_case))                                       \
+    {                                                         \
+        int firstValue = 0;                                   \
+        int secondValue = 0;                                  \
+                                                              \
+        error = stackPop(cpu->stack, &secondValue);           \
+        if (error)                                            \
+            return error;                                     \
+                                                              \
+        error = stackPop(cpu->stack, &firstValue);            \
+        if (error)                                            \
+            return error;                                     \
+        error |= stackPush(cpu->stack,                        \
+                           firstValue operation secondValue); \
+        if (error)                                            \
+            return error;                                     \
+                                                              \
+        cpu->ip++;                                            \
     }
 
 size_t run(CPU *cpu)
@@ -99,7 +98,6 @@ size_t run(CPU *cpu)
             stackError |= stackPop(cpu->stack, &value);
             if (stackError)
                 return stackError;
-
             printf("ANSWER = %d\n", value);
             cpu->ip++;
         }
@@ -131,14 +129,27 @@ size_t run(CPU *cpu)
         else if (command == COMMAND_CODES::POP)
         {
             cpu->ip++;
-            int value = 0;
-
-            stackError |= stackPop(cpu->stack, &value);
-            if (stackError)
-                return stackError;
+            int arg = 0;
 
             int command_arg = *(int *) (cpu->code->code + cpu->ip);
-            cpu->regs[command_arg] = value;
+
+            if (args & REG_MASK)
+            {
+                stackError |= stackPop(cpu->stack, &arg);
+                if (stackError)
+                    return stackError;
+
+                cpu->regs[command_arg] = arg;
+            }
+
+            if (args & RAM_MASK)
+            {
+                stackError |= stackPop(cpu->stack, &arg);
+                if (stackError)
+                    return stackError;
+
+                cpu->RAM[command_arg] = arg;
+            }
             cpu->ip += sizeof(int);
         }
         else
@@ -161,7 +172,7 @@ int main()
 
     Code code = {};
     CPU cpu = {&code, &stack};
-    cpu.RAM[5] = {42};
+    cpu.RAM[5] = {69};
 
     error = readCode(fp, &code);
 

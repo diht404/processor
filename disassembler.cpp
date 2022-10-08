@@ -102,13 +102,13 @@ size_t disassemle(Code *code, FILE *fp)
                     if (cmd & REG_MASK)
                     {
                         if (value > 0 and value < 5)
-                            fprintf(fp, "push %s\n", REGS_NAMES[value]);
+                            fprintf(fp, "pop %s\n", REGS_NAMES[value]);
                         else
                             return UNKNOWN_REG;
                     }
                     if (cmd & IMM_MASK)
                     {
-                        fprintf(fp, "push %d\n", value);
+                        fprintf(fp, "pop %d\n", value);
                     }
                 }
                 ip += sizeof(int);

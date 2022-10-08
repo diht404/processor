@@ -145,15 +145,29 @@ void processPushArgs(uint8_t **code,
 void processPopArgs(uint8_t **code,
                     char *buffer,
                     size_t *lenOfCode,
+                    int value,
                     size_t *error)
 {
     reg_compile(COMMAND_CODES::POP, "rax", 1)
     else reg_compile(COMMAND_CODES::POP, "rbx", 2)
     else reg_compile(COMMAND_CODES::POP, "rcx", 3)
     else reg_compile(COMMAND_CODES::POP, "rdx", 4)
-    else
+    else if (!sscanf(buffer,
+                "%d",
+                &value))
     {
         *error |= ASSEMBLER_COMPILATION_FAILED;
+        return;
+    }
+    else
+    {
+        **code |= COMMAND_CODES::POP;//attn dont use imm mask here
+        (*lenOfCode)++;
+        (*code)++;
+        **(int **) code = value;
+
+        *lenOfCode += sizeof(int);
+        *code += sizeof(int);
     }
 }
 
@@ -228,8 +242,8 @@ uint8_t *compile(Program *program, size_t *error)
             writeCommand(&code, &lenOfCode, COMMAND_CODES::IN);
         else if (stricmp(cmd, "pop") == 0)
         {
-
             char buffer[BUFFER_SIZE] = "";
+            int value = 0;
 
             skipSpaces(program, line, &commandSize);
 
@@ -242,7 +256,7 @@ uint8_t *compile(Program *program, size_t *error)
             if (*error)
                 return nullptr;
 
-            processPopArgs(&code, buffer, &lenOfCode, error);
+            processPopArgs(&code, buffer, &lenOfCode, value, error);
         }
         else
         {
@@ -356,3 +370,11 @@ int main()
     fclose(fp);
     return 0;
 }
+
+//push value   value -> stack
+//
+//push rax     rax   -> stack
+//pop  rax     stack -> rax
+//
+//push []      ram   -> stack
+//pop  []      stack -> ram
