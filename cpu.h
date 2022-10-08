@@ -17,7 +17,7 @@ struct CPU
     Code *code = nullptr;
     Stack *stack = nullptr;
     size_t ip = 0;
-    int regs[4] = {0, 0, 0, 0};
+    int regs[5] = {0, 0, 0, 0, 0};
 };
 
 /**

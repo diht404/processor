@@ -17,6 +17,13 @@ enum COMMAND_CODES
     IN   = 8,
 };
 
+const uint8_t CMD_MASK = 0x0F;
+const uint8_t ARG_MASK = 0xF0;
+
+const uint8_t RAM_MASK = 0x40;
+const uint8_t REG_MASK = 0x20;
+const uint8_t IMM_MASK = 0x10;
+
 enum UTILS_ERRORS
 {
     NO_ERRORS                     = 0,
@@ -27,7 +34,7 @@ enum UTILS_ERRORS
 };
 
 const size_t COMPILATION_CONST = 0xDEADF00D;
-const size_t VERSION = 0;
+const size_t VERSION = 3;
 
 struct Code
 {

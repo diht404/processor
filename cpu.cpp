@@ -21,7 +21,7 @@ void processorDump(FILE *fp, CPU *cpu)
 }
 
 #define applyOperation(cmd_case, operation)                               \
-else if (cpu->code->code[cpu->ip] == (cmd_case))                          \
+else if (command == (cmd_case))                                           \
     {                                                                     \
         int firstValue = 0;                                               \
         int secondValue = 0;                                              \
@@ -54,10 +54,17 @@ size_t run(CPU *cpu)
 
     while (cpu->ip < cpu->code->len)
     {
-        if (cpu->code->code[cpu->ip] == COMMAND_CODES::PUSH)
+        uint8_t command = cpu->code->code[cpu->ip] & CMD_MASK;
+        uint8_t args = cpu->code->code[cpu->ip] & ARG_MASK;
+
+        if (command == COMMAND_CODES::PUSH)
         {
             cpu->ip++;
-            stackError |= stackPush(cpu->stack, *(int *) (cpu->code->code + cpu->ip));
+            int arg = 0;
+            if (args & IMM_MASK) arg += *(int *) (cpu->code->code + cpu->ip);
+            if (args & REG_MASK) arg += cpu->regs[*(int *) (cpu->code->code + cpu->ip)];
+            if (args & RAM_MASK) arg = *(int *) (cpu->code->code + cpu->ip);
+            stackError |= stackPush(cpu->stack, arg);
             cpu->ip += sizeof(int);
 
             if (stackError)
@@ -70,7 +77,7 @@ size_t run(CPU *cpu)
         applyOperation(COMMAND_CODES::DIV, /)
 #undef applyOperation
 
-        else if (cpu->code->code[cpu->ip] == COMMAND_CODES::OUT)
+        else if (command == COMMAND_CODES::OUT)
         {
             int value = 0;
 
@@ -81,17 +88,17 @@ size_t run(CPU *cpu)
             printf("ANSWER = %d\n", value);
             cpu->ip++;
         }
-        else if (cpu->code->code[cpu->ip] == COMMAND_CODES::HLT)
+        else if (command == COMMAND_CODES::HLT)
         {
             return stackError;
         }
-        else if (cpu->code->code[cpu->ip] == COMMAND_CODES::DUMP)
+        else if (command == COMMAND_CODES::DUMP)
         {
             stackDump(cpu->stack, &cpu->stack->info, stackError);
             processorDump(stdout, cpu);
             cpu->ip++;
         }
-        else if (cpu->code->code[cpu->ip] == COMMAND_CODES::IN)
+        else if (command == COMMAND_CODES::IN)
         {
             int value = 0;
             printf("Enter number: \n");
@@ -104,6 +111,7 @@ size_t run(CPU *cpu)
         }
         else
         {
+            fprintf(stderr, "CPU_UNKNOWN_COMMAND\n");
             return CPU_ERRORS::CPU_UNKNOWN_COMMAND;
         }
     }

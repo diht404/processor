@@ -90,21 +90,72 @@ uint8_t *compile(Program *program, size_t *error)
 
         if (stricmp(cmd, "push") == 0)
         {
-            int value = 0;
-            if (!sscanf(program->lines[line] + commandSize,
-                        "%d",
-                        &value))
-            {
-                *error |= ASSEMBLER_COMPILATION_FAILED;
-                return nullptr;
-            }
-            *code = COMMAND_CODES::PUSH;
-            lenOfCode++;
-            code++;
-            *(int *) code = value;
+            char *reg = nullptr;
 
-            lenOfCode += sizeof(int);
-            code += sizeof(int);
+            if (sscanf(program->lines[line] + commandSize,
+                       "%s",
+                       reg))
+            {
+                if (stricmp(cmd, "rax") == 0)
+                {
+                    *code = COMMAND_CODES::PUSH | REG_MASK;
+                    lenOfCode++;
+                    code++;
+                    *(int *) code = 1;
+
+                    lenOfCode += sizeof(int);
+                    code += sizeof(int);
+                }
+                else if (stricmp(cmd, "rbx") == 0)
+                {
+                    *code = COMMAND_CODES::PUSH | REG_MASK;
+                    lenOfCode++;
+                    code++;
+                    *(int *) code = 2;
+
+                    lenOfCode += sizeof(int);
+                    code += sizeof(int);
+                }
+                else if (stricmp(cmd, "rcx") == 0)
+                {
+                    *code = COMMAND_CODES::PUSH | REG_MASK;
+                    lenOfCode++;
+                    code++;
+                    *(int *) code = 3;
+
+                    lenOfCode += sizeof(int);
+                    code += sizeof(int);
+                }
+                else if (stricmp(cmd, "rdx") == 0)
+                {
+                    *code = COMMAND_CODES::PUSH | REG_MASK;
+                    lenOfCode++;
+                    code++;
+                    *(int *) code = 4;
+
+                    lenOfCode += sizeof(int);
+                    code += sizeof(int);
+                }
+            }
+            else
+            {
+                int value = 0;
+                if (!sscanf(program->lines[line] + commandSize,
+                            "%d",
+                            &value))
+                {
+                    *error |= ASSEMBLER_COMPILATION_FAILED;
+                    return nullptr;
+                }
+                *code = COMMAND_CODES::PUSH | IMM_MASK;
+                lenOfCode++;
+                code++;
+                *(int *) code = value;
+
+                lenOfCode += sizeof(int);
+                code += sizeof(int);
+            }
+
         }
         else if (stricmp(cmd, "add") == 0)
         {
@@ -216,22 +267,24 @@ size_t saveFileTxt(uint8_t *code, const char *filename)
     size_t ip = 0;
     while (ip < length)
     {
-        if (code[ip] == HLT)
+        if ((code[ip]  & CMD_MASK) == HLT)
         {
             fprintf(fp, "%hhu", code[ip]);
             break;
         }
-        if (code[ip] == PUSH)
+        else if ((code[ip] & CMD_MASK) == PUSH)
         {
             fprintf(fp,
                     "%hhu %d\n",
                     code[ip],
                     *(int *) (code + ip + 1));
             ip += 1 + sizeof(int);
-            continue;
         }
-        fprintf(fp, "%hhu\n", code[ip]);
-        ip += sizeof(char);
+        else
+        {
+            fprintf(fp, "%hhu\n", code[ip]);
+            ip += sizeof(char);
+        }
     }
 
     fclose(fp);

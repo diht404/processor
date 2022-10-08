@@ -8,7 +8,7 @@ size_t disassemle(Code *code, FILE *fp)
     size_t ip = 0;
     while (ip < code->len)
     {
-        switch (code->code[ip])
+        switch (code->code[ip] & CMD_MASK)
         {
             case HLT:
             {
@@ -18,8 +18,30 @@ size_t disassemle(Code *code, FILE *fp)
             }
             case PUSH:
             {
+                uint8_t cmd = code->code[ip];
                 ip++;
-                fprintf(fp, "push %d\n", *(int *)(code->code+ip));
+                int value = *(int *)(code->code+ip);
+
+                if (cmd & ARG_MASK)
+                {
+                    if (cmd & REG_MASK)
+                    {
+                        if (value == 1)
+                            fprintf(fp, "push rax\n");
+                        else if (value == 2)
+                            fprintf(fp, "push rbx\n");
+                        else if (value == 3)
+                            fprintf(fp, "push rcx\n");
+                        else if (value == 4)
+                            fprintf(fp, "push rdx\n");
+                        else
+                            return UNKNOWN_REG;
+                    }
+                    if (cmd & IMM_MASK)
+                    {
+                        fprintf(fp, "push %d\n", value);
+                    }
+                }
                 ip += sizeof(int);
                 break;
             }

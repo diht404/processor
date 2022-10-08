@@ -6,6 +6,7 @@
 enum DISASSEMBLER_ERRORS
 {
     UNKNOWN_COMMAND = 1 << 6,
+    UNKNOWN_REG     = 1 << 7,
 };
 
 size_t disassemle(Code *code, FILE *fp);
