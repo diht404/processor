@@ -22,7 +22,7 @@ struct Program
     size_t length = 0;
 };
 
-#define reg_compile(cmd_arg, reg_name, number)     \
+#define reg_compile_2(cmd_arg, reg_name, number)     \
     if (stricmp(buffer, (reg_name)) == 0)          \
     {                                              \
         *code = (cmd_arg) | REG_MASK;              \
@@ -32,7 +32,16 @@ struct Program
         lenOfCode += sizeof(int);                  \
         code += sizeof(int);                       \
     }
-
+#define reg_compile(cmd_arg, reg_name, number)     \
+    if (stricmp(buffer, (reg_name)) == 0)          \
+    {                                              \
+        **code = (cmd_arg) | REG_MASK;              \
+        (*lenOfCode)++;                               \
+        (*code)++;                                    \
+        **(int **) code = (number);                  \
+        *lenOfCode += sizeof(int);                  \
+        *code += sizeof(int);                       \
+    }
 /**
  * @brief reads file to struct Program
  *

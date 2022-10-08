@@ -21,19 +21,24 @@ void processorDump(FILE *fp, CPU *cpu)
 }
 
 #define applyOperation(cmd_case, operation)                               \
-else if (command == (cmd_case))                                           \
+(command == (cmd_case))                                                   \
     {                                                                     \
         int firstValue = 0;                                               \
         int secondValue = 0;                                              \
+                                                                          \
         error = stackPop(cpu->stack, &secondValue);                       \
         if (error)                                                        \
             return error;                                                 \
+                                                                          \
         error = stackPop(cpu->stack, &firstValue);                        \
         if (error)                                                        \
             return error;                                                 \
-        error |= stackPush(cpu->stack, firstValue operation secondValue); \
+                                                                          \
+        error |= stackPush(cpu->stack,                                    \
+                           firstValue operation secondValue);             \
         if (error)                                                        \
             return error;                                                 \
+                                                                          \
         cpu->ip++;                                                        \
     }
 
@@ -61,28 +66,29 @@ size_t run(CPU *cpu)
         {
             cpu->ip++;
             int arg = 0;
+
+            int command_arg = *(int *) (cpu->code->code + cpu->ip);
+
             if (args & IMM_MASK)
-                arg += *(int *) (cpu->code->code + cpu->ip);
+                arg += command_arg;
+
             if (args & REG_MASK)
-            {
-                arg += cpu->regs[*(int *) (cpu->code->code + cpu->ip)];
-            }
+                arg += cpu->regs[command_arg];
+
             if (args & RAM_MASK)
-            {
-                arg = cpu->RAM[*(int *) (cpu->code->code + cpu->ip)];
-            }
+                arg = cpu->RAM[command_arg];
 
             stackError |= stackPush(cpu->stack, arg);
-            cpu->ip += sizeof(int);
-
             if (stackError)
                 return stackError;
+
+            cpu->ip += sizeof(int);
         }
 
-        applyOperation(COMMAND_CODES::ADD, +)
-        applyOperation(COMMAND_CODES::SUB, -)
-        applyOperation(COMMAND_CODES::MUL, *)
-        applyOperation(COMMAND_CODES::DIV, /)
+        else if applyOperation(COMMAND_CODES::ADD, +)
+        else if applyOperation(COMMAND_CODES::SUB, -)
+        else if applyOperation(COMMAND_CODES::MUL, *)
+        else if applyOperation(COMMAND_CODES::DIV, /)
 
 #undef applyOperation
 
@@ -110,24 +116,29 @@ size_t run(CPU *cpu)
         else if (command == COMMAND_CODES::IN)
         {
             int value = 0;
+
             printf("Enter number: \n");
+
             if (!scanf("%d", &value))
                 return CPU_ERRORS::CPU_READ_FROM_CONSOLE_FAILED;
+
             stackError |= stackPush(cpu->stack, value);
             if (stackError)
                 return stackError;
+
             cpu->ip++;
         }
         else if (command == COMMAND_CODES::POP)
         {
             cpu->ip++;
-
             int value = 0;
+
             stackError |= stackPop(cpu->stack, &value);
             if (stackError)
                 return stackError;
 
-            cpu->regs[*(int *) (cpu->code->code + cpu->ip)] = value;
+            int command_arg = *(int *) (cpu->code->code + cpu->ip);
+            cpu->regs[command_arg] = value;
             cpu->ip += sizeof(int);
         }
         else
@@ -142,7 +153,6 @@ size_t run(CPU *cpu)
 int main()
 {
     setbuf(stdout, NULL);
-//    printf("Starting CPU...\n\n");
     FILE *fp = fopen("data.code", "rb");
 
     Stack stack = {};
@@ -167,6 +177,5 @@ int main()
         printf("Stack size: %zu\n", stack.size);
     }
     fclose(fp);
-//    printf("\nStopping CPU...");
     return 0;
 }

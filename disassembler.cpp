@@ -62,17 +62,21 @@ size_t disassemle(Code *code, FILE *fp)
             {
                 uint8_t cmd = code->code[ip];
                 ip++;
-                int value = *(int *)(code->code+ip);
+                int value = *(int *) (code->code + ip);
 
                 if (cmd & ARG_MASK)
                 {
                     if (cmd & REG_MASK)
                     {
-                        if (value>0 and value<5)
+                        if (value > 0 and value < 5)
                             if (cmd & RAM_MASK)
-                                fprintf(fp, "push [%s]\n", REGS_NAMES[value]);
+                                fprintf(fp,
+                                        "push [%s]\n",
+                                        REGS_NAMES[value]);
                             else
-                                fprintf(fp, "push %s\n", REGS_NAMES[value]);
+                                fprintf(fp,
+                                        "push %s\n",
+                                        REGS_NAMES[value]);
                         else
                             return UNKNOWN_REG;
                     }
@@ -91,13 +95,13 @@ size_t disassemle(Code *code, FILE *fp)
             {
                 uint8_t cmd = code->code[ip];
                 ip++;
-                int value = *(int *)(code->code+ip);
+                int value = *(int *) (code->code + ip);
 
                 if (cmd & ARG_MASK)
                 {
                     if (cmd & REG_MASK)
                     {
-                        if (value>0 and value<5)
+                        if (value > 0 and value < 5)
                             fprintf(fp, "push %s\n", REGS_NAMES[value]);
                         else
                             return UNKNOWN_REG;
