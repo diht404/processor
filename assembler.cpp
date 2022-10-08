@@ -153,15 +153,15 @@ void processPopArgs(uint8_t **code,
     else reg_compile(COMMAND_CODES::POP, "rcx", 3)
     else reg_compile(COMMAND_CODES::POP, "rdx", 4)
     else if (!sscanf(buffer,
-                "%d",
-                &value))
+                     "%d",
+                     &value))
     {
         *error |= ASSEMBLER_COMPILATION_FAILED;
         return;
     }
     else
     {
-        **code |= COMMAND_CODES::POP;//attn dont use imm mask here
+        **code |= COMMAND_CODES::POP | IMM_MASK;
         (*lenOfCode)++;
         (*code)++;
         **(int **) code = value;

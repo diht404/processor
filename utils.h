@@ -34,10 +34,10 @@ enum UTILS_ERRORS
     INCORRECT_VERSION             = 1 << 4,
 };
 
-const size_t COMPILATION_CONST = 0xDEADF00D;
-const size_t VERSION_CONST     = 5;
-const char REGS_NAMES[5][4] = {"r0x", "rax", "rbx", "rcx", "rdx"};
-const uint8_t BUFFER_SIZE = 128;
+const size_t  COMPILATION_CONST = 0xDEADF00D;
+const size_t  VERSION_CONST     = 5;
+const char    REGS_NAMES[5][4]  = {"r0x", "rax", "rbx", "rcx", "rdx"};
+const uint8_t BUFFER_SIZE       = 128;
 
 struct Code
 {
@@ -70,6 +70,14 @@ size_t readFileToBuf(FILE *fp, size_t *lenOfFile, char **txt);
  * @return number of lines in buffer
  */
 size_t countLines(const char *txt, size_t lenOfFile);
+
+/**
+ * @brief checks if code has correct compilation const and version
+ *
+ * @param buf buffer with code
+ * @return error code
+ */
+size_t verifyCode(char **buf);
 
 /**
  * @brief Reads code from binary file

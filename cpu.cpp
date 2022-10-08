@@ -172,10 +172,8 @@ int main()
 
     Code code = {};
     CPU cpu = {&code, &stack};
-    cpu.RAM[5] = {69};
 
     error = readCode(fp, &code);
-
     if (error)
     {
         printf("ERROR read: %zu\n", error);

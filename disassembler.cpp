@@ -108,7 +108,10 @@ size_t disassemle(Code *code, FILE *fp)
                     }
                     if (cmd & IMM_MASK)
                     {
-                        fprintf(fp, "pop %d\n", value);
+                        if (cmd & RAM_MASK)
+                            fprintf(fp, "pop [%d]\n", value);
+                        else
+                            fprintf(fp, "pop %d\n", value);
                     }
                 }
                 ip += sizeof(int);
