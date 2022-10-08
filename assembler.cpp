@@ -96,9 +96,7 @@ void detectBrackets(Program *program,
                program->lines[line] + bra + 1,
                ket - bra);
         *code |= RAM_MASK;
-        // если нашли [] то в buffer лежит внутренность
-        // ram->stack
-        // пока только [int]
+        // TODO: add [r*x + value] support
     }
     else
     {
@@ -115,7 +113,7 @@ void writeCommand(uint8_t **code, size_t *lenOfCode, int command)
     (*code)++;
 }
 
-void processArgs(uint8_t **code, char *buffer, size_t *lenOfCode, int value, size_t *error)
+void processPushArgs(uint8_t **code, char *buffer, size_t *lenOfCode, int value, size_t *error)
 {
     reg_compile(COMMAND_CODES::PUSH, "rax", 1)
     else reg_compile(COMMAND_CODES::PUSH, "rbx", 2)
@@ -137,6 +135,18 @@ void processArgs(uint8_t **code, char *buffer, size_t *lenOfCode, int value, siz
 
         *lenOfCode += sizeof(int);
         *code += sizeof(int);
+    }
+}
+
+void processPopArgs(uint8_t **code, char *buffer, size_t *lenOfCode, size_t *error)
+{
+    reg_compile(COMMAND_CODES::POP, "rax", 1)
+    else reg_compile(COMMAND_CODES::POP, "rbx", 2)
+    else reg_compile(COMMAND_CODES::POP, "rcx", 3)
+    else reg_compile(COMMAND_CODES::POP, "rdx", 4)
+    else
+    {
+        *error |= ASSEMBLER_COMPILATION_FAILED;
     }
 }
 
@@ -191,7 +201,7 @@ uint8_t *compile(Program *program, size_t *error)
             if (*error)
                 return nullptr;
 
-            processArgs(&code, buffer, &lenOfCode, value, error);
+            processPushArgs(&code, buffer, &lenOfCode, value, error);
 
         }
         else if (stricmp(cmd, "add") == 0)
@@ -212,23 +222,21 @@ uint8_t *compile(Program *program, size_t *error)
             writeCommand(&code, &lenOfCode, COMMAND_CODES::IN);
         else if (stricmp(cmd, "pop") == 0)
         {
-            char buffer[128];
-            if (!sscanf(program->lines[line] + commandSize,
-                        "%s",
-                        buffer))
-            {
-                *error |= ASSEMBLER_COMPILATION_FAILED;
+
+            char buffer[BUFFER_SIZE] = "";
+
+            skipSpaces(program, line, &commandSize);
+
+            detectBrackets(program,
+                           code,
+                           commandSize,
+                           buffer,
+                           line,
+                           error);
+            if (*error)
                 return nullptr;
-            }
-            reg_compile_2(COMMAND_CODES::POP, "rax", 1)
-            else reg_compile_2(COMMAND_CODES::POP, "rbx", 2)
-            else reg_compile_2(COMMAND_CODES::POP, "rcx", 3)
-            else reg_compile_2(COMMAND_CODES::POP, "rdx", 4)
-            else
-            {
-                *error |= ASSEMBLER_COMPILATION_FAILED;
-                return nullptr;
-            }
+
+            processPopArgs(&code, buffer, &lenOfCode, error);
         }
         else
         {

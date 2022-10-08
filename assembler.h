@@ -22,26 +22,17 @@ struct Program
     size_t length = 0;
 };
 
-#define reg_compile_2(cmd_arg, reg_name, number)     \
-    if (stricmp(buffer, (reg_name)) == 0)          \
-    {                                              \
-        *code = (cmd_arg) | REG_MASK;              \
-        lenOfCode++;                               \
-        code++;                                    \
-        *(int *) code = (number);                  \
-        lenOfCode += sizeof(int);                  \
-        code += sizeof(int);                       \
+#define reg_compile(cmd_arg, reg_name, number) \
+    if (stricmp(buffer, (reg_name)) == 0)      \
+    {                                          \
+        **code = (cmd_arg) | REG_MASK;         \
+        (*lenOfCode)++;                        \
+        (*code)++;                             \
+        **(int **) code = (number);            \
+        *lenOfCode += sizeof(int);             \
+        *code += sizeof(int);                  \
     }
-#define reg_compile(cmd_arg, reg_name, number)     \
-    if (stricmp(buffer, (reg_name)) == 0)          \
-    {                                              \
-        **code = (cmd_arg) | REG_MASK;              \
-        (*lenOfCode)++;                               \
-        (*code)++;                                    \
-        **(int **) code = (number);                  \
-        *lenOfCode += sizeof(int);                  \
-        *code += sizeof(int);                       \
-    }
+
 /**
  * @brief reads file to struct Program
  *
@@ -92,6 +83,27 @@ void detectBrackets(Program *program,
  * @param command command name to write
  */
 void writeCommand(uint8_t **code, size_t *lenOfCode, int command);
+
+/**
+ * @brief process push args
+ *
+ * @param code array with code
+ * @param buffer buffer for storing code extracted from []
+ * @param lenOfCode length of array with code
+ * @param value value to push
+ * @param error error code
+ */
+void processPushArgs(uint8_t **code, char *buffer, size_t *lenOfCode, int value, size_t *error);
+
+/**
+ * @brief process push args
+ *
+ * @param code array with code
+ * @param buffer buffer for storing code extracted from []
+ * @param lenOfCode length of array with code
+ * @param error error code
+ */
+void processPopArgs(uint8_t **code, char *buffer, size_t *lenOfCode, size_t *error);
 
 /**
  * @brief Compiles code
