@@ -12,14 +12,12 @@ enum CPU_ERRORS
     CPU_UNKNOWN_COMMAND          = 1 << 4,
 };
 
-/**
- * @brief Applies operators +, -, *, /
- *
- * @param stack stack for program
- * @param operation operation to execute(+, -, *, /)
- * @param error error code
- */
-void applyOperator(Stack *stack, char operation, size_t *error);
+struct CPU
+{
+    Code *code = nullptr;
+    Stack *stack = nullptr;
+    size_t ip = 0;
+};
 
 /**
  * @brief runs code
@@ -28,6 +26,8 @@ void applyOperator(Stack *stack, char operation, size_t *error);
  * @param stack stack for code
  * @return
  */
-size_t run(Code *code, Stack *stack);
+size_t run(CPU *cpu);
+
+void processorDump(FILE *fp, CPU *cpu);
 
 #endif //STACK__CPU_H
