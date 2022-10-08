@@ -54,6 +54,16 @@ void addInfo(uint8_t **code)
     *code = (uint8_t *) ((size_t *) *code + 1);
 }
 
+void skipSpaces(Program *program, size_t line, int *commandSize)
+{
+    while (*(program->lines[line] + *commandSize) == ' '
+        or *(program->lines[line] + *commandSize) == '\0'
+        or *(program->lines[line] + *commandSize) == '\n')
+    {
+        (*commandSize)++;
+    }
+}
+
 uint8_t *compile(Program *program, size_t *error)
 {
     assert(program != nullptr);
@@ -94,12 +104,7 @@ uint8_t *compile(Program *program, size_t *error)
 //            char reg[128] = "";
             int value = 0;
 
-            while (*(program->lines[line] + commandSize) == ' '
-                or *(program->lines[line] + commandSize) == '\0'
-                or *(program->lines[line] + commandSize) == '\n')
-            {
-                commandSize++;
-            }
+            skipSpaces(program, line, &commandSize);
 
             if (*(program->lines[line] + commandSize) == '[')
             {

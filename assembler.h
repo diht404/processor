@@ -49,6 +49,8 @@ size_t readFile(FILE *fp, Program *program);
  */
 void addInfo(uint8_t **code);
 
+void skipSpaces(Program *program, size_t line, int *commandSize);
+
 /**
  * @brief Compiles code
  *
