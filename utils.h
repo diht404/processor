@@ -15,6 +15,7 @@ enum COMMAND_CODES
     OUT  = 6,
     DUMP = 7,
     IN   = 8,
+    POP  = 9,
 };
 
 const uint8_t CMD_MASK = 0x1F;
@@ -34,7 +35,7 @@ enum UTILS_ERRORS
 };
 
 const size_t COMPILATION_CONST = 0xDEADF00D;
-const size_t VERSION_CONST     = 3;
+const size_t VERSION_CONST     = 4;
 
 struct Code
 {

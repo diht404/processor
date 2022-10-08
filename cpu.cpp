@@ -54,15 +54,20 @@ size_t run(CPU *cpu)
 
     while (cpu->ip < cpu->code->len)
     {
+//        fprintf(stderr, "code: %d\n", cpu->code->code[cpu->ip]);
         uint8_t command = cpu->code->code[cpu->ip] & CMD_MASK;
         uint8_t args = cpu->code->code[cpu->ip] & ARG_MASK;
 
         if (command == COMMAND_CODES::PUSH)
         {
+//            fprintf(stderr, "args: %d command: %d \n", args, command);
             cpu->ip++;
             int arg = 0;
             if (args & IMM_MASK) arg += *(int *) (cpu->code->code + cpu->ip);
-            if (args & REG_MASK) arg += cpu->regs[*(int *) (cpu->code->code + cpu->ip)];
+            if (args & REG_MASK)
+            {
+                arg += cpu->regs[*(int *) (cpu->code->code + cpu->ip)];
+            }
             if (args & RAM_MASK) arg = *(int *) (cpu->code->code + cpu->ip);
             stackError |= stackPush(cpu->stack, arg);
             cpu->ip += sizeof(int);
@@ -109,6 +114,21 @@ size_t run(CPU *cpu)
                 return stackError;
             cpu->ip++;
         }
+        else if (command == COMMAND_CODES::POP)
+        {
+            cpu->ip++;
+
+            int value = 0;
+            stackError |= stackPop(cpu->stack, &value);
+            if (stackError)
+                return stackError;
+
+//            fprintf(stderr, "args: %d command: %d\n", args, command);
+//
+            cpu->regs[*(int *) (cpu->code->code + cpu->ip)] = value;
+            cpu->ip+= sizeof(int);
+
+        }
         else
         {
             fprintf(stderr, "CPU_UNKNOWN_COMMAND\n");
@@ -121,7 +141,7 @@ size_t run(CPU *cpu)
 int main()
 {
     setbuf(stdout, NULL);
-    printf("Starting CPU...\n\n");
+//    printf("Starting CPU...\n\n");
     FILE *fp = fopen("data.code", "rb");
 
     Stack stack = {};
@@ -145,6 +165,6 @@ int main()
         printf("Stack size: %zu\n", stack.size);
     }
     fclose(fp);
-    printf("\nStopping CPU...");
+//    printf("\nStopping CPU...");
     return 0;
 }

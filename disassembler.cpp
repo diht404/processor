@@ -45,6 +45,35 @@ size_t disassemle(Code *code, FILE *fp)
                 ip += sizeof(int);
                 break;
             }
+            case POP:
+            {
+                uint8_t cmd = code->code[ip];
+                ip++;
+                int value = *(int *)(code->code+ip);
+
+                if (cmd & ARG_MASK)
+                {
+                    if (cmd & REG_MASK)
+                    {
+                        if (value == 1)
+                            fprintf(fp, "pop rax\n");
+                        else if (value == 2)
+                            fprintf(fp, "pop rbx\n");
+                        else if (value == 3)
+                            fprintf(fp, "pop rcx\n");
+                        else if (value == 4)
+                            fprintf(fp, "pop rdx\n");
+                        else
+                            return UNKNOWN_REG;
+                    }
+                    if (cmd & IMM_MASK)
+                    {
+                        fprintf(fp, "push %d\n", value);
+                    }
+                }
+                ip += sizeof(int);
+                break;
+            }
             case ADD:
             {
                 fprintf(fp, "add\n");
