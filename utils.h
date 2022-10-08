@@ -17,12 +17,12 @@ enum COMMAND_CODES
     IN   = 8,
 };
 
-const uint8_t CMD_MASK = 0x0F;
-const uint8_t ARG_MASK = 0xF0;
+const uint8_t CMD_MASK = 0x1F;
+const uint8_t ARG_MASK = 0xE0;
 
-const uint8_t RAM_MASK = 0x40;
-const uint8_t REG_MASK = 0x20;
-const uint8_t IMM_MASK = 0x10;
+const uint8_t RAM_MASK = 0x80;
+const uint8_t REG_MASK = 0x40;
+const uint8_t IMM_MASK = 0x20;
 
 enum UTILS_ERRORS
 {
