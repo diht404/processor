@@ -5,7 +5,7 @@
 
 enum DISASSEMBLER_ERRORS
 {
-    UNKNOWN_COMMAND = 1 << 6,
+    UNKNOWN_COMMAND_CODE = 1 << 6,
     UNKNOWN_REG     = 1 << 7,
 };
 

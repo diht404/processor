@@ -10,55 +10,55 @@ size_t disassemle(Code *code, FILE *fp)
     {
         switch (code->code[ip] & CMD_MASK)
         {
-            case HLT:
+            case COMMAND_CODES::HLT:
             {
                 ip = code->len;
                 fprintf(fp, "hlt");
                 break;
             }
-            case ADD:
+            case COMMAND_CODES::ADD:
             {
                 fprintf(fp, "add\n");
                 ip++;
                 break;
             }
-            case SUB:
+            case COMMAND_CODES::SUB:
             {
                 fprintf(fp, "sub\n");
                 ip++;
                 break;
             }
-            case MUL:
+            case COMMAND_CODES::MUL:
             {
                 fprintf(fp, "mul\n");
                 ip++;
                 break;
             }
-            case DIV:
+            case COMMAND_CODES::DIV:
             {
                 fprintf(fp, "div\n");
                 ip++;
                 break;
             }
-            case OUT:
+            case COMMAND_CODES::OUT:
             {
                 fprintf(fp, "out\n");
                 ip++;
                 break;
             }
-            case DUMP:
+            case COMMAND_CODES::DUMP:
             {
                 fprintf(fp, "dump\n");
                 ip++;
                 break;
             }
-            case IN:
+            case COMMAND_CODES::IN:
             {
                 fprintf(fp, "in\n");
                 ip++;
                 break;
             }
-            case PUSH:
+            case COMMAND_CODES::PUSH:
             {
                 uint8_t cmd = code->code[ip];
                 ip++;
@@ -91,7 +91,7 @@ size_t disassemle(Code *code, FILE *fp)
                 ip += sizeof(int);
                 break;
             }
-            case POP:
+            case COMMAND_CODES::POP:
             {
                 uint8_t cmd = code->code[ip];
                 ip++;
@@ -116,7 +116,7 @@ size_t disassemle(Code *code, FILE *fp)
             }
             default:
             {
-                return UNKNOWN_COMMAND;
+                return UNKNOWN_COMMAND_CODE;
             }
         }
     }
