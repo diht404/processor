@@ -130,56 +130,33 @@ uint8_t *compile(Program *program, size_t *error)
                 // если нашли [] то в buffer лежит внутренность
                 // ram->stack
                 // пока только [int]
-
-                reg_compile(COMMAND_CODES::PUSH, "rax", 1)
-                else reg_compile(COMMAND_CODES::PUSH, "rbx", 2)
-                else reg_compile(COMMAND_CODES::PUSH, "rcx", 3)
-                else reg_compile(COMMAND_CODES::PUSH, "rdx", 4)
-                else if (!sscanf(buffer,
-                                 "%d",
-                                 &value))
-                {
-                    fprintf(stderr, "FAILED HERE\n");
-                    *error |= ASSEMBLER_COMPILATION_FAILED;
-                    return nullptr;
-                }
-                else
-                {
-                    *code |= COMMAND_CODES::PUSH | IMM_MASK;
-                    lenOfCode++;
-                    code++;
-                    *(int *) code = value;
-
-                    lenOfCode += sizeof(int);
-                    code += sizeof(int);
-                }
-
             }
-            else if (sscanf((program->lines[line] + commandSize),
-                       "%s",
-                       buffer))
+            else
             {
-                reg_compile(COMMAND_CODES::PUSH, "rax", 1)
-                else reg_compile(COMMAND_CODES::PUSH, "rbx", 2)
-                else reg_compile(COMMAND_CODES::PUSH, "rcx", 3)
-                else reg_compile(COMMAND_CODES::PUSH, "rdx", 4)
-                else if (!sscanf(program->lines[line] + commandSize,
-                                 "%d",
-                                 &value))
-                {
-                    *error |= ASSEMBLER_COMPILATION_FAILED;
-                    return nullptr;
-                }
-                else
-                {
-                    *code |= COMMAND_CODES::PUSH | IMM_MASK;
-                    lenOfCode++;
-                    code++;
-                    *(int *) code = value;
+                memcpy(buffer,
+                       (program->lines[line] + commandSize),
+                       128);
+            }
+            reg_compile(COMMAND_CODES::PUSH, "rax", 1)
+            else reg_compile(COMMAND_CODES::PUSH, "rbx", 2)
+            else reg_compile(COMMAND_CODES::PUSH, "rcx", 3)
+            else reg_compile(COMMAND_CODES::PUSH, "rdx", 4)
+            else if (!sscanf(buffer,
+                             "%d",
+                             &value))
+            {
+                *error |= ASSEMBLER_COMPILATION_FAILED;
+                return nullptr;
+            }
+            else
+            {
+                *code |= COMMAND_CODES::PUSH | IMM_MASK;
+                lenOfCode++;
+                code++;
+                *(int *) code = value;
 
-                    lenOfCode += sizeof(int);
-                    code += sizeof(int);
-                }
+                lenOfCode += sizeof(int);
+                code += sizeof(int);
             }
         }
         else if (stricmp(cmd, "add") == 0)
