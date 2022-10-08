@@ -56,7 +56,7 @@ void addInfo(uint8_t **code);
  * @param line line of code
  * @param commandSize len of command in symbols
  */
-void skipSpaces(Program *program, size_t line, int *commandSize);
+void skipSpaces(Program *program, size_t line, size_t *commandSize);
 
 /**
  * @brief process code if there is [] in line of code
@@ -70,7 +70,7 @@ void skipSpaces(Program *program, size_t line, int *commandSize);
  */
 void detectBrackets(Program *program,
                     uint8_t *code,
-                    int commandSize,
+                    size_t commandSize,
                     char *buffer,
                     size_t line,
                     size_t *error);

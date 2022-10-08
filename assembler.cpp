@@ -55,7 +55,7 @@ void addInfo(uint8_t **code)
     *code = (uint8_t *) ((size_t *) *code + 1);
 }
 
-void skipSpaces(Program *program, size_t line, int *commandSize)
+void skipSpaces(Program *program, size_t line, size_t *commandSize)
 {
     while (*(program->lines[line] + *commandSize) == ' '
         or *(program->lines[line] + *commandSize) == '\0'
@@ -67,7 +67,7 @@ void skipSpaces(Program *program, size_t line, int *commandSize)
 
 void detectBrackets(Program *program,
                     uint8_t *code,
-                    int commandSize,
+                    size_t commandSize,
                     char *buffer,
                     size_t line,
                     size_t *error)
@@ -158,7 +158,7 @@ uint8_t *compile(Program *program, size_t *error)
 
     size_t line = 0;
     char cmd[BUFFER_SIZE] = "";
-    int commandSize = 0;
+    size_t commandSize = 0;
 
     size_t constLen = sizeof(COMPILATION_CONST);
 
