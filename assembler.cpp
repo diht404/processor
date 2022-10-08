@@ -48,7 +48,7 @@ void addInfo(uint8_t **code)
     *(size_t *) *code = COMPILATION_CONST;
     *code = (uint8_t *) ((size_t *) *code + 1);
 
-    *(size_t *) *code = VERSION;
+    *(size_t *) *code = VERSION_CONST;
     *code = (uint8_t *) ((size_t *) *code + 1);
 
     *code = (uint8_t *) ((size_t *) *code + 1);

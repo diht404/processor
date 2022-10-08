@@ -59,7 +59,7 @@ size_t verifyCode(char **buf)
 
     size_t version = *((size_t *) (*buf) + 1);
 
-    if (version != VERSION)
+    if (version != VERSION_CONST)
         return INCORRECT_VERSION;
 
     return NO_ERRORS;

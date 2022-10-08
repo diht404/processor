@@ -34,7 +34,7 @@ enum UTILS_ERRORS
 };
 
 const size_t COMPILATION_CONST = 0xDEADF00D;
-const size_t VERSION = 3;
+const size_t VERSION_CONST     = 3;
 
 struct Code
 {
