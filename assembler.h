@@ -49,7 +49,40 @@ size_t readFile(FILE *fp, Program *program);
  */
 void addInfo(uint8_t **code);
 
+/**
+ * @brief skips spaces in code
+ *
+ * @param program struct with code
+ * @param line line of code
+ * @param commandSize len of command in symbols
+ */
 void skipSpaces(Program *program, size_t line, int *commandSize);
+
+/**
+ * @brief process code if there is [] in line of code
+ *
+ * @param program struct with code
+ * @param code array with code
+ * @param commandSize len of command in symbols
+ * @param buffer buffer for storing code extracted from []
+ * @param line line of code
+ * @param error error code
+ */
+void detectBrackets(Program *program,
+                    uint8_t *code,
+                    int commandSize,
+                    char *buffer,
+                    size_t line,
+                    size_t *error);
+
+/**
+ * @brief writes simple commands to array with machine codes
+ *
+ * @param code array with code
+ * @param lenOfCode length of array with code
+ * @param command command name to write
+ */
+void writeCommand(uint8_t **code, size_t *lenOfCode, int command);
 
 /**
  * @brief Compiles code
