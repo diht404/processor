@@ -63,12 +63,18 @@ size_t run(CPU *cpu)
 //            fprintf(stderr, "args: %d command: %d \n", args, command);
             cpu->ip++;
             int arg = 0;
-            if (args & IMM_MASK) arg += *(int *) (cpu->code->code + cpu->ip);
+            if (args & IMM_MASK)
+                arg += *(int *) (cpu->code->code + cpu->ip);
             if (args & REG_MASK)
             {
                 arg += cpu->regs[*(int *) (cpu->code->code + cpu->ip)];
             }
-            if (args & RAM_MASK) arg = *(int *) (cpu->code->code + cpu->ip);
+            if (args & RAM_MASK)
+            {
+                arg = cpu->RAM[*(int *) (cpu->code->code + cpu->ip)];
+                fprintf(stderr, "RAM ARG %d\n", arg);
+            }
+
             stackError |= stackPush(cpu->stack, arg);
             cpu->ip += sizeof(int);
 
@@ -76,10 +82,11 @@ size_t run(CPU *cpu)
                 return stackError;
         }
 
-        applyOperation(COMMAND_CODES::ADD, +)
-        applyOperation(COMMAND_CODES::SUB, -)
-        applyOperation(COMMAND_CODES::MUL, *)
-        applyOperation(COMMAND_CODES::DIV, /)
+        applyOperation(COMMAND_CODES::ADD, +)applyOperation(
+            COMMAND_CODES::SUB,
+            -)applyOperation(COMMAND_CODES::MUL, *)applyOperation(
+            COMMAND_CODES::DIV,
+            /)
 #undef applyOperation
 
         else if (command == COMMAND_CODES::OUT)
@@ -126,7 +133,7 @@ size_t run(CPU *cpu)
 //            fprintf(stderr, "args: %d command: %d\n", args, command);
 //
             cpu->regs[*(int *) (cpu->code->code + cpu->ip)] = value;
-            cpu->ip+= sizeof(int);
+            cpu->ip += sizeof(int);
 
         }
         else
@@ -150,6 +157,7 @@ int main()
 
     Code code = {};
     CPU cpu = {&code, &stack};
+    cpu.RAM[5] = {42};
 
     error = readCode(fp, &code);
 

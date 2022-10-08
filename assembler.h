@@ -9,6 +9,7 @@ enum ASSEMBLER_ERRORS
     ASSEMBLER_CANT_ALLOCATE_MEMORY_FOR_STRINGS = 1 << 5,
     ASSEMBLER_COMPILATION_FAILED               = 1 << 6,
     ASSEMBLER_CANT_SHRINK_TO_FIT               = 1 << 7,
+    INCORRECT_BRACKETS                         = 1 << 8,
 };
 
 /**
@@ -20,6 +21,17 @@ struct Program
     char **lines  = nullptr;
     size_t length = 0;
 };
+
+#define reg_compile(cmd_arg, reg_name, number)     \
+    if (stricmp(buffer, (reg_name)) == 0)          \
+    {                                              \
+        *code = (cmd_arg) | REG_MASK;              \
+        lenOfCode++;                               \
+        code++;                                    \
+        *(int *) code = (number);                  \
+        lenOfCode += sizeof(int);                  \
+        code += sizeof(int);                       \
+    }
 
 /**
  * @brief reads file to struct Program

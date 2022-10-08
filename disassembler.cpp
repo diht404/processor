@@ -26,20 +26,20 @@ size_t disassemle(Code *code, FILE *fp)
                 {
                     if (cmd & REG_MASK)
                     {
-                        if (value == 1)
-                            fprintf(fp, "push rax\n");
-                        else if (value == 2)
-                            fprintf(fp, "push rbx\n");
-                        else if (value == 3)
-                            fprintf(fp, "push rcx\n");
-                        else if (value == 4)
-                            fprintf(fp, "push rdx\n");
+                        if (value>0 and value<5)
+                            if (cmd & RAM_MASK)
+                                fprintf(fp, "push [%s]\n", REGS_NAMES[value]);
+                            else
+                                fprintf(fp, "push %s\n", REGS_NAMES[value]);
                         else
                             return UNKNOWN_REG;
                     }
                     if (cmd & IMM_MASK)
                     {
-                        fprintf(fp, "push %d\n", value);
+                        if (cmd & RAM_MASK)
+                            fprintf(fp, "push [%d]\n", value);
+                        else
+                            fprintf(fp, "push %d\n", value);
                     }
                 }
                 ip += sizeof(int);
@@ -55,14 +55,8 @@ size_t disassemle(Code *code, FILE *fp)
                 {
                     if (cmd & REG_MASK)
                     {
-                        if (value == 1)
-                            fprintf(fp, "pop rax\n");
-                        else if (value == 2)
-                            fprintf(fp, "pop rbx\n");
-                        else if (value == 3)
-                            fprintf(fp, "pop rcx\n");
-                        else if (value == 4)
-                            fprintf(fp, "pop rdx\n");
+                        if (value>0 and value<5)
+                            fprintf(fp, "push %s\n", REGS_NAMES[value]);
                         else
                             return UNKNOWN_REG;
                     }

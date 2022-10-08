@@ -90,22 +90,75 @@ uint8_t *compile(Program *program, size_t *error)
 
         if (stricmp(cmd, "push") == 0)
         {
-            char reg[128] = "";
+            char buffer[128] = "";
+//            char reg[128] = "";
             int value = 0;
-            if (sscanf(program->lines[line] + commandSize,
-                       "%s",
-                       reg))
+
+            while (*(program->lines[line] + commandSize) == ' '
+                or *(program->lines[line] + commandSize) == '\0'
+                or *(program->lines[line] + commandSize) == '\n')
             {
-#define reg_compile(cmd_arg, reg_name, number) \
-if (stricmp(reg, (reg_name)) == 0)             \
-{                                              \
-    *code = (cmd_arg) | REG_MASK;              \
-    lenOfCode++;                               \
-    code++;                                    \
-    *(int *) code = (number);                  \
-    lenOfCode += sizeof(int);                  \
-    code += sizeof(int);                       \
-}
+                commandSize++;
+            }
+
+            if (*(program->lines[line] + commandSize) == '[')
+            {
+                size_t bra = commandSize;
+                size_t ket = commandSize;
+                bool correct = false;
+                while (not
+                    (*(program->lines[line] + ket) != ']'
+                        and *(program->lines[line] + ket) != '\0'
+                        and *(program->lines[line] + ket) == '\n')
+                    )
+                {
+                    if (*(program->lines[line] + ket) == ']')
+                    {
+                        correct = true;
+                    }
+                    ket++;
+                }
+                if (!correct)
+                {
+                    *error |= INCORRECT_BRACKETS;
+                    return nullptr;
+                }
+                memcpy(buffer,
+                       program->lines[line] + bra + 1,
+                       ket - bra);
+                *code |= RAM_MASK;
+                // если нашли [] то в buffer лежит внутренность
+                // ram->stack
+                // пока только [int]
+
+                reg_compile(COMMAND_CODES::PUSH, "rax", 1)
+                else reg_compile(COMMAND_CODES::PUSH, "rbx", 2)
+                else reg_compile(COMMAND_CODES::PUSH, "rcx", 3)
+                else reg_compile(COMMAND_CODES::PUSH, "rdx", 4)
+                else if (!sscanf(buffer,
+                                 "%d",
+                                 &value))
+                {
+                    fprintf(stderr, "FAILED HERE\n");
+                    *error |= ASSEMBLER_COMPILATION_FAILED;
+                    return nullptr;
+                }
+                else
+                {
+                    *code |= COMMAND_CODES::PUSH | IMM_MASK;
+                    lenOfCode++;
+                    code++;
+                    *(int *) code = value;
+
+                    lenOfCode += sizeof(int);
+                    code += sizeof(int);
+                }
+
+            }
+            else if (sscanf((program->lines[line] + commandSize),
+                       "%s",
+                       buffer))
+            {
                 reg_compile(COMMAND_CODES::PUSH, "rax", 1)
                 else reg_compile(COMMAND_CODES::PUSH, "rbx", 2)
                 else reg_compile(COMMAND_CODES::PUSH, "rcx", 3)
@@ -119,7 +172,7 @@ if (stricmp(reg, (reg_name)) == 0)             \
                 }
                 else
                 {
-                    *code = COMMAND_CODES::PUSH | IMM_MASK;
+                    *code |= COMMAND_CODES::PUSH | IMM_MASK;
                     lenOfCode++;
                     code++;
                     *(int *) code = value;
@@ -179,10 +232,10 @@ if (stricmp(reg, (reg_name)) == 0)             \
         }
         else if (stricmp(cmd, "pop") == 0)
         {
-            char reg[128];
+            char buffer[128];
             if (!sscanf(program->lines[line] + commandSize,
-                       "%s",
-                       reg))
+                        "%s",
+                        buffer))
             {
                 *error |= ASSEMBLER_COMPILATION_FAILED;
                 return nullptr;
@@ -259,7 +312,7 @@ size_t saveFileTxt(uint8_t *code, const char *filename)
     size_t ip = 0;
     while (ip < length)
     {
-        if ((code[ip]  & CMD_MASK) == HLT)
+        if ((code[ip] & CMD_MASK) == HLT)
         {
             fprintf(fp, "%hhu", code[ip]);
             break;

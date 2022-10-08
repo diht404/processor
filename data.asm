@@ -7,7 +7,7 @@ pop rbx
 push rbx
 div
 add
-push 5
+push [5]
 sub
 out
 hlt
