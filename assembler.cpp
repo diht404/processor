@@ -106,23 +106,24 @@ void detectBrackets(Program *program,
     }
 }
 
-void writeCommand(uint8_t **code, size_t *lenOfCode, int command)
+void writeCommand(uint8_t **code, int *lenOfCode, int command)
 {
     **code = command;
     (*lenOfCode)++;
     (*code)++;
 }
 
-void processPushArgs(uint8_t **code,
+void processArgs(uint8_t **code,
+                     int command_code,
                      char *buffer,
-                     size_t *lenOfCode,
+                     int *lenOfCode,
                      int value,
                      size_t *error)
 {
-    reg_compile(COMMAND_CODES::PUSH, "rax", 1)
-    else reg_compile(COMMAND_CODES::PUSH, "rbx", 2)
-    else reg_compile(COMMAND_CODES::PUSH, "rcx", 3)
-    else reg_compile(COMMAND_CODES::PUSH, "rdx", 4)
+    reg_compile(command_code, "rax", 1)
+    else reg_compile(command_code, "rbx", 2)
+    else reg_compile(command_code, "rcx", 3)
+    else reg_compile(command_code, "rdx", 4)
     else if (!sscanf(buffer,
                      "%d",
                      &value))
@@ -132,36 +133,7 @@ void processPushArgs(uint8_t **code,
     }
     else
     {
-        **code |= COMMAND_CODES::PUSH | IMM_MASK;
-        (*lenOfCode)++;
-        (*code)++;
-        **(int **) code = value;
-
-        *lenOfCode += sizeof(int);
-        *code += sizeof(int);
-    }
-}
-
-void processPopArgs(uint8_t **code,
-                    char *buffer,
-                    size_t *lenOfCode,
-                    int value,
-                    size_t *error)
-{
-    reg_compile(COMMAND_CODES::POP, "rax", 1)
-    else reg_compile(COMMAND_CODES::POP, "rbx", 2)
-    else reg_compile(COMMAND_CODES::POP, "rcx", 3)
-    else reg_compile(COMMAND_CODES::POP, "rdx", 4)
-    else if (!sscanf(buffer,
-                     "%d",
-                     &value))
-    {
-        *error |= ASSEMBLER_COMPILATION_FAILED;
-        return;
-    }
-    else
-    {
-        **code |= COMMAND_CODES::POP | IMM_MASK;
+        **code |= command_code | IMM_MASK;
         (*lenOfCode)++;
         (*code)++;
         **(int **) code = value;
@@ -192,14 +164,14 @@ uint8_t *compile(Program *program, size_t *error)
 
     addInfo(&code);
 
-    size_t lenOfCode = 0;
+    int lenOfCode = 0;
 
     while (line < program->length)
     {
+        skipSpaces(program, line, &commandSize);
         if (!sscanf(program->lines[line],
-                    "%s%n",
-                    cmd,
-                    &commandSize))
+                    "%s",
+                    cmd))
         {
             *error |= ASSEMBLER_COMPILATION_FAILED;
             return nullptr;
@@ -209,6 +181,7 @@ uint8_t *compile(Program *program, size_t *error)
         {
             char buffer[BUFFER_SIZE] = "";
             int value = 0;
+            commandSize = 4;
 
             skipSpaces(program, line, &commandSize);
 
@@ -221,7 +194,7 @@ uint8_t *compile(Program *program, size_t *error)
             if (*error)
                 return nullptr;
 
-            processPushArgs(&code, buffer, &lenOfCode, value, error);
+            processArgs(&code, COMMAND_CODES::PUSH, buffer, &lenOfCode, value, error);
 
         }
         else if (stricmp(cmd, "add") == 0)
@@ -242,6 +215,7 @@ uint8_t *compile(Program *program, size_t *error)
             writeCommand(&code, &lenOfCode, COMMAND_CODES::IN);
         else if (stricmp(cmd, "pop") == 0)
         {
+            commandSize = 3;
             char buffer[BUFFER_SIZE] = "";
             int value = 0;
 
@@ -256,8 +230,12 @@ uint8_t *compile(Program *program, size_t *error)
             if (*error)
                 return nullptr;
 
-            processPopArgs(&code, buffer, &lenOfCode, value, error);
+            processArgs(&code, COMMAND_CODES::POP, buffer, &lenOfCode, value, error);
         }
+//        else if (stricmp(cmd, "jump") == 0)
+//        {
+//
+//        }
         else
         {
             *error |= ASSEMBLER_COMPILATION_FAILED;

@@ -82,29 +82,20 @@ void detectBrackets(Program *program,
  * @param lenOfCode length of array with code
  * @param command command name to write
  */
-void writeCommand(uint8_t **code, size_t *lenOfCode, int command);
+void writeCommand(uint8_t **code, int *lenOfCode, int command);
+
 
 /**
  * @brief process push args
  *
  * @param code array with code
+ * @param command command to process
  * @param buffer buffer for storing code extracted from []
  * @param lenOfCode length of array with code
  * @param value value to push
  * @param error error code
  */
-void processPushArgs(uint8_t **code, char *buffer, size_t *lenOfCode, int value, size_t *error);
-
-/**
- * @brief process push args
- *
- * @param code array with code
- * @param buffer buffer for storing code extracted from []
- * @param lenOfCode length of array with code
- * @param value value to push
- * @param error error code
- */
-void processPopArgs(uint8_t **code, char *buffer, size_t *lenOfCode, int value, size_t *error);
+void processArgs(uint8_t **code, int command, char *buffer, size_t *lenOfCode, int value, size_t *error);
 
 /**
  * @brief Compiles code
