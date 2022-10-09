@@ -114,11 +114,11 @@ void writeCommand(uint8_t **code, int *lenOfCode, int command)
 }
 
 void processArgs(uint8_t **code,
-                     int command_code,
-                     char *buffer,
-                     int *lenOfCode,
-                     int value,
-                     size_t *error)
+                 int command_code,
+                 char *buffer,
+                 int *lenOfCode,
+                 int value,
+                 size_t *error)
 {
     reg_compile(command_code, "rax", 1)
     else reg_compile(command_code, "rbx", 2)
@@ -150,7 +150,6 @@ uint8_t *compile(Program *program, size_t *error)
 
     size_t line = 0;
     char cmd[BUFFER_SIZE] = "";
-    size_t commandSize = 0;
 
     size_t constLen = sizeof(COMPILATION_CONST);
 
@@ -168,6 +167,7 @@ uint8_t *compile(Program *program, size_t *error)
 
     while (line < program->length)
     {
+        size_t commandSize = 0;
         skipSpaces(program, line, &commandSize);
         if (!sscanf(program->lines[line],
                     "%s",
@@ -181,7 +181,7 @@ uint8_t *compile(Program *program, size_t *error)
         {
             char buffer[BUFFER_SIZE] = "";
             int value = 0;
-            commandSize = 4;
+            commandSize += 4;
 
             skipSpaces(program, line, &commandSize);
 
@@ -194,7 +194,12 @@ uint8_t *compile(Program *program, size_t *error)
             if (*error)
                 return nullptr;
 
-            processArgs(&code, COMMAND_CODES::PUSH, buffer, &lenOfCode, value, error);
+            processArgs(&code,
+                        COMMAND_CODES::PUSH,
+                        buffer,
+                        &lenOfCode,
+                        value,
+                        error);
 
         }
         else if (stricmp(cmd, "add") == 0)
@@ -215,7 +220,7 @@ uint8_t *compile(Program *program, size_t *error)
             writeCommand(&code, &lenOfCode, COMMAND_CODES::IN);
         else if (stricmp(cmd, "pop") == 0)
         {
-            commandSize = 3;
+            commandSize += 3;
             char buffer[BUFFER_SIZE] = "";
             int value = 0;
 
@@ -230,12 +235,36 @@ uint8_t *compile(Program *program, size_t *error)
             if (*error)
                 return nullptr;
 
-            processArgs(&code, COMMAND_CODES::POP, buffer, &lenOfCode, value, error);
+            processArgs(&code,
+                        COMMAND_CODES::POP,
+                        buffer,
+                        &lenOfCode,
+                        value,
+                        error);
         }
-//        else if (stricmp(cmd, "jump") == 0)
-//        {
-//
-//        }
+        else if (stricmp(cmd, "jmp") == 0)
+        {
+            commandSize += 4;
+            int value = 0;
+            char buffer[BUFFER_SIZE] = "";
+            skipSpaces(program, line, &commandSize);
+
+            detectBrackets(program,
+                           code,
+                           commandSize,
+                           buffer,
+                           line,
+                           error);
+            if (*error)
+                return nullptr;
+
+            processArgs(&code,
+                        COMMAND_CODES::JMP,
+                        buffer,
+                        &lenOfCode,
+                        value,
+                        error);
+        }
         else
         {
             *error |= ASSEMBLER_COMPILATION_FAILED;
@@ -303,15 +332,9 @@ size_t saveFileTxt(uint8_t *code, const char *filename)
             fprintf(fp, "%hhu", code[ip]);
             break;
         }
-        else if ((code[ip] & CMD_MASK) == PUSH)
-        {
-            fprintf(fp,
-                    "%hhu %d\n",
-                    code[ip],
-                    *(int *) (code + ip + 1));
-            ip += 1 + sizeof(int);
-        }
-        else if ((code[ip] & CMD_MASK) == POP)
+        else if ((code[ip] & CMD_MASK) == PUSH
+            || (code[ip] & CMD_MASK) == POP
+            || (code[ip] & CMD_MASK) == JMP)
         {
             fprintf(fp,
                     "%hhu %d\n",
@@ -342,6 +365,7 @@ int main()
     uint8_t *code = compile(&text, &error);
     if (error)
         printf("compile error: %zu\n", error);
+
     saveFile(code, "data.code");
     error = saveFileTxt(code, "data.txt");
     free(code);

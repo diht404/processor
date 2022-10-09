@@ -95,7 +95,12 @@ void writeCommand(uint8_t **code, int *lenOfCode, int command);
  * @param value value to push
  * @param error error code
  */
-void processArgs(uint8_t **code, int command, char *buffer, size_t *lenOfCode, int value, size_t *error);
+void processArgs(uint8_t **code,
+                 int command_code,
+                 char *buffer,
+                 int *lenOfCode,
+                 int value,
+                 size_t *error);
 
 /**
  * @brief Compiles code
