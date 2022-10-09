@@ -152,6 +152,19 @@ size_t run(CPU *cpu)
             }
             cpu->ip += sizeof(int);
         }
+        else if (command == COMMAND_CODES::JMP)
+        {
+            cpu->ip++;
+            int arg = 0;
+
+            int command_arg = *(int *) (cpu->code->code + cpu->ip);
+
+            if (args & IMM_MASK) arg += command_arg;
+            if (args & REG_MASK) arg += cpu->regs[command_arg];
+            if (args & RAM_MASK) arg = cpu->RAM[arg];
+
+            cpu->ip = arg;
+        }
         else
         {
             fprintf(stderr, "CPU_UNKNOWN_COMMAND\n");

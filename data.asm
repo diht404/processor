@@ -12,5 +12,5 @@ pop [5]
 push [5]
 sub
 out
-jmp 1
+jmp 0
 hlt

@@ -117,6 +117,32 @@ size_t disassemle(Code *code, FILE *fp)
                 ip += sizeof(int);
                 break;
             }
+            case COMMAND_CODES::JMP:
+            {
+                uint8_t cmd = code->code[ip];
+                ip++;
+                int value = *(int *) (code->code + ip);
+
+                if (cmd & ARG_MASK)
+                {
+                    if (cmd & REG_MASK)
+                    {
+                        if (value > 0 and value < 5)
+                            fprintf(fp, "jmp %s\n", REGS_NAMES[value]);
+                        else
+                            return UNKNOWN_REG;
+                    }
+                    if (cmd & IMM_MASK)
+                    {
+                        if (cmd & RAM_MASK)
+                            fprintf(fp, "jmp [%d]\n", value);
+                        else
+                            fprintf(fp, "jmp %d\n", value);
+                    }
+                }
+                ip += sizeof(int);
+                break;
+            }
             default:
             {
                 return UNKNOWN_COMMAND_CODE;
