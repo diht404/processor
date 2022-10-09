@@ -22,6 +22,12 @@ struct Program
     size_t length = 0;
 };
 
+struct NamesTable
+{
+    char names_table[BUFFER_SIZE][BUFFER_SIZE] = {};
+    int positions[BUFFER_SIZE] = {};
+};
+
 #define reg_compile(cmd_arg, reg_name, number) \
     if (stricmp(buffer, (reg_name)) == 0)      \
     {                                          \
@@ -106,10 +112,42 @@ void processArgs(uint8_t **code,
  * @brief Compiles code
  *
  * @param program array with program to compile
+ * @param table names table
  * @param error error code
  * @return compiled code
  */
-uint8_t *compile(Program *program, size_t *error);
+uint8_t *compile(Program *program, NamesTable *table, size_t *error);
+
+/**
+ * @brief fills names table and search index of label in table
+ *
+ * @param names_table table with names of labels
+ * @param name name of label
+ * @param ip index of label
+ */
+void fillNameTable(NamesTable *table,
+                  char name[BUFFER_SIZE],
+                  int ip);
+
+/**
+ * @brief finds id of label in names table
+ *
+ * @param names_table table with names of labels
+ * @param name name of label
+ * @return index of label in name table or -1 if not success
+ */
+int getIpFromTable(NamesTable *table,
+                   char name[BUFFER_SIZE]);
+
+/**
+ * @brief compiles code with names table
+ *
+ * @param program array with program to compile
+ * @param error error code
+ * @return compiled code
+ */
+uint8_t *compileWithNamesTable(Program *program,
+                               size_t *error);
 
 /**
  * @brief Saves array with compiled code to file

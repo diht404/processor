@@ -143,7 +143,9 @@ void processArgs(uint8_t **code,
     }
 }
 
-uint8_t *compile(Program *program, size_t *error)
+uint8_t *compile(Program *program,
+                 NamesTable *table,
+                 size_t *error)
 {
     assert(program != nullptr);
     assert(error != nullptr);
@@ -176,8 +178,12 @@ uint8_t *compile(Program *program, size_t *error)
             *error |= ASSEMBLER_COMPILATION_FAILED;
             return nullptr;
         }
-
-        if (stricmp(cmd, "push") == 0)
+        // label definition
+        if (cmd[0] == ':')
+        {
+            fillNameTable(table, cmd, lenOfCode);
+        }
+        else if (stricmp(cmd, "push") == 0)
         {
             char buffer[BUFFER_SIZE] = "";
             int value = 0;
@@ -257,13 +263,25 @@ uint8_t *compile(Program *program, size_t *error)
                            error);
             if (*error)
                 return nullptr;
+            if (buffer[0] == ':')
+            {
+                value = getIpFromTable(table, buffer);
+                *code |= COMMAND_CODES::JMP | IMM_MASK;
 
-            processArgs(&code,
-                        COMMAND_CODES::JMP,
-                        buffer,
-                        &lenOfCode,
-                        value,
-                        error);
+                lenOfCode++;
+                code++;
+                *(int *) code = value;
+
+                lenOfCode += sizeof(int);
+                code += sizeof(int);
+            }
+            else
+                processArgs(&code,
+                            COMMAND_CODES::JMP,
+                            buffer,
+                            &lenOfCode,
+                            value,
+                            error);
         }
         else
         {
@@ -285,6 +303,61 @@ uint8_t *compile(Program *program, size_t *error)
         *error = ASSEMBLER_CANT_SHRINK_TO_FIT;
         return code;
     }
+    return code;
+}
+
+void fillNameTable(NamesTable *table,
+                  char name[BUFFER_SIZE],
+                  int ip)
+{
+    bool exist = false;
+    for (int i = 0; i < BUFFER_SIZE; i++)
+    {
+        if (stricmp(table->names_table[i], name) == 0)
+        {
+            exist = true;
+            break;
+        }
+    }
+    if (!exist)
+    {
+        for (int i = 0; i < BUFFER_SIZE; i++)
+        {
+            if (stricmp(table->names_table[i], "") == 0)
+            {
+                memcpy(table->names_table[i], name, BUFFER_SIZE);
+                table->positions[i] = ip;
+                return;
+            }
+        }
+    }
+}
+
+int getIpFromTable(NamesTable *table,
+                   char name[BUFFER_SIZE])
+{
+    for (int i = 0; i < BUFFER_SIZE; i++)
+    {
+        if (stricmp(table->names_table[i], name) == 0)
+        {
+            return table->positions[i];
+        }
+    }
+    return -1;
+}
+
+uint8_t *compileWithNamesTable(Program *program,
+                               size_t *error)
+{
+    NamesTable table = {};
+    // [id][name]
+
+    uint8_t *code = nullptr;
+
+    code = compile(program, &table, error);
+    // add names from names table
+    code = compile(program, &table, error);
+
     return code;
 }
 
@@ -362,7 +435,8 @@ int main()
 
     size_t error = 0;
 
-    uint8_t *code = compile(&text, &error);
+    uint8_t *code = compileWithNamesTable(&text, &error);
+
     if (error)
         printf("compile error: %zu\n", error);
 
