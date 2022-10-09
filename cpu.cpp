@@ -159,9 +159,12 @@ size_t run(CPU *cpu)
 
             int command_arg = *(int *) (cpu->code->code + cpu->ip);
 
-            if (args & IMM_MASK) arg += command_arg;
-            if (args & REG_MASK) arg += cpu->regs[command_arg];
-            if (args & RAM_MASK) arg = cpu->RAM[arg];
+            if (args & IMM_MASK)
+                arg += command_arg;
+            if (args & REG_MASK)
+                arg += cpu->regs[command_arg];
+            if (args & RAM_MASK)
+                arg = cpu->RAM[arg];
 
             cpu->ip = arg;
         }

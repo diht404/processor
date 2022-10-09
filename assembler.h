@@ -18,7 +18,7 @@ enum ASSEMBLER_ERRORS
  */
 struct Program
 {
-    char **lines  = nullptr;
+    char **lines = nullptr;
     size_t length = 0;
 };
 
@@ -90,7 +90,6 @@ void detectBrackets(Program *program,
  */
 void writeCommand(uint8_t **code, int *lenOfCode, int command);
 
-
 /**
  * @brief process push args
  *
@@ -126,8 +125,8 @@ uint8_t *compile(Program *program, NamesTable *table, size_t *error);
  * @param ip index of label
  */
 void fillNameTable(NamesTable *table,
-                  char name[BUFFER_SIZE],
-                  int ip);
+                   char name[BUFFER_SIZE],
+                   int ip);
 
 /**
  * @brief finds id of label in names table

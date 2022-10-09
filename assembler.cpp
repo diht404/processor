@@ -96,7 +96,7 @@ void detectBrackets(Program *program,
                program->lines[line] + bra + 1,
                ket - bra);
         *code |= RAM_MASK;
-        // TODO: add [r*x + value] support
+        // TODO: add [rax + value] support
     }
     else
     {
@@ -307,8 +307,8 @@ uint8_t *compile(Program *program,
 }
 
 void fillNameTable(NamesTable *table,
-                  char name[BUFFER_SIZE],
-                  int ip)
+                   char name[BUFFER_SIZE],
+                   int ip)
 {
     bool exist = false;
     for (int i = 0; i < BUFFER_SIZE; i++)
