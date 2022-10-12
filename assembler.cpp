@@ -106,13 +106,6 @@ void detectBrackets(Program *program,
     }
 }
 
-void writeCommand(uint8_t **code, int *lenOfCode, int command)
-{
-    **code = command;
-    (*lenOfCode)++;
-    (*code)++;
-}
-
 void processArgs(uint8_t **code,
                  int command_code,
                  char *buffer,
@@ -141,6 +134,69 @@ void processArgs(uint8_t **code,
         *lenOfCode += sizeof(int);
         *code += sizeof(int);
     }
+}
+
+void putArgs(Program *program,
+             size_t line,
+             uint8_t **code,
+             int *commandSize,
+             int *lenOfCode,
+             int command_code,
+             NamesTable *table,
+             size_t *error)
+{
+    char buffer[BUFFER_SIZE] = "";
+    int value = 0;
+
+    skipSpaces(program, line, commandSize);
+
+    detectBrackets(program,
+                   *code,
+                   *commandSize,
+                   buffer,
+                   line,
+                   error);
+    if (*error)
+        return;
+
+    if (buffer[0] == ':')
+    {
+        value = getIpFromTable(table, buffer);
+        **code |= command_code | IMM_MASK;
+
+        (*lenOfCode)++;
+        (*code)++;
+        **(int **) code = value;
+
+        *lenOfCode += sizeof(int);
+        *code += sizeof(int);
+    }
+    else
+        processArgs(code,
+                    command_code,
+                    buffer,
+                    lenOfCode,
+                    value,
+                    error);
+}
+
+#define DEF_CMD(name, num, arg)            \
+else if (strcasecmp(cmd, #name) == 0)      \
+{                                          \
+    if (!arg)                              \
+    {                                      \
+        *code = COMMAND_CODES::CMD_##name; \
+        lenOfCode++;                       \
+        code++;                            \
+    }                                      \
+    else putArgs(program,                  \
+            line,                          \
+            &code,                         \
+            &commandSize,                  \
+            &lenOfCode,                    \
+            COMMAND_CODES::CMD_##name,     \
+            table,                         \
+            error);                        \
 }
 
 uint8_t *compile(Program *program,
@@ -184,108 +240,9 @@ uint8_t *compile(Program *program,
         {
             fillNameTable(table, cmd, lenOfCode);
         }
-        else if (strcasecmp(cmd, "push") == 0)
-        {
-            char buffer[BUFFER_SIZE] = "";
-            int value = 0;
-
-            skipSpaces(program, line, &commandSize);
-
-            detectBrackets(program,
-                           code,
-                           commandSize,
-                           buffer,
-                           line,
-                           error);
-            if (*error)
-                return nullptr;
-
-            processArgs(&code,
-                        COMMAND_CODES::CMD_PUSH,
-                        buffer,
-                        &lenOfCode,
-                        value,
-                        error);
-
-        }
-        else if (strcasecmp(cmd, "pop") == 0)
-        {
-            char buffer[BUFFER_SIZE] = "";
-            int value = 0;
-
-            skipSpaces(program, line, &commandSize);
-
-            detectBrackets(program,
-                           code,
-                           commandSize,
-                           buffer,
-                           line,
-                           error);
-            if (*error)
-                return nullptr;
-
-            processArgs(&code,
-                        COMMAND_CODES::CMD_POP,
-                        buffer,
-                        &lenOfCode,
-                        value,
-                        error);
-        }
-        else if (strcasecmp(cmd, "add") == 0)
-            writeCommand(&code, &lenOfCode, COMMAND_CODES::CMD_ADD);
-        else if (strcasecmp(cmd, "sub") == 0)
-            writeCommand(&code, &lenOfCode, COMMAND_CODES::CMD_SUB);
-        else if (strcasecmp(cmd, "mul") == 0)
-            writeCommand(&code, &lenOfCode, COMMAND_CODES::CMD_MUL);
-        else if (strcasecmp(cmd, "div") == 0)
-            writeCommand(&code, &lenOfCode, COMMAND_CODES::CMD_DIV);
-        else if (strcasecmp(cmd, "out") == 0)
-            writeCommand(&code, &lenOfCode, COMMAND_CODES::CMD_OUT);
-        else if (strcasecmp(cmd, "hlt") == 0)
-            writeCommand(&code, &lenOfCode, COMMAND_CODES::CMD_HLT);
-        else if (strcasecmp(cmd, "dump") == 0)
-            writeCommand(&code, &lenOfCode, COMMAND_CODES::CMD_DUMP);
-        else if (strcasecmp(cmd, "in") == 0)
-            writeCommand(&code, &lenOfCode, COMMAND_CODES::CMD_IN);
-
-        else if (strcasecmp(cmd, "jmp") == 0)
-        {
-            commandSize += 4;
-            int value = 0;
-            char buffer[BUFFER_SIZE] = "";
-            skipSpaces(program, line, &commandSize);
-
-            detectBrackets(program,
-                           code,
-                           commandSize,
-                           buffer,
-                           line,
-                           error);
-            if (*error)
-                return nullptr;
-            if (buffer[0] == ':')
-            {
-                value = getIpFromTable(table, buffer);
-                *code |= COMMAND_CODES::CMD_JMP | IMM_MASK;
-
-                lenOfCode++;
-                code++;
-                *(int *) code = value;
-
-                lenOfCode += sizeof(int);
-                code += sizeof(int);
-            }
-            else
-                processArgs(&code,
-                            COMMAND_CODES::CMD_JMP,
-                            buffer,
-                            &lenOfCode,
-                            value,
-                            error);
-        }
+#include "cmd.h"
         else
         {
-            fprintf(stderr, "%s\n", cmd);
             *error |= ASSEMBLER_COMPILATION_FAILED;
             return nullptr;
         }
@@ -306,6 +263,7 @@ uint8_t *compile(Program *program,
     }
     return code;
 }
+#undef DEF_CMD
 
 void fillNameTable(NamesTable *table,
                    char name[BUFFER_SIZE],

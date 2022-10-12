@@ -4,13 +4,14 @@
 #include "stack/stack.h"
 #include <sys/stat.h>
 
-#define DEF_CMD(name, num)          \
-CMD_##name = num,                   \
+#define DEF_CMD(name, num, arg) \
+CMD_##name = num,
 
 enum COMMAND_CODES
 {
 #include "cmd.h"
 };
+
 #undef DEF_CMD
 
 const uint8_t CMD_MASK = 0x1F;
