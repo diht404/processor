@@ -183,7 +183,7 @@ uint8_t *compile(Program *program,
         {
             fillNameTable(table, cmd, lenOfCode);
         }
-        else if (stricmp(cmd, "push") == 0)
+        else if (strcasecmp(cmd, "push") == 0)
         {
             char buffer[BUFFER_SIZE] = "";
             int value = 0;
@@ -208,23 +208,23 @@ uint8_t *compile(Program *program,
                         error);
 
         }
-        else if (stricmp(cmd, "add") == 0)
+        else if (strcasecmp(cmd, "add") == 0)
             writeCommand(&code, &lenOfCode, COMMAND_CODES::ADD);
-        else if (stricmp(cmd, "sub") == 0)
+        else if (strcasecmp(cmd, "sub") == 0)
             writeCommand(&code, &lenOfCode, COMMAND_CODES::SUB);
-        else if (stricmp(cmd, "mul") == 0)
+        else if (strcasecmp(cmd, "mul") == 0)
             writeCommand(&code, &lenOfCode, COMMAND_CODES::MUL);
-        else if (stricmp(cmd, "div") == 0)
+        else if (strcasecmp(cmd, "div") == 0)
             writeCommand(&code, &lenOfCode, COMMAND_CODES::DIV);
-        else if (stricmp(cmd, "OUT") == 0)
+        else if (strcasecmp(cmd, "OUT") == 0)
             writeCommand(&code, &lenOfCode, COMMAND_CODES::OUT);
-        else if (stricmp(cmd, "hlt") == 0)
+        else if (strcasecmp(cmd, "hlt") == 0)
             writeCommand(&code, &lenOfCode, COMMAND_CODES::HLT);
-        else if (stricmp(cmd, "dump") == 0)
+        else if (strcasecmp(cmd, "dump") == 0)
             writeCommand(&code, &lenOfCode, COMMAND_CODES::DUMP);
-        else if (stricmp(cmd, "in") == 0)
+        else if (strcasecmp(cmd, "in") == 0)
             writeCommand(&code, &lenOfCode, COMMAND_CODES::IN);
-        else if (stricmp(cmd, "pop") == 0)
+        else if (strcasecmp(cmd, "pop") == 0)
         {
             commandSize += 3;
             char buffer[BUFFER_SIZE] = "";
@@ -248,7 +248,7 @@ uint8_t *compile(Program *program,
                         value,
                         error);
         }
-        else if (stricmp(cmd, "jmp") == 0)
+        else if (strcasecmp(cmd, "jmp") == 0)
         {
             commandSize += 4;
             int value = 0;
@@ -313,7 +313,7 @@ void fillNameTable(NamesTable *table,
     bool exist = false;
     for (int i = 0; i < BUFFER_SIZE; i++)
     {
-        if (stricmp(table->names_table[i], name) == 0)
+        if (strcasecmp(table->names_table[i], name) == 0)
         {
             exist = true;
             break;
@@ -323,7 +323,7 @@ void fillNameTable(NamesTable *table,
     {
         for (int i = 0; i < BUFFER_SIZE; i++)
         {
-            if (stricmp(table->names_table[i], "") == 0)
+            if (strcasecmp(table->names_table[i], "") == 0)
             {
                 memcpy(table->names_table[i], name, BUFFER_SIZE);
                 table->positions[i] = ip;
@@ -338,7 +338,7 @@ int getIpFromTable(NamesTable *table,
 {
     for (int i = 0; i < BUFFER_SIZE; i++)
     {
-        if (stricmp(table->names_table[i], name) == 0)
+        if (strcasecmp(table->names_table[i], name) == 0)
         {
             return table->positions[i];
         }
@@ -426,21 +426,32 @@ size_t saveFileTxt(uint8_t *code, const char *filename)
     return NO_ERRORS;
 }
 
-int main()
+int main(int argc, char *argv[])
 {
-    FILE *fp = fopen("data.asm", "r");
+    size_t error = NO_ERRORS;
+    const char *input_filename = "data.asm";
+    const char *output_filename = "data.code";
+
+    if (argc == 3)
+    {
+        input_filename = argv[1];
+        output_filename = argv[2];
+    }
+    if (argc > 3)
+    {
+        return -1;
+    }
+    FILE *fp = fopen(input_filename, "r");
 
     Program text = {};
     readFile(fp, &text);
-
-    size_t error = 0;
 
     uint8_t *code = compileWithNamesTable(&text, &error);
 
     if (error)
         printf("compile error: %zu\n", error);
 
-    saveFile(code, "data.code");
+    saveFile(code, output_filename);
     error = saveFileTxt(code, "data.txt");
     free(code);
     fclose(fp);

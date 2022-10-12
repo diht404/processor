@@ -177,13 +177,23 @@ size_t run(CPU *cpu)
     return CPU_ERRORS::CPU_NO_ERRORS;
 }
 
-int main()
+int main(int argc, char *argv[])
 {
+    size_t error = NO_ERRORS;
+    const char *input_filename = "data.code";
+
+    if (argc == 2)
+    {
+        input_filename = argv[1];
+    }
+    if (argc > 2)
+    {
+        return -1;
+    }
     setbuf(stdout, NULL);
-    FILE *fp = fopen("data.code", "rb");
+    FILE *fp = fopen(input_filename, "rb");
 
     Stack stack = {};
-    size_t error = 0;
     stackCtor(&stack, 1, &error)
 
     Code code = {};

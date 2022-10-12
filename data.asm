@@ -1,4 +1,3 @@
-:label
 push 3
 push 2
 mul
@@ -13,5 +12,4 @@ pop [5]
 push [5]
 sub
 out
-jmp :label
 hlt
