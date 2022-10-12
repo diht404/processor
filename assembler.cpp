@@ -55,7 +55,7 @@ void addInfo(uint8_t **code)
     *code = (uint8_t *) ((size_t *) *code + 1);
 }
 
-void skipSpaces(Program *program, size_t line, size_t *commandSize)
+void skipSpaces(Program *program, size_t line, int *commandSize)
 {
     while (*(program->lines[line] + *commandSize) == ' '
         or *(program->lines[line] + *commandSize) == '\0'
@@ -67,7 +67,7 @@ void skipSpaces(Program *program, size_t line, size_t *commandSize)
 
 void detectBrackets(Program *program,
                     uint8_t *code,
-                    size_t commandSize,
+                    int commandSize,
                     char *buffer,
                     size_t line,
                     size_t *error)
@@ -169,11 +169,12 @@ uint8_t *compile(Program *program,
 
     while (line < program->length)
     {
-        size_t commandSize = 0;
+        int commandSize = 0;
         skipSpaces(program, line, &commandSize);
         if (!sscanf(program->lines[line],
-                    "%s",
-                    cmd))
+                    "%s%n",
+                    cmd,
+                    &commandSize))
         {
             *error |= ASSEMBLER_COMPILATION_FAILED;
             return nullptr;
@@ -187,7 +188,6 @@ uint8_t *compile(Program *program,
         {
             char buffer[BUFFER_SIZE] = "";
             int value = 0;
-            commandSize += 4;
 
             skipSpaces(program, line, &commandSize);
 
@@ -208,25 +208,8 @@ uint8_t *compile(Program *program,
                         error);
 
         }
-        else if (strcasecmp(cmd, "add") == 0)
-            writeCommand(&code, &lenOfCode, COMMAND_CODES::CMD_ADD);
-        else if (strcasecmp(cmd, "sub") == 0)
-            writeCommand(&code, &lenOfCode, COMMAND_CODES::CMD_SUB);
-        else if (strcasecmp(cmd, "mul") == 0)
-            writeCommand(&code, &lenOfCode, COMMAND_CODES::CMD_MUL);
-        else if (strcasecmp(cmd, "div") == 0)
-            writeCommand(&code, &lenOfCode, COMMAND_CODES::CMD_DIV);
-        else if (strcasecmp(cmd, "out") == 0)
-            writeCommand(&code, &lenOfCode, COMMAND_CODES::CMD_OUT);
-        else if (strcasecmp(cmd, "hlt") == 0)
-            writeCommand(&code, &lenOfCode, COMMAND_CODES::CMD_HLT);
-        else if (strcasecmp(cmd, "dump") == 0)
-            writeCommand(&code, &lenOfCode, COMMAND_CODES::CMD_DUMP);
-        else if (strcasecmp(cmd, "in") == 0)
-            writeCommand(&code, &lenOfCode, COMMAND_CODES::CMD_IN);
         else if (strcasecmp(cmd, "pop") == 0)
         {
-            commandSize += 3;
             char buffer[BUFFER_SIZE] = "";
             int value = 0;
 
@@ -248,6 +231,23 @@ uint8_t *compile(Program *program,
                         value,
                         error);
         }
+        else if (strcasecmp(cmd, "add") == 0)
+            writeCommand(&code, &lenOfCode, COMMAND_CODES::CMD_ADD);
+        else if (strcasecmp(cmd, "sub") == 0)
+            writeCommand(&code, &lenOfCode, COMMAND_CODES::CMD_SUB);
+        else if (strcasecmp(cmd, "mul") == 0)
+            writeCommand(&code, &lenOfCode, COMMAND_CODES::CMD_MUL);
+        else if (strcasecmp(cmd, "div") == 0)
+            writeCommand(&code, &lenOfCode, COMMAND_CODES::CMD_DIV);
+        else if (strcasecmp(cmd, "out") == 0)
+            writeCommand(&code, &lenOfCode, COMMAND_CODES::CMD_OUT);
+        else if (strcasecmp(cmd, "hlt") == 0)
+            writeCommand(&code, &lenOfCode, COMMAND_CODES::CMD_HLT);
+        else if (strcasecmp(cmd, "dump") == 0)
+            writeCommand(&code, &lenOfCode, COMMAND_CODES::CMD_DUMP);
+        else if (strcasecmp(cmd, "in") == 0)
+            writeCommand(&code, &lenOfCode, COMMAND_CODES::CMD_IN);
+
         else if (strcasecmp(cmd, "jmp") == 0)
         {
             commandSize += 4;
