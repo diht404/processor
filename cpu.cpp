@@ -61,7 +61,7 @@ size_t run(CPU *cpu)
         uint8_t command = cpu->code->code[cpu->ip] & CMD_MASK;
         uint8_t args = cpu->code->code[cpu->ip] & ARG_MASK;
 
-        if (command == COMMAND_CODES::PUSH)
+        if (command == COMMAND_CODES::CMD_PUSH)
         {
             cpu->ip++;
             int arg = 0;
@@ -84,14 +84,14 @@ size_t run(CPU *cpu)
             cpu->ip += sizeof(int);
         }
 
-        else if applyOperation(COMMAND_CODES::ADD, +)
-        else if applyOperation(COMMAND_CODES::SUB, -)
-        else if applyOperation(COMMAND_CODES::MUL, *)
-        else if applyOperation(COMMAND_CODES::DIV, /)
+        else if applyOperation(COMMAND_CODES::CMD_ADD, +)
+        else if applyOperation(COMMAND_CODES::CMD_SUB, -)
+        else if applyOperation(COMMAND_CODES::CMD_MUL, *)
+        else if applyOperation(COMMAND_CODES::CMD_DIV, /)
 
 #undef applyOperation
 
-        else if (command == COMMAND_CODES::OUT)
+        else if (command == COMMAND_CODES::CMD_OUT)
         {
             int value = 0;
 
@@ -101,17 +101,17 @@ size_t run(CPU *cpu)
             printf("ANSWER = %d\n", value);
             cpu->ip++;
         }
-        else if (command == COMMAND_CODES::HLT)
+        else if (command == COMMAND_CODES::CMD_HLT)
         {
             return stackError;
         }
-        else if (command == COMMAND_CODES::DUMP)
+        else if (command == COMMAND_CODES::CMD_DUMP)
         {
             stackDump(cpu->stack, &cpu->stack->info, stackError);
             processorDump(stdout, cpu);
             cpu->ip++;
         }
-        else if (command == COMMAND_CODES::IN)
+        else if (command == COMMAND_CODES::CMD_IN)
         {
             int value = 0;
 
@@ -126,7 +126,7 @@ size_t run(CPU *cpu)
 
             cpu->ip++;
         }
-        else if (command == COMMAND_CODES::POP)
+        else if (command == COMMAND_CODES::CMD_POP)
         {
             cpu->ip++;
             int arg = 0;
@@ -152,7 +152,7 @@ size_t run(CPU *cpu)
             }
             cpu->ip += sizeof(int);
         }
-        else if (command == COMMAND_CODES::JMP)
+        else if (command == COMMAND_CODES::CMD_JMP)
         {
             cpu->ip++;
             int arg = 0;

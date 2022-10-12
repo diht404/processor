@@ -201,7 +201,7 @@ uint8_t *compile(Program *program,
                 return nullptr;
 
             processArgs(&code,
-                        COMMAND_CODES::PUSH,
+                        COMMAND_CODES::CMD_PUSH,
                         buffer,
                         &lenOfCode,
                         value,
@@ -209,21 +209,21 @@ uint8_t *compile(Program *program,
 
         }
         else if (strcasecmp(cmd, "add") == 0)
-            writeCommand(&code, &lenOfCode, COMMAND_CODES::ADD);
+            writeCommand(&code, &lenOfCode, COMMAND_CODES::CMD_ADD);
         else if (strcasecmp(cmd, "sub") == 0)
-            writeCommand(&code, &lenOfCode, COMMAND_CODES::SUB);
+            writeCommand(&code, &lenOfCode, COMMAND_CODES::CMD_SUB);
         else if (strcasecmp(cmd, "mul") == 0)
-            writeCommand(&code, &lenOfCode, COMMAND_CODES::MUL);
+            writeCommand(&code, &lenOfCode, COMMAND_CODES::CMD_MUL);
         else if (strcasecmp(cmd, "div") == 0)
-            writeCommand(&code, &lenOfCode, COMMAND_CODES::DIV);
-        else if (strcasecmp(cmd, "OUT") == 0)
-            writeCommand(&code, &lenOfCode, COMMAND_CODES::OUT);
+            writeCommand(&code, &lenOfCode, COMMAND_CODES::CMD_DIV);
+        else if (strcasecmp(cmd, "out") == 0)
+            writeCommand(&code, &lenOfCode, COMMAND_CODES::CMD_OUT);
         else if (strcasecmp(cmd, "hlt") == 0)
-            writeCommand(&code, &lenOfCode, COMMAND_CODES::HLT);
+            writeCommand(&code, &lenOfCode, COMMAND_CODES::CMD_HLT);
         else if (strcasecmp(cmd, "dump") == 0)
-            writeCommand(&code, &lenOfCode, COMMAND_CODES::DUMP);
+            writeCommand(&code, &lenOfCode, COMMAND_CODES::CMD_DUMP);
         else if (strcasecmp(cmd, "in") == 0)
-            writeCommand(&code, &lenOfCode, COMMAND_CODES::IN);
+            writeCommand(&code, &lenOfCode, COMMAND_CODES::CMD_IN);
         else if (strcasecmp(cmd, "pop") == 0)
         {
             commandSize += 3;
@@ -242,7 +242,7 @@ uint8_t *compile(Program *program,
                 return nullptr;
 
             processArgs(&code,
-                        COMMAND_CODES::POP,
+                        COMMAND_CODES::CMD_POP,
                         buffer,
                         &lenOfCode,
                         value,
@@ -266,7 +266,7 @@ uint8_t *compile(Program *program,
             if (buffer[0] == ':')
             {
                 value = getIpFromTable(table, buffer);
-                *code |= COMMAND_CODES::JMP | IMM_MASK;
+                *code |= COMMAND_CODES::CMD_JMP | IMM_MASK;
 
                 lenOfCode++;
                 code++;
@@ -277,7 +277,7 @@ uint8_t *compile(Program *program,
             }
             else
                 processArgs(&code,
-                            COMMAND_CODES::JMP,
+                            COMMAND_CODES::CMD_JMP,
                             buffer,
                             &lenOfCode,
                             value,
@@ -285,6 +285,7 @@ uint8_t *compile(Program *program,
         }
         else
         {
+            fprintf(stderr, "%s\n", cmd);
             *error |= ASSEMBLER_COMPILATION_FAILED;
             return nullptr;
         }
@@ -400,14 +401,14 @@ size_t saveFileTxt(uint8_t *code, const char *filename)
     size_t ip = 0;
     while (ip < length)
     {
-        if ((code[ip] & CMD_MASK) == HLT)
+        if ((code[ip] & CMD_MASK) == CMD_HLT)
         {
             fprintf(fp, "%hhu", code[ip]);
             break;
         }
-        else if ((code[ip] & CMD_MASK) == PUSH
-            || (code[ip] & CMD_MASK) == POP
-            || (code[ip] & CMD_MASK) == JMP)
+        else if ((code[ip] & CMD_MASK) == CMD_PUSH
+            || (code[ip] & CMD_MASK) == CMD_POP
+            || (code[ip] & CMD_MASK) == CMD_JMP)
         {
             fprintf(fp,
                     "%hhu %d\n",
@@ -437,10 +438,7 @@ int main(int argc, char *argv[])
         input_filename = argv[1];
         output_filename = argv[2];
     }
-    if (argc > 3)
-    {
-        return -1;
-    }
+
     FILE *fp = fopen(input_filename, "r");
 
     Program text = {};

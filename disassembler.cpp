@@ -10,55 +10,55 @@ size_t disassemle(Code *code, FILE *fp)
     {
         switch (code->code[ip] & CMD_MASK)
         {
-            case COMMAND_CODES::HLT:
+            case COMMAND_CODES::CMD_HLT:
             {
                 ip = code->len;
                 fprintf(fp, "hlt");
                 break;
             }
-            case COMMAND_CODES::ADD:
+            case COMMAND_CODES::CMD_ADD:
             {
                 fprintf(fp, "add\n");
                 ip++;
                 break;
             }
-            case COMMAND_CODES::SUB:
+            case COMMAND_CODES::CMD_SUB:
             {
                 fprintf(fp, "sub\n");
                 ip++;
                 break;
             }
-            case COMMAND_CODES::MUL:
+            case COMMAND_CODES::CMD_MUL:
             {
                 fprintf(fp, "mul\n");
                 ip++;
                 break;
             }
-            case COMMAND_CODES::DIV:
+            case COMMAND_CODES::CMD_DIV:
             {
                 fprintf(fp, "div\n");
                 ip++;
                 break;
             }
-            case COMMAND_CODES::OUT:
+            case COMMAND_CODES::CMD_OUT:
             {
                 fprintf(fp, "out\n");
                 ip++;
                 break;
             }
-            case COMMAND_CODES::DUMP:
+            case COMMAND_CODES::CMD_DUMP:
             {
                 fprintf(fp, "dump\n");
                 ip++;
                 break;
             }
-            case COMMAND_CODES::IN:
+            case COMMAND_CODES::CMD_IN:
             {
                 fprintf(fp, "in\n");
                 ip++;
                 break;
             }
-            case COMMAND_CODES::PUSH:
+            case COMMAND_CODES::CMD_PUSH:
             {
                 uint8_t cmd = code->code[ip];
                 ip++;
@@ -91,7 +91,7 @@ size_t disassemle(Code *code, FILE *fp)
                 ip += sizeof(int);
                 break;
             }
-            case COMMAND_CODES::POP:
+            case COMMAND_CODES::CMD_POP:
             {
                 uint8_t cmd = code->code[ip];
                 ip++;
@@ -117,7 +117,7 @@ size_t disassemle(Code *code, FILE *fp)
                 ip += sizeof(int);
                 break;
             }
-            case COMMAND_CODES::JMP:
+            case COMMAND_CODES::CMD_JMP:
             {
                 uint8_t cmd = code->code[ip];
                 ip++;

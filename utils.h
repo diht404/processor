@@ -4,25 +4,14 @@
 #include "stack/stack.h"
 #include <sys/stat.h>
 
+#define DEF_CMD(name, num)          \
+CMD_##name = num,                   \
+
 enum COMMAND_CODES
 {
-    HLT  =  0,
-    PUSH =  1,
-    ADD  =  2,
-    SUB  =  3,
-    MUL  =  4,
-    DIV  =  5,
-    OUT  =  6,
-    DUMP =  7,
-    IN   =  8,
-    POP  =  9,
-    JMP  = 10,
-    JA   = 12,
-    JAE  = 13,
-    JB   = 14,
-    JE   = 15,
-    JNE  = 16,
+#include "cmd.h"
 };
+#undef DEF_CMD
 
 const uint8_t CMD_MASK = 0x1F;
 const uint8_t ARG_MASK = 0xE0;

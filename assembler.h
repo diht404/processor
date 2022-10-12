@@ -29,7 +29,7 @@ struct NamesTable
 };
 
 #define reg_compile(cmd_arg, reg_name, number) \
-    if (strcasecmp(buffer, (reg_name)) == 0)      \
+    if (strcasecmp(buffer, (reg_name)) == 0)   \
     {                                          \
         **code = (cmd_arg) | REG_MASK;         \
         (*lenOfCode)++;                        \
