@@ -33,6 +33,9 @@ void processorDump(FILE *fp, CPU *cpu)
         error = stackPop(cpu->stack, &firstValue);            \
         if (error)                                            \
             return error;                                     \
+                                                              \
+        if (#operation[0] == '/' and secondValue == 0)        \
+            return DIVISION_BY_ZER0;                          \
         error |= stackPush(cpu->stack,                        \
                            firstValue operation secondValue); \
         if (error)                                            \
@@ -40,6 +43,12 @@ void processorDump(FILE *fp, CPU *cpu)
                                                               \
         cpu->ip++;                                            \
     }
+
+#define DEF_CMD(name, num, arg, cpu_code) \
+case COMMAND_CODES::CMD_##name:           \
+    cpu_code                              \
+    break;                                \
+
 
 size_t run(CPU *cpu)
 {
@@ -60,119 +69,21 @@ size_t run(CPU *cpu)
     {
         uint8_t command = cpu->code->code[cpu->ip] & CMD_MASK;
         uint8_t args = cpu->code->code[cpu->ip] & ARG_MASK;
-
-        if (command == COMMAND_CODES::CMD_PUSH)
+        switch (command)
         {
-            cpu->ip++;
-            int arg = 0;
-
-            int command_arg = *(int *) (cpu->code->code + cpu->ip);
-
-            if (args & IMM_MASK)
-                arg += command_arg;
-
-            if (args & REG_MASK)
-                arg += cpu->regs[command_arg];
-
-            if (args & RAM_MASK)
-                arg = cpu->RAM[command_arg];
-
-            stackError |= stackPush(cpu->stack, arg);
-            if (stackError)
-                return stackError;
-
-            cpu->ip += sizeof(int);
-        }
-
-        else if applyOperation(COMMAND_CODES::CMD_ADD, +)
-        else if applyOperation(COMMAND_CODES::CMD_SUB, -)
-        else if applyOperation(COMMAND_CODES::CMD_MUL, *)
-        else if applyOperation(COMMAND_CODES::CMD_DIV, /)
-
-#undef applyOperation
-
-        else if (command == COMMAND_CODES::CMD_OUT)
-        {
-            int value = 0;
-
-            stackError |= stackPop(cpu->stack, &value);
-            if (stackError)
-                return stackError;
-            printf("ANSWER = %d\n", value);
-            cpu->ip++;
-        }
-        else if (command == COMMAND_CODES::CMD_HLT)
-        {
-            return stackError;
-        }
-        else if (command == COMMAND_CODES::CMD_DUMP)
-        {
-            stackDump(cpu->stack, &cpu->stack->info, stackError);
-            processorDump(stdout, cpu);
-            cpu->ip++;
-        }
-        else if (command == COMMAND_CODES::CMD_IN)
-        {
-            int value = 0;
-
-            printf("Enter number: \n");
-
-            if (!scanf("%d", &value))
-                return CPU_ERRORS::CPU_READ_FROM_CONSOLE_FAILED;
-
-            stackError |= stackPush(cpu->stack, value);
-            if (stackError)
-                return stackError;
-
-            cpu->ip++;
-        }
-        else if (command == COMMAND_CODES::CMD_POP)
-        {
-            cpu->ip++;
-            int arg = 0;
-
-            int command_arg = *(int *) (cpu->code->code + cpu->ip);
-
-            if (args & REG_MASK)
+#include "../cmd.h"
+            default:
             {
-                stackError |= stackPop(cpu->stack, &arg);
-                if (stackError)
-                    return stackError;
-
-                cpu->regs[command_arg] = arg;
+                fprintf(stderr, "CPU_UNKNOWN_COMMAND\n");
+                return CPU_ERRORS::CPU_UNKNOWN_COMMAND;
             }
-
-            if (args & RAM_MASK)
-            {
-                stackError |= stackPop(cpu->stack, &arg);
-                if (stackError)
-                    return stackError;
-
-                cpu->RAM[command_arg] = arg;
-            }
-            cpu->ip += sizeof(int);
         }
-        else if (command == COMMAND_CODES::CMD_JMP)
-        {
-            cpu->ip++;
-            int arg = 0;
 
-            int command_arg = *(int *) (cpu->code->code + cpu->ip);
 
-            if (args & IMM_MASK)
-                arg += command_arg;
-            if (args & REG_MASK)
-                arg += cpu->regs[command_arg];
-            if (args & RAM_MASK)
-                arg = cpu->RAM[arg];
 
-            cpu->ip = arg;
-        }
-        else
-        {
-            fprintf(stderr, "CPU_UNKNOWN_COMMAND\n");
-            return CPU_ERRORS::CPU_UNKNOWN_COMMAND;
-        }
     }
     return CPU_ERRORS::CPU_NO_ERRORS;
 }
+
+#undef applyOperation
+#undef DEF_CMD

@@ -4,7 +4,7 @@
 #include "stack/stack.h"
 #include <sys/stat.h>
 
-#define DEF_CMD(name, num, arg) \
+#define DEF_CMD(name, num, arg, cpu_code) \
 CMD_##name = num,
 
 enum COMMAND_CODES

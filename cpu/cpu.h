@@ -10,6 +10,7 @@ enum CPU_ERRORS
     CPU_NO_ERRORS                = 0,
     CPU_READ_FROM_CONSOLE_FAILED = 1 << 3,
     CPU_UNKNOWN_COMMAND          = 1 << 4,
+    DIVISION_BY_ZER0             = 1 << 5,
 };
 
 struct CPU

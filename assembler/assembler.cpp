@@ -180,7 +180,7 @@ void putArgs(Program *program,
                     error);
 }
 
-#define DEF_CMD(name, num, arg)            \
+#define DEF_CMD(name, num, arg, cpu_code)  \
 else if (strcasecmp(cmd, #name) == 0)      \
 {                                          \
     if (!arg)                              \

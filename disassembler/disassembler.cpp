@@ -27,17 +27,17 @@ size_t printArg(Code *code, FILE *fp, const char *command_name, size_t *ip)
     return NO_ERRORS;
 }
 
-#define DEF_CMD(name, num, arg)         \
-case COMMAND_CODES::CMD_##name:         \
-{                                       \
-    if (arg)                            \
-    {                                   \
-        printArg(code, fp, #name, &ip); \
-        break;                          \
-    }                                   \
-    fprintf(fp, #name"\n");             \
-    ip++;                               \
-    break;                              \
+#define DEF_CMD(name, num, arg, cpu_code)\
+case COMMAND_CODES::CMD_##name:          \
+{                                        \
+    if (arg)                             \
+    {                                    \
+        printArg(code, fp, #name, &ip);  \
+        break;                           \
+    }                                    \
+    fprintf(fp, #name"\n");              \
+    ip++;                                \
+    break;                               \
 }
 
 size_t disassemle(Code *code, FILE *fp)
