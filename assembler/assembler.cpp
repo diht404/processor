@@ -240,7 +240,7 @@ uint8_t *compile(Program *program,
         {
             fillNameTable(table, cmd, lenOfCode);
         }
-#include "cmd.h"
+#include "../cmd.h"
         else
         {
             *error |= ASSEMBLER_COMPILATION_FAILED;
@@ -384,40 +384,3 @@ size_t saveFileTxt(uint8_t *code, const char *filename)
     fclose(fp);
     return NO_ERRORS;
 }
-
-int main(int argc, char *argv[])
-{
-    size_t error = NO_ERRORS;
-    const char *input_filename = "data.asm";
-    const char *output_filename = "data.code";
-
-    if (argc == 3)
-    {
-        input_filename = argv[1];
-        output_filename = argv[2];
-    }
-
-    FILE *fp = fopen(input_filename, "r");
-
-    Program text = {};
-    readFile(fp, &text);
-
-    uint8_t *code = compileWithNamesTable(&text, &error);
-
-    if (error)
-        printf("compile error: %zu\n", error);
-
-    saveFile(code, output_filename);
-    error = saveFileTxt(code, "data.txt");
-    free(code);
-    fclose(fp);
-    return 0;
-}
-
-//push value   value -> stack
-//
-//push rax     rax   -> stack
-//pop  rax     stack -> rax
-//
-//push []      ram   -> stack
-//pop  []      stack -> ram

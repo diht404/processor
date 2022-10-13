@@ -8,9 +8,9 @@ set(CMAKE_C_STANDARD 99)
 add_executable(stack stack/main.cpp stack/stack.cpp stack/stack_logs.cpp stack/stack_verification.cpp)
 
 add_executable(main main.cpp)
-add_executable(assembler assembler.cpp utils.cpp
+add_executable(assembler assembler/main.cpp utils.cpp
         stack/stack.cpp stack/stack_logs.cpp stack/stack_verification.cpp)
-add_executable(disassembler disassembler.cpp utils.cpp
+add_executable(disassembler disassembler/disassembler.cpp utils.cpp
         stack/stack.cpp stack/stack_logs.cpp stack/stack_verification.cpp)
-add_executable(cpu cpu.cpp utils.cpp
+add_executable(cpu cpu/cpu.cpp utils.cpp
         stack/stack.cpp stack/stack_logs.cpp stack/stack_verification.cpp)

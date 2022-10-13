@@ -1,9 +1,9 @@
 #ifndef STACK__CPU_H
 #define STACK__CPU_H
 
-#include "stack/stack.h"
-#include "stack/stack_logs.h"
-#include "utils.h"
+#include "../stack/stack.h"
+#include "../stack/stack_logs.h"
+#include "../utils.h"
 
 enum CPU_ERRORS
 {

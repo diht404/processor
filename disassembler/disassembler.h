@@ -1,12 +1,12 @@
 #ifndef STACK__DISASSEMBLER_H
 #define STACK__DISASSEMBLER_H
 
-#include "utils.h"
+#include "../utils.h"
 
 enum DISASSEMBLER_ERRORS
 {
     UNKNOWN_COMMAND_CODE = 1 << 6,
-    UNKNOWN_REG     = 1 << 7,
+    UNKNOWN_REG          = 1 << 7,
 };
 
 /**
