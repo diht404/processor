@@ -145,11 +145,11 @@ DEF_CMD(POP, 9, 1, {
 
     if (args & REG_MASK)
     {
-    stackError |= stackPop(cpu->stack, &arg);
-    if (stackError)
-        return stackError;
+        stackError |= stackPop(cpu->stack, &arg);
+        if (stackError)
+            return stackError;
 
-    cpu->regs[command_arg] = arg;
+        cpu->regs[command_arg] = arg;
     }
 
     if (args & RAM_MASK)
@@ -179,16 +179,194 @@ DEF_CMD(JMP, 10, 1, {
     cpu->ip = arg;
 })
 
-DEF_CMD(JA, 11, 1, {})
+DEF_CMD(JA, 11, 1, {
+    cpu->ip++;
+    int arg = 0;
 
-DEF_CMD(JAE, 12, 1, {})
+    int command_arg = *(int *) (cpu->code->code + cpu->ip);
 
-DEF_CMD(JB, 13, 1, {})
+    int firstValue = 0;
+    int secondValue = 0;
 
-DEF_CMD(JBE, 14, 1, {})
+    error = stackPop(cpu->stack, &secondValue);
+    if (error)
+        return error;
 
-DEF_CMD(JE, 15, 1, {})
+    error = stackPop(cpu->stack, &firstValue);
+    if (error)
+        return error;
 
-DEF_CMD(JN, 16, 1, {})
+    if (firstValue > secondValue)
+    {
+        if (args & IMM_MASK)
+            arg += command_arg;
+        if (args & REG_MASK)
+            arg += cpu->regs[command_arg];
+        if (args & RAM_MASK)
+            arg = cpu->RAM[arg];
 
-DEF_CMD(JNE, 17, 1, {})
+        cpu->ip = arg;
+    }
+    else
+        cpu->ip++;
+})
+
+DEF_CMD(JAE, 12, 1, {
+cpu->ip++;
+int arg = 0;
+
+int command_arg = *(int *) (cpu->code->code + cpu->ip);
+
+int firstValue = 0;
+int secondValue = 0;
+
+error = stackPop(cpu->stack, &secondValue);
+    if (error)
+        return error;
+
+    error = stackPop(cpu->stack, &firstValue);
+    if (error)
+        return error;
+
+    if (firstValue >= secondValue)
+    {
+        if (args & IMM_MASK)
+            arg += command_arg;
+        if (args & REG_MASK)
+            arg += cpu->regs[command_arg];
+        if (args & RAM_MASK)
+            arg = cpu->RAM[arg];
+
+        cpu->ip = arg;
+    }
+    else
+        cpu->ip++;
+})
+
+DEF_CMD(JB, 13, 1, {
+    cpu->ip++;
+    int arg = 0;
+
+    int command_arg = *(int *) (cpu->code->code + cpu->ip);
+
+    int firstValue = 0;
+    int secondValue = 0;
+
+    error = stackPop(cpu->stack, &secondValue);
+    if (error)
+        return error;
+
+    error = stackPop(cpu->stack, &firstValue);
+    if (error)
+        return error;
+
+    if (firstValue < secondValue)
+    {
+        if (args & IMM_MASK)
+        arg += command_arg;
+        if (args & REG_MASK)
+        arg += cpu->regs[command_arg];
+        if (args & RAM_MASK)
+        arg = cpu->RAM[arg];
+
+        cpu->ip = arg;
+    }
+    else
+        cpu->ip++;
+})
+
+DEF_CMD(JBE, 14, 1, {
+    cpu->ip++;
+    int arg = 0;
+
+    int command_arg = *(int *) (cpu->code->code + cpu->ip);
+
+    int firstValue = 0;
+    int secondValue = 0;
+
+    error = stackPop(cpu->stack, &secondValue);
+    if (error)
+        return error;
+
+    error = stackPop(cpu->stack, &firstValue);
+    if (error)
+        return error;
+
+    if (firstValue <= secondValue)
+    {
+        if (args & IMM_MASK)
+            arg += command_arg;
+        if (args & REG_MASK)
+            arg += cpu->regs[command_arg];
+        if (args & RAM_MASK)
+            arg = cpu->RAM[arg];
+
+        cpu->ip = arg;
+    }
+    else
+        cpu->ip++;
+})
+
+DEF_CMD(JE, 15, 1, {
+    cpu->ip++;
+    int arg = 0;
+
+    int command_arg = *(int *) (cpu->code->code + cpu->ip);
+
+    int firstValue = 0;
+    int secondValue = 0;
+
+    error = stackPop(cpu->stack, &secondValue);
+    if (error)
+        return error;
+
+    error = stackPop(cpu->stack, &firstValue);
+    if (error)
+        return error;
+
+    if (firstValue == secondValue)
+    {
+        if (args & IMM_MASK)
+            arg += command_arg;
+        if (args & REG_MASK)
+            arg += cpu->regs[command_arg];
+        if (args & RAM_MASK)
+            arg = cpu->RAM[arg];
+
+        cpu->ip = arg;
+    }
+    else
+        cpu->ip++;
+})
+
+DEF_CMD(JNE, 17, 1, {
+    cpu->ip++;
+    int arg = 0;
+
+    int command_arg = *(int *) (cpu->code->code + cpu->ip);
+
+    int firstValue = 0;
+    int secondValue = 0;
+
+    error = stackPop(cpu->stack, &secondValue);
+    if (error)
+        return error;
+
+    error = stackPop(cpu->stack, &firstValue);
+    if (error)
+        return error;
+
+    if (firstValue != secondValue)
+    {
+        if (args & IMM_MASK)
+            arg += command_arg;
+        if (args & REG_MASK)
+            arg += cpu->regs[command_arg];
+        if (args & RAM_MASK)
+            arg = cpu->RAM[arg];
+
+        cpu->ip = arg;
+    }
+    else
+        cpu->ip++;
+})
