@@ -1,4 +1,6 @@
-DEF_CMD(HLT, 0, 0, {})
+DEF_CMD(HLT, 0, 0, {
+    return stackError;
+})
 
 DEF_CMD(PUSH, 1, 1, {
     cpu->ip++;
@@ -272,7 +274,10 @@ DEF_CMD(JB, 13, 1, {
         cpu->ip = arg;
     }
     else
-        cpu->ip++;
+    {
+        cpu->ip += sizeof(int);
+    }
+
 })
 
 DEF_CMD(JBE, 14, 1, {

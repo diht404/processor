@@ -5,14 +5,13 @@
 #define flags ""
 int main()
 {
-    system("rm ./assembler/assembler ./disassembler/disassembler ./cpu/cpu");
     system("g++ " flags "assembler/main.cpp assembler/assembler.cpp utils.cpp stack/stack.cpp "
            "stack/stack_logs.cpp stack/stack_verification.cpp -o assembler/assembler");
     system("g++ " flags "disassembler/main.cpp disassembler/disassembler.cpp utils.cpp stack/stack.cpp "
            "stack/stack_logs.cpp stack/stack_verification.cpp -o disassembler/disassembler");
     system("g++ " flags "cpu/main.cpp cpu/cpu.cpp utils.cpp stack/stack.cpp "
            "stack/stack_logs.cpp stack/stack_verification.cpp -o cpu/cpu");
-    system("./assembler/assembler data.asm data.code");
+    system("./assembler/assembler print_squares.asm data.code");
     system("./disassembler/disassembler data.code data.disasm");
     system("./cpu/cpu data.code");
     system("rm ./data.code");
