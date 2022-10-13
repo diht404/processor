@@ -18,9 +18,14 @@ int main(int argc, char *argv[])
 
     Stack stack = {};
     stackCtor(&stack, 1, &error)
+    Stack call_stack = {};
+    stackCtor(&call_stack, 1, &error)
 
     Code code = {};
-    CPU cpu = {&code, &stack};
+    CPU cpu = {};
+    cpu.code = &code;
+    cpu.stack = &stack;
+    cpu.call_stack = &call_stack;
 
     error = readCode(fp, &code);
     if (error)
@@ -33,6 +38,9 @@ int main(int argc, char *argv[])
     {
         printf("ERROR run: %zu\n", error);
         printf("Stack size: %zu\n", stack.size);
+//        ASSERT_OK(&stack, &error);
+        printf("Call stack size: %zu\n", call_stack.size);
+//        ASSERT_OK(&call_stack, &error);
     }
     fclose(fp);
     return 0;

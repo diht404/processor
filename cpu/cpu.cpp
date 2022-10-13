@@ -20,47 +20,29 @@ void processorDump(FILE *fp, CPU *cpu)
     fprintf(fp, "\n");
 }
 
-#define applyOperation(cmd_case, operation)                   \
-(command == (cmd_case))                                       \
-    {                                                         \
-        int firstValue = 0;                                   \
-        int secondValue = 0;                                  \
-                                                              \
-        error = stackPop(cpu->stack, &secondValue);           \
-        if (error)                                            \
-            return error;                                     \
-                                                              \
-        error = stackPop(cpu->stack, &firstValue);            \
-        if (error)                                            \
-            return error;                                     \
-                                                              \
-        if (#operation[0] == '/' and secondValue == 0)        \
-            return DIVISION_BY_ZER0;                          \
-        error |= stackPush(cpu->stack,                        \
-                           firstValue operation secondValue); \
-        if (error)                                            \
-            return error;                                     \
-                                                              \
-        cpu->ip++;                                            \
-    }
-
 #define DEF_CMD(name, num, arg, cpu_code) \
 case COMMAND_CODES::CMD_##name:           \
     cpu_code                              \
     break;                                \
-
 
 size_t run(CPU *cpu)
 {
     assert(cpu != nullptr);
 
     Stack stack_run = {};
+    Stack stack_call_run = {};
     size_t stackError = 0;
 
     if (cpu->stack == nullptr)
     {
         cpu->stack = &stack_run;
         stackCtor(cpu->stack, 1, &stackError)
+    }
+
+    if (cpu->call_stack == nullptr)
+    {
+        cpu->call_stack = &stack_call_run;
+        stackCtor(cpu->call_stack, 1, &stackError)
     }
 
     size_t error = NO_ERRORS;

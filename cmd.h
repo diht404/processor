@@ -114,13 +114,15 @@ DEF_CMD(OUT, 6, 0, {
     stackError |= stackPop(cpu->stack, &value);
     if (stackError)
         return stackError;
+
     printf("ANSWER = %d\n", value);
     cpu->ip++;
 })
 
 DEF_CMD(DUMP, 7, 0, {
     stackDump(cpu->stack, &cpu->stack->info, stackError);
-    processorDump(stdout, cpu);
+    stackDump(cpu->call_stack, &cpu->call_stack->info, stackError);
+    processorDump(stderr, cpu);
     cpu->ip++;
 })
 
@@ -374,4 +376,36 @@ DEF_CMD(JNE, 17, 1, {
     }
     else
         cpu->ip++;
+})
+
+DEF_CMD(call, 18, 1, {
+//    fprintf(stderr, "ip = %d\n", cpu->ip);
+    cpu->ip++;
+    if (error)
+        return error;
+    int arg = 0;
+
+    int command_arg = *(int *) (cpu->code->code + cpu->ip);
+
+    if (args & IMM_MASK)
+        arg += command_arg;
+    if (args & REG_MASK)
+        arg += cpu->regs[command_arg];
+    if (args & RAM_MASK)
+        arg = cpu->RAM[arg];
+
+    error = stackPush(cpu->call_stack, cpu->ip + sizeof(int));
+
+    cpu->ip = arg;
+
+})
+
+DEF_CMD(ret, 19, 0, {
+    cpu->ip++;
+    int arg = 0;
+
+    error = stackPop(cpu->call_stack, &arg);
+    if (error)
+        return error;
+    cpu->ip = arg;
 })
