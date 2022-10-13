@@ -1,5 +1,45 @@
 #include "disassembler.h"
 
+size_t printArg(Code *code, FILE *fp, const char *command_name, size_t *ip)
+{
+    uint8_t cmd = code->code[*ip];
+    (*ip)++;
+    int value = *(int *) (code->code + *ip);
+
+    if (cmd & ARG_MASK)
+    {
+        if (cmd & REG_MASK)
+        {
+            if (value > 0 and value < 5)
+                fprintf(fp, "%s %s\n", command_name, REGS_NAMES[value]);
+            else
+                return UNKNOWN_REG;
+        }
+        if (cmd & IMM_MASK)
+        {
+            if (cmd & RAM_MASK)
+                fprintf(fp, "%s [%d]\n", command_name, value);
+            else
+                fprintf(fp, "%s %d\n", command_name, value);
+        }
+    }
+    *ip += sizeof(int);
+    return NO_ERRORS;
+}
+
+#define DEF_CMD(name, num, arg)         \
+case COMMAND_CODES::CMD_##name:         \
+{                                       \
+    if (arg)                            \
+    {                                   \
+        printArg(code, fp, #name, &ip); \
+        break;                          \
+    }                                   \
+    fprintf(fp, #name"\n");             \
+    ip++;                               \
+    break;                              \
+}
+
 size_t disassemle(Code *code, FILE *fp)
 {
     assert(code != nullptr);
@@ -10,139 +50,7 @@ size_t disassemle(Code *code, FILE *fp)
     {
         switch (code->code[ip] & CMD_MASK)
         {
-            case COMMAND_CODES::CMD_HLT:
-            {
-                ip = code->len;
-                fprintf(fp, "hlt");
-                break;
-            }
-            case COMMAND_CODES::CMD_ADD:
-            {
-                fprintf(fp, "add\n");
-                ip++;
-                break;
-            }
-            case COMMAND_CODES::CMD_SUB:
-            {
-                fprintf(fp, "sub\n");
-                ip++;
-                break;
-            }
-            case COMMAND_CODES::CMD_MUL:
-            {
-                fprintf(fp, "mul\n");
-                ip++;
-                break;
-            }
-            case COMMAND_CODES::CMD_DIV:
-            {
-                fprintf(fp, "div\n");
-                ip++;
-                break;
-            }
-            case COMMAND_CODES::CMD_OUT:
-            {
-                fprintf(fp, "out\n");
-                ip++;
-                break;
-            }
-            case COMMAND_CODES::CMD_DUMP:
-            {
-                fprintf(fp, "dump\n");
-                ip++;
-                break;
-            }
-            case COMMAND_CODES::CMD_IN:
-            {
-                fprintf(fp, "in\n");
-                ip++;
-                break;
-            }
-            case COMMAND_CODES::CMD_PUSH:
-            {
-                uint8_t cmd = code->code[ip];
-                ip++;
-                int value = *(int *) (code->code + ip);
-
-                if (cmd & ARG_MASK)
-                {
-                    if (cmd & REG_MASK)
-                    {
-                        if (value > 0 and value < 5)
-                            if (cmd & RAM_MASK)
-                                fprintf(fp,
-                                        "push [%s]\n",
-                                        REGS_NAMES[value]);
-                            else
-                                fprintf(fp,
-                                        "push %s\n",
-                                        REGS_NAMES[value]);
-                        else
-                            return UNKNOWN_REG;
-                    }
-                    if (cmd & IMM_MASK)
-                    {
-                        if (cmd & RAM_MASK)
-                            fprintf(fp, "push [%d]\n", value);
-                        else
-                            fprintf(fp, "push %d\n", value);
-                    }
-                }
-                ip += sizeof(int);
-                break;
-            }
-            case COMMAND_CODES::CMD_POP:
-            {
-                uint8_t cmd = code->code[ip];
-                ip++;
-                int value = *(int *) (code->code + ip);
-
-                if (cmd & ARG_MASK)
-                {
-                    if (cmd & REG_MASK)
-                    {
-                        if (value > 0 and value < 5)
-                            fprintf(fp, "pop %s\n", REGS_NAMES[value]);
-                        else
-                            return UNKNOWN_REG;
-                    }
-                    if (cmd & IMM_MASK)
-                    {
-                        if (cmd & RAM_MASK)
-                            fprintf(fp, "pop [%d]\n", value);
-                        else
-                            fprintf(fp, "pop %d\n", value);
-                    }
-                }
-                ip += sizeof(int);
-                break;
-            }
-            case COMMAND_CODES::CMD_JMP:
-            {
-                uint8_t cmd = code->code[ip];
-                ip++;
-                int value = *(int *) (code->code + ip);
-
-                if (cmd & ARG_MASK)
-                {
-                    if (cmd & REG_MASK)
-                    {
-                        if (value > 0 and value < 5)
-                            fprintf(fp, "jmp %s\n", REGS_NAMES[value]);
-                        else
-                            return UNKNOWN_REG;
-                    }
-                    if (cmd & IMM_MASK)
-                    {
-                        if (cmd & RAM_MASK)
-                            fprintf(fp, "jmp [%d]\n", value);
-                        else
-                            fprintf(fp, "jmp %d\n", value);
-                    }
-                }
-                ip += sizeof(int);
-                break;
-            }
+#include "cmd.h"
             default:
             {
                 return UNKNOWN_COMMAND_CODE;
@@ -151,6 +59,8 @@ size_t disassemle(Code *code, FILE *fp)
     }
     return NO_ERRORS;
 }
+#undef DEF_CMD
+
 
 int main(int argc, char *argv[])
 {

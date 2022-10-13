@@ -81,14 +81,14 @@ void detectBrackets(Program *program,
                     size_t line,
                     size_t *error);
 
-/**
- * @brief writes simple commands to array with machine codes
- *
- * @param code array with code
- * @param lenOfCode length of array with code
- * @param command command name to write
- */
-void writeCommand(uint8_t **code, int *lenOfCode, int command);
+///**
+// * @brief writes simple commands to array with machine codes
+// *
+// * @param code array with code
+// * @param lenOfCode length of array with code
+// * @param command command name to write
+// */
+//void writeCommand(uint8_t **code, int *lenOfCode, int command);
 
 /**
  * @brief process push args
@@ -106,6 +106,27 @@ void processArgs(uint8_t **code,
                  int *lenOfCode,
                  int value,
                  size_t *error);
+
+/**
+ * @brief puts args to code
+ *
+ * @param program struct with code
+ * @param line line index of code
+ * @param code array with code
+ * @param commandSize length of command
+ * @param lenOfCode length of array with code
+ * @param command_code code of command
+ * @param table names table
+ * @param error error code
+ */
+void putArgs(Program *program,
+             size_t line,
+             uint8_t **code,
+             int *commandSize,
+             int *lenOfCode,
+             int command_code,
+             NamesTable *table,
+             size_t *error);
 
 /**
  * @brief Compiles code
