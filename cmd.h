@@ -244,7 +244,7 @@ error = stackPop(cpu->stack, &secondValue);
         cpu->ip = arg;
     }
     else
-        cpu->ip++;
+        cpu->ip+=sizeof(int);
 })
 
 DEF_CMD(JB, 13, 1, {
@@ -311,7 +311,7 @@ DEF_CMD(JBE, 14, 1, {
         cpu->ip = arg;
     }
     else
-        cpu->ip++;
+        cpu->ip+=sizeof(int);
 })
 
 DEF_CMD(JE, 15, 1, {
@@ -330,7 +330,7 @@ DEF_CMD(JE, 15, 1, {
     error = stackPop(cpu->stack, &firstValue);
     if (error)
         return error;
-
+//    fprintf(stderr, "%d %d\n", firstValue, secondValue);
     if (firstValue == secondValue)
     {
         if (args & IMM_MASK)
@@ -343,7 +343,7 @@ DEF_CMD(JE, 15, 1, {
         cpu->ip = arg;
     }
     else
-        cpu->ip++;
+        cpu->ip+=sizeof(int);
 })
 
 DEF_CMD(JNE, 17, 1, {
@@ -375,7 +375,7 @@ DEF_CMD(JNE, 17, 1, {
         cpu->ip = arg;
     }
     else
-        cpu->ip++;
+        cpu->ip+=sizeof(int);
 })
 
 DEF_CMD(call, 18, 1, {
