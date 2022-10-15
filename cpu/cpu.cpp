@@ -31,21 +31,19 @@ size_t run(CPU *cpu)
 
     Stack stack_run = {};
     Stack stack_call_run = {};
-    size_t stackError = 0;
+    size_t error = NO_ERRORS;
 
     if (cpu->stack == nullptr)
     {
         cpu->stack = &stack_run;
-        stackCtor(cpu->stack, 1, &stackError)
+        stackCtor(cpu->stack, 1, &error)
     }
 
     if (cpu->call_stack == nullptr)
     {
         cpu->call_stack = &stack_call_run;
-        stackCtor(cpu->call_stack, 1, &stackError)
+        stackCtor(cpu->call_stack, 1, &error)
     }
-
-    size_t error = NO_ERRORS;
 
     while (cpu->ip < cpu->code->len)
     {
