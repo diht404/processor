@@ -3,7 +3,7 @@
 int main(int argc, char *argv[])
 {
     size_t error = NO_ERRORS;
-    const char *input_filename = "func.asm";
+    const char *input_filename = "quadratic.asm";
     const char *output_filename = "data.code";
 
     if (argc == 3)

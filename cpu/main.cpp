@@ -38,9 +38,7 @@ int main(int argc, char *argv[])
     {
         printf("ERROR run: %zu\n", error);
         printf("Stack size: %zu\n", stack.size);
-//        ASSERT_OK(&stack, &error);
         printf("Call stack size: %zu\n", call_stack.size);
-//        ASSERT_OK(&call_stack, &error);
     }
     fclose(fp);
     return 0;

@@ -1,3 +1,5 @@
+#include "config.h"
+
 #define POP(var)                       \
     error = stackPop(cpu->stack, var); \
     if (error)                         \
@@ -9,13 +11,13 @@
         return error;
 
 #define POP_TWO()       \
-    int firstValue = 0; \
+    int firstValue  = 0;\
     int secondValue = 0;\
                         \
     POP(&secondValue);  \
     POP(&firstValue);   \
 
-#define PUSH(value)                       \
+#define PUSH_VALUE(value)                 \
     error = stackPush(cpu->stack, value); \
     if (error)                            \
         return error;
@@ -24,18 +26,6 @@
     error = stackPush(cpu->call_stack, value); \
     if (error)                                 \
         return error;
-
-#define applyOperation(operation)               \
-{                                               \
-    POP_TWO()                                   \
-                                                \
-    if (secondValue == 0 and #operation[0]=='/')\
-        return DIVISION_BY_ZER0;                \
-                                                \
-    PUSH(firstValue operation secondValue);     \
-                                                \
-    cpu->ip++;                                  \
-}
 
 #define GET_ARG()                                          \
     if (args & IMM_MASK)                                   \
@@ -59,25 +49,48 @@ DEF_CMD(HLT, 0, 0, {
 
 DEF_CMD(PUSH, 1, 1, {
     ARG_COMMAND_STEP()
-    GET_ARG()
-    PUSH(arg)
+    if (args & IMM_MASK)
+        arg += command_arg * precision;
+    if (args & REG_MASK)
+        arg += cpu->regs[command_arg];
+    if (args & RAM_MASK)
+        arg = cpu->RAM[arg];
+    PUSH_VALUE(arg)
     ARG_STEP()
 })
 
-DEF_CMD(ADD, 2, 0, {applyOperation(+)})
+DEF_CMD(ADD, 2, 0, {
+    POP_TWO()
+    PUSH_VALUE(firstValue + secondValue);
+    cpu->ip++;
+})
 
-DEF_CMD(MUL, 3, 0, {applyOperation(*)})
+DEF_CMD(MUL, 3, 0, {
+    POP_TWO()
+    PUSH_VALUE(firstValue * secondValue / precision);
+    cpu->ip++;
+})
 
-DEF_CMD(SUB, 4, 0, {applyOperation(-)})
+DEF_CMD(SUB, 4, 0, {
+    POP_TWO()
+    PUSH_VALUE(firstValue - secondValue);
+    cpu->ip++;
+})
 
-DEF_CMD(DIV, 5, 0, {applyOperation(/)})
+DEF_CMD(DIV, 5, 0, {
+    POP_TWO()
+    if (secondValue == 0)
+        return DIVISION_BY_ZER0;
+    PUSH_VALUE(precision * firstValue / secondValue);
+    cpu->ip++;
+})
 
 DEF_CMD(OUT, 6, 0, {
     int value = 0;
 
     POP(&value);
-
-    printf("ANSWER = %d\n", value);
+    float output = (float)value;
+    printf("ANSWER = %lg\n", output / precision);
     cpu->ip++;
 })
 
@@ -96,7 +109,7 @@ DEF_CMD(IN, 8, 0, {
     if (!scanf("%d", &value))
         return CPU_ERRORS::CPU_READ_FROM_CONSOLE_FAILED;
 
-    PUSH(value);
+    PUSH_VALUE(value);
 
     cpu->ip++;
 })
@@ -172,6 +185,6 @@ DEF_CMD(any_num, 20, 0, {
 DEF_CMD(SQRT, 21, 0, {
     int value = 0;
     POP(&value)
-    PUSH((int)sqrt(value))
+    PUSH_VALUE((int)sqrt(value * precision))
     cpu->ip++;
 })

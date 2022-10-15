@@ -1,4 +1,4 @@
-call :in
+call :input
 call :push_regs
 call :func
 hlt
@@ -10,10 +10,10 @@ hlt
     push 0
     jne :a_not_zero
     ret
-:in
-    push 1
-    push 4
-    push 2
+:input
+    in
+    in
+    in
     ret
 :push_regs
     pop rcx

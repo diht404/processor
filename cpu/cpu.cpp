@@ -58,9 +58,6 @@ size_t run(CPU *cpu)
                 return CPU_ERRORS::CPU_UNKNOWN_COMMAND;
             }
         }
-
-
-
     }
     return CPU_ERRORS::CPU_NO_ERRORS;
 }
