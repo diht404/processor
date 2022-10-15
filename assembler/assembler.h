@@ -81,15 +81,6 @@ void detectBrackets(Program *program,
                     size_t line,
                     size_t *error);
 
-///**
-// * @brief writes simple commands to array with machine codes
-// *
-// * @param code array with code
-// * @param lenOfCode length of array with code
-// * @param command command name to write
-// */
-//void writeCommand(uint8_t **code, int *lenOfCode, int command);
-
 /**
  * @brief process push args
  *
