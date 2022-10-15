@@ -158,26 +158,26 @@ DEF_CMD(JBE, 14, 1, CONDITION_JMP(<=))
 DEF_CMD(JE, 15, 1, CONDITION_JMP(==))
 DEF_CMD(JNE, 16, 1, CONDITION_JMP(!=))
 
-DEF_CMD(call, 17, 1, {
+DEF_CMD(CALL, 17, 1, {
     ARG_COMMAND_STEP()
     GET_ARG()
     CALL_PUSH(cpu->ip + sizeof(int));
     cpu->ip = arg;
 })
 
-DEF_CMD(ret, 18, 0, {
+DEF_CMD(RET, 18, 0, {
     cpu->ip++;
     int arg = 0;
     CALL_POP(&arg)
     cpu->ip = arg;
 })
 
-DEF_CMD(no_sols, 19, 0, {
+DEF_CMD(NO_SOLS, 19, 0, {
     printf("NO SOLUTIONS\n");
     cpu->ip++;
 })
 
-DEF_CMD(any_num, 20, 0, {
+DEF_CMD(ANY_NUM, 20, 0, {
     printf("ANY NUMBER\n\n");
     cpu->ip++;
 })
