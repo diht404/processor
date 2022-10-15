@@ -62,5 +62,4 @@ size_t run(CPU *cpu)
     return CPU_ERRORS::CPU_NO_ERRORS;
 }
 
-#undef applyOperation
 #undef DEF_CMD
