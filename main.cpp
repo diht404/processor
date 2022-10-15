@@ -11,10 +11,68 @@ int main()
            "stack/stack_logs.cpp stack/stack_verification.cpp -o disassembler/disassembler");
     system("g++ " flags "cpu/main.cpp cpu/cpu.cpp utils.cpp stack/stack.cpp "
            "stack/stack_logs.cpp stack/stack_verification.cpp -o cpu/cpu");
-    system("./assembler/assembler quadratic.asm data.code");
+    system("./assembler/assembler factorial.asm data.code");
     system("./disassembler/disassembler data.code data.disasm");
     system("./cpu/cpu data.code");
     system("rm ./data.code");
     system("rm ./assembler/assembler ./disassembler/disassembler ./cpu/cpu ./main");
     return 0;
 }
+//rbx - текущий множитель
+//rax - хранилище произведения
+
+//push 10
+//call :factorial
+//out
+//dump
+//hlt
+//:factorial
+//    call :set_rax
+//    pop rbx
+//    push rbx
+//    push rax
+//    mul
+//    pop rax
+//    push rbx
+//    push 1
+//    sub
+//    pop rbx
+//    push rbx
+//    push 1
+//    jb :exit
+//    push rbx
+//    call :factorial
+//    push rbx
+//    push 1
+//    jb :push_answer
+//    ret
+//:set_rax
+//    push rax
+//    push 1
+//    jae :exit
+//    push 1
+//    pop rax
+//    ret
+//:exit
+//    ret
+//:push_answer
+//    push rax
+//    ret
+
+
+//push 2
+//call :factorial
+//out
+//hlt
+//:factorial
+//    pop rbx
+//    push rbx
+//    push 1
+//    jbe :exit
+//    pop rax
+//    push rax
+//    push rbx
+//    push 1
+//:exit
+//    push 1
+//    ret
