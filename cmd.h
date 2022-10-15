@@ -109,7 +109,7 @@ DEF_CMD(IN, 8, 0, {
     if (!scanf("%d", &value))
         return CPU_ERRORS::CPU_READ_FROM_CONSOLE_FAILED;
 
-    PUSH_VALUE(value);
+    PUSH_VALUE(value * precision);
 
     cpu->ip++;
 })
