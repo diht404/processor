@@ -178,13 +178,4 @@ uint8_t *compileWithNamesTable(Program *program,
  */
 size_t saveFile(uint8_t *code, const char *filename);
 
-/**
- * @brief Saves array with compiled code to txt file
- *
- * @param code code to write to file
- * @param filename name of file to write
- * @return error code
- */
-size_t saveFileTxt(uint8_t *code, const char *filename);
-
 #endif //STACK__ASSEMBLER_H

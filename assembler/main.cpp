@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
         printf("compile error: %zu\n", error);
 
     saveFile(code, output_filename);
-    error = saveFileTxt(code, "data.txt");
+//    error = saveFileTxt(code, "data.txt");
     free(code);
     fclose(fp);
     return 0;
