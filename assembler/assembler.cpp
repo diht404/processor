@@ -6,6 +6,7 @@ size_t readFile(FILE *fp, Program *program)
     {
         return FILENAME_IS_NULLPTR;
     }
+
     if (program == nullptr)
     {
         return PROGRAM_IS_NULLPTR;

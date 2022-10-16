@@ -1,12 +1,12 @@
 #include "cpu.h"
 
-void processorDump(FILE *fp, CPU *cpu)
+size_t processorDump(FILE *fp, CPU *cpu)
 {
     if (fp == nullptr)
         fp = stderr;
 
     if (cpu == nullptr)
-        return;
+        return CPU_IS_NULLPTR;
 
     for (size_t i = 0; i < cpu->code->len; i++)
     {
@@ -18,6 +18,7 @@ void processorDump(FILE *fp, CPU *cpu)
         fprintf(fp, "%d ", cpu->code->code[i]);
     }
     fprintf(fp, "\n");
+    return CPU_NO_ERRORS;
 }
 
 #define DEF_CMD(name, num, arg, cpu_code) \
@@ -27,7 +28,8 @@ case COMMAND_CODES::CMD_##name:           \
 
 size_t run(CPU *cpu)
 {
-    assert(cpu != nullptr);
+    if (cpu == nullptr)
+        return CPU_IS_NULLPTR;
 
     Stack stack_run = {};
     Stack stack_call_run = {};

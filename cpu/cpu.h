@@ -11,6 +11,7 @@ enum CPU_ERRORS
     CPU_READ_FROM_CONSOLE_FAILED = 1 << 3,
     CPU_UNKNOWN_COMMAND          = 1 << 4,
     DIVISION_BY_ZER0             = 1 << 5,
+    CPU_IS_NULLPTR               = 1 << 6,
 };
 
 struct CPU
@@ -33,6 +34,6 @@ struct CPU
  */
 size_t run(CPU *cpu);
 
-void processorDump(FILE *fp, CPU *cpu);
+size_t processorDump(FILE *fp, CPU *cpu);
 
 #endif //STACK__CPU_H
