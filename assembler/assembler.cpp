@@ -245,7 +245,7 @@ uint8_t *compile(Program *program,
         {
             fillNameTable(table, cmd, lenOfCode);
         }
-#include "../cmd.h"
+#include "../common/cmd.h"
         else
         {
             *error |= ASSEMBLER_COMPILATION_FAILED;

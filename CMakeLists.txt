@@ -8,10 +8,10 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D _DEBUG -ggdb3 -std=c++17 -O0 -Wall -W
 add_executable(stack stack/main.cpp stack/stack.cpp stack/stack_logs.cpp stack/stack_verification.cpp)
 
 add_executable(main main.cpp)
-add_executable(assembler_run assembler/main.cpp assembler/assembler.cpp utils.cpp
+add_executable(assembler_run assembler/main.cpp assembler/assembler.cpp common/utils.cpp
         stack/stack.cpp stack/stack_logs.cpp stack/stack_verification.cpp)
-add_executable(disassembler_run disassembler/main.cpp disassembler/disassembler.cpp utils.cpp
+add_executable(disassembler_run disassembler/main.cpp disassembler/disassembler.cpp common/utils.cpp
         stack/stack.cpp stack/stack_logs.cpp stack/stack_verification.cpp)
-add_executable(cpu_run cpu/main.cpp cpu/cpu.cpp utils.cpp
+add_executable(cpu_run cpu/main.cpp cpu/cpu.cpp common/utils.cpp
         stack/stack.cpp stack/stack_logs.cpp stack/stack_verification.cpp)
 add_executable(sfml_test sfml_test.cpp)

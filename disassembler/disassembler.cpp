@@ -50,7 +50,7 @@ size_t disassemle(Code *code, FILE *fp)
     {
         switch (code->code[ip] & CMD_MASK)
         {
-#include "../cmd.h"
+#include "../common/cmd.h"
             default:
             {
                 return UNKNOWN_COMMAND_CODE;

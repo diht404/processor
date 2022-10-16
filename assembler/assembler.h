@@ -1,7 +1,7 @@
 #ifndef STACK__ASSEMBLER_H
 #define STACK__ASSEMBLER_H
 
-#include "../utils.h"
+#include "../common/utils.h"
 
 enum ASSEMBLER_ERRORS
 {

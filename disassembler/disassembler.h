@@ -1,7 +1,7 @@
 #ifndef STACK__DISASSEMBLER_H
 #define STACK__DISASSEMBLER_H
 
-#include "../utils.h"
+#include "../common/utils.h"
 
 enum DISASSEMBLER_ERRORS
 {

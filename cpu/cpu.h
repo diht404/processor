@@ -3,7 +3,7 @@
 
 #include "../stack/stack.h"
 #include "../stack/stack_logs.h"
-#include "../utils.h"
+#include "../common/utils.h"
 
 enum CPU_ERRORS
 {

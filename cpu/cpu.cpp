@@ -51,7 +51,7 @@ size_t run(CPU *cpu)
         uint8_t args = cpu->code->code[cpu->ip] & ARG_MASK;
         switch (command)
         {
-#include "../cmd.h"
+#include "../common/cmd.h"
             default:
             {
                 fprintf(stderr, "CPU_UNKNOWN_COMMAND\n");

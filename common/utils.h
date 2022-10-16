@@ -1,7 +1,7 @@
 #ifndef STACK__UTILS_H
 #define STACK__UTILS_H
 
-#include "stack/stack.h"
+#include "../stack/stack.h"
 #include <sys/stat.h>
 #include <unistd.h>
 
@@ -11,6 +11,7 @@ CMD_##name = num,
 enum COMMAND_CODES
 {
 #include "cmd.h"
+#include "config.h"
 };
 
 #undef DEF_CMD
