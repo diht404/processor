@@ -12,4 +12,5 @@ pop rax
 push rax
 push 10
 jb :label
+PICTURE
 hlt

@@ -20,7 +20,8 @@ struct CPU
     Stack *call_stack = nullptr;
     size_t ip = 0;
     int regs[5] = {0, 0, 0, 0, 0};
-    int RAM[100] = {0};
+    static const int vram_size = 20*20;
+    int RAM[vram_size] = {0};
 };
 
 /**

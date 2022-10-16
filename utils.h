@@ -3,6 +3,7 @@
 
 #include "stack/stack.h"
 #include <sys/stat.h>
+#include <unistd.h>
 
 #define DEF_CMD(name, num, arg, cpu_code) \
 CMD_##name = num,
@@ -20,6 +21,8 @@ const uint8_t ARG_MASK = 0xE0;
 const uint8_t RAM_MASK = 0x80;
 const uint8_t REG_MASK = 0x40;
 const uint8_t IMM_MASK = 0x20;
+const int EPS = 8;
+const float SQUEEZE = 1.5;
 
 enum UTILS_ERRORS
 {

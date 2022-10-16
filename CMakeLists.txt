@@ -14,3 +14,4 @@ add_executable(disassembler_run disassembler/main.cpp disassembler/disassembler.
         stack/stack.cpp stack/stack_logs.cpp stack/stack_verification.cpp)
 add_executable(cpu_run cpu/main.cpp cpu/cpu.cpp utils.cpp
         stack/stack.cpp stack/stack_logs.cpp stack/stack_verification.cpp)
+add_executable(sfml_test sfml_test.cpp)

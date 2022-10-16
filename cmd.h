@@ -33,7 +33,10 @@
     if (args & REG_MASK)                                   \
         arg += cpu->regs[command_arg];                     \
     if (args & RAM_MASK)                                   \
+    {                                                      \
+        sleep(0);                                          \
         arg = cpu->RAM[arg];                               \
+    }
 
 #define ARG_COMMAND_STEP()                                 \
     cpu->ip++;                                             \
@@ -54,7 +57,10 @@ DEF_CMD(PUSH, 1, 1, {
     if (args & REG_MASK)
         arg += cpu->regs[command_arg];
     if (args & RAM_MASK)
+    {
+        sleep(0);
         arg = cpu->RAM[arg];
+    }
     PUSH_VALUE(arg)
     ARG_STEP()
 })
@@ -126,6 +132,7 @@ DEF_CMD(POP, 9, 1, {
     if (args & RAM_MASK)
     {
         POP(&arg)
+        sleep(0);
         cpu->RAM[command_arg] = arg;
     }
     ARG_STEP()
@@ -186,5 +193,32 @@ DEF_CMD(SQRT, 21, 0, {
     int value = 0;
     POP(&value)
     PUSH_VALUE((int)sqrt(value * precision))
+    cpu->ip++;
+})
+
+DEF_CMD(PICTURE, 22, 0, {
+    int size = sqrt(cpu->vram_size);
+    int radius = size / 2;
+
+    for (int y = 0; y < size; y++)
+    {
+        for (int x = 0; x < size; x++)
+        {
+            if (abs((x - radius) * (x - radius) +
+                    (y - radius) * (y - radius) -
+                    radius * radius / SQUEEZE
+                    ) < EPS)
+                cpu->RAM[size * y + x] = 1;
+        }
+    }
+
+    for (int y = 0; y < size; y++)
+    {
+        for (int x = 0; x < size; x++)
+        {
+            printf("%s", cpu->RAM[size * y + x]? "***": "...");
+        }
+        printf("\n");
+    }
     cpu->ip++;
 })
