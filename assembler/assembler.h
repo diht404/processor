@@ -179,4 +179,11 @@ uint8_t *compileWithNamesTable(Program *program,
  */
 size_t saveFile(uint8_t *code, const char *filename);
 
+/**
+ * @brief process error
+ *
+ * @param error error code
+ */
+void processAsmError(size_t error);
+
 #endif //STACK__ASSEMBLER_H

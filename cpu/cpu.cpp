@@ -65,3 +65,23 @@ size_t run(CPU *cpu)
 }
 
 #undef DEF_CMD
+
+void processCpuError(size_t error, CPU *cpu)
+{
+    FILE *fp = stderr;
+    if (!error)
+    {
+        return;
+    }
+    if (error)
+        processorDump(fp, cpu);
+
+    if (error & CPU_READ_FROM_CONSOLE_FAILED)
+        fprintf(fp, "Reading from console failed.\n");
+    if (error & CPU_UNKNOWN_COMMAND)
+        fprintf(fp, "Got unknown command.\n");
+    if (error & DIVISION_BY_ZER0)
+        fprintf(fp, "Division by zero.\n");
+    if (error & CPU_IS_NULLPTR)
+        fprintf(fp, "CPU is pullptr.\n");
+}

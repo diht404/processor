@@ -36,4 +36,12 @@ size_t run(CPU *cpu);
 
 size_t processorDump(FILE *fp, CPU *cpu);
 
+/**
+ * @brief process error
+ *
+ * @param error error code
+ * @param cpu cpu with error
+ */
+void processCpuError(size_t error, CPU *cpu);
+
 #endif //STACK__CPU_H

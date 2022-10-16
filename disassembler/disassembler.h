@@ -33,4 +33,11 @@ size_t printArg(Code *code, FILE *fp, const char *command_name, size_t *ip);
  */
 size_t disassemle(Code *code, FILE *fp);
 
+/**
+ * @brief process error
+ *
+ * @param error error code
+ */
+void processDisasmError(size_t error);
+
 #endif //STACK__DISASSEMBLER_H

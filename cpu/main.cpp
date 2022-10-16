@@ -30,15 +30,13 @@ int main(int argc, char *argv[])
     error = readCode(fp, &code);
     if (error)
     {
-        printf("ERROR read: %zu\n", error);
+        processCpuError(error, &cpu);
     }
 
     error = run(&cpu);
     if (error)
     {
-        printf("ERROR run: %zu\n", error);
-        printf("Stack size: %zu\n", stack.size);
-        printf("Call stack size: %zu\n", call_stack.size);
+        processCpuError(error, &cpu);
     }
     fclose(fp);
     return 0;

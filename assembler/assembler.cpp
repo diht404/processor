@@ -449,7 +449,6 @@ uint8_t *compileWithNamesTable(Program *program,
     }
 
     NamesTable table = {};
-    // [id][name]
 
     uint8_t *code = nullptr;
 
@@ -480,4 +479,40 @@ size_t saveFile(uint8_t *code, const char *filename)
 
     fclose(fp);
     return NO_ERRORS;
+}
+
+void processAsmError(size_t error)
+{
+    FILE *fp = stderr;
+    if (!error)
+    {
+        return;
+    }
+
+    if (error & ASSEMBLER_CANT_ALLOCATE_MEMORY_FOR_PROGRAM)
+        fprintf(fp, "Can't allocate memory for program.\n");
+    if (error & ASSEMBLER_CANT_ALLOCATE_MEMORY_FOR_STRINGS)
+        fprintf(fp, "Can't allocate memory for strings.\n");
+    if (error & ASSEMBLER_COMPILATION_FAILED)
+        fprintf(fp, "Compilation failed.\n");
+    if (error & ASSEMBLER_CANT_SHRINK_TO_FIT)
+        fprintf(fp, "Can't shrink array with code to fit.\n");
+    if (error & INCORRECT_BRACKETS)
+        fprintf(fp, "Got incorrect brackets.\n");
+    if (error & CODE_IS_NULLPTR)
+        fprintf(fp, "Code is nullptr.\n");
+    if (error & BUFFER_IS_NULLPTR)
+        fprintf(fp, "Buffer is nullptr.\n");
+    if (error & PROGRAM_IS_NULLPTR)
+        fprintf(fp, "Program is nullptr.\n");
+    if (error & COMMAND_SIZE_IS_NULLPTR)
+        fprintf(fp, "Command size is nullptr.\n");
+    if (error & LEN_OF_CODE_IS_NULLPTR)
+        fprintf(fp, "Length of code is nullptr.\n");
+    if (error & NAME_TABLE_IS_NULLPTR)
+        fprintf(fp, "Names table is nullptr.\n");
+    if (error & FILENAME_IS_NULLPTR)
+        fprintf(fp, "Filename is nullptr.\n");
+    if (error & FILE_IS_NULLPTR)
+        fprintf(fp, "File is nullptr.\n");
 }

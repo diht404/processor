@@ -15,14 +15,15 @@ int main(int argc, char *argv[])
     FILE *fp = fopen(input_filename, "r");
 
     Program text = {};
-    readFile(fp, &text);
+    error = readFile(fp, &text);
+    processAsmError(error);
 
     uint8_t *code = compileWithNamesTable(&text, &error);
+    processAsmError(error);
 
-    if (error)
-        printf("compile error: %zu\n", error);
+    error = saveFile(code, output_filename);
+    processAsmError(error);
 
-    saveFile(code, output_filename);
     free(code);
     fclose(fp);
     return 0;
