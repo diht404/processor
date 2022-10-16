@@ -81,6 +81,8 @@ void detectBrackets(Program *program,
                     size_t line,
                     size_t *error);
 
+void detectPlus();
+
 /**
  * @brief process push args
  *

@@ -59,7 +59,7 @@ DEF_CMD(PUSH, 1, 1, {
     if (args & RAM_MASK)
     {
         sleep(0);
-        arg = cpu->RAM[arg];
+        arg = cpu->RAM[arg / precision];
     }
     PUSH_VALUE(arg)
     ARG_STEP()

@@ -1,4 +1,3 @@
-:label
 push 3
 push 2
 mul
@@ -9,9 +8,8 @@ push rbx
 div
 add
 push 42
-pop [5]
-push [5]
+pop [56]
+push [56]
 sub
 out
-jmp :label
 hlt

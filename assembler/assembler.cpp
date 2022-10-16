@@ -74,29 +74,28 @@ void detectBrackets(Program *program,
 {
     if (*(program->lines[line] + commandSize) == '[')
     {
-        size_t bra = commandSize;
-        size_t ket = commandSize;
+        int bracket = commandSize;
 
         bool correct = false;
-        while (!(*(program->lines[line] + ket) != ']'
-            and *(program->lines[line] + ket) != '\0'
-            and *(program->lines[line] + ket) == '\n'))
+        while(commandSize < BUFFER_SIZE)
         {
-            if (*(program->lines[line] + ket) == ']')
+            if (*(program->lines[line] + commandSize) == ']')
+            {
                 correct = true;
-            ket++;
+                break;
+            }
+            else
+                commandSize++;
         }
-
         if (!correct)
         {
             *error |= INCORRECT_BRACKETS;
             return;
         }
         memcpy(buffer,
-               program->lines[line] + bra + 1,
-               ket - bra);
+               program->lines[line] + bracket + 1,
+               commandSize - bracket - 1);
         *code |= RAM_MASK;
-        // TODO: add [rax + value] support
     }
     else
     {
@@ -105,6 +104,12 @@ void detectBrackets(Program *program,
                BUFFER_SIZE);
     }
 }
+
+void detectPlus()
+{
+
+};
+
 
 void processArgs(uint8_t **code,
                  int command_code,

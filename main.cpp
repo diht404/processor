@@ -11,7 +11,7 @@ int main()
            "stack/stack_logs.cpp stack/stack_verification.cpp -o disassembler/disassembler");
     system("g++ " flags "cpu/main.cpp cpu/cpu.cpp utils.cpp stack/stack.cpp "
            "stack/stack_logs.cpp stack/stack_verification.cpp -o cpu/cpu");
-    system("./assembler/assembler print_squares.asm data.code");
+    system("./assembler/assembler data.asm data.code");
     system("./disassembler/disassembler data.code data.disasm");
     system("./cpu/cpu data.code");
     system("rm ./data.code");
