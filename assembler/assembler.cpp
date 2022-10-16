@@ -150,12 +150,6 @@ void detectBrackets(Program *program,
     }
 }
 
-void detectRexPlusArg()
-{
-
-};
-
-
 void processArgs(uint8_t **code,
                  int command_code,
                  char *buffer,
