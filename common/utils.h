@@ -34,7 +34,7 @@ enum UTILS_ERRORS
 };
 
 const size_t  COMPILATION_CONST = 0xDEADF00D;
-const size_t  VERSION_CONST     = 6;
+const size_t  VERSION_CONST     = 10;
 const char    REGS_NAMES[5][4]  = {"r0x", "rax", "rbx", "rcx", "rdx"};
 const uint8_t BUFFER_SIZE       = 128;
 

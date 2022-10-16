@@ -12,5 +12,6 @@ pop rax
 push rax
 push 10
 jb :label
-PICTURE
+CIRCLE_PICTURE
+SQUARE_PICTURE
 hlt

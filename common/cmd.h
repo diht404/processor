@@ -46,6 +46,17 @@
 #define ARG_STEP()          \
     cpu->ip += sizeof(int);
 
+#define SHOW_RAM_DATA                                        \
+    printf("\n");                                            \
+    for (int y = 0; y < size; y++)                           \
+    {                                                        \
+        for (int x = 0; x < size; x++)                       \
+        {                                                    \
+            printf("%s", cpu->RAM[size * y + x]? "* ": ". ");\
+        }                                                    \
+        printf("\n");                                        \
+    }
+
 DEF_CMD(HLT, 0, 0, {
     return error;
 })
@@ -196,7 +207,7 @@ DEF_CMD(SQRT, 21, 0, {
     cpu->ip++;
 })
 
-DEF_CMD(PICTURE, 22, 0, {
+DEF_CMD(CIRCLE_PICTURE, 22, 0, {
     int size = sqrt(cpu->vram_size);
     int radius = size / 2;
 
@@ -209,16 +220,46 @@ DEF_CMD(PICTURE, 22, 0, {
                     radius * radius / SQUEEZE
                     ) < EPS)
                 cpu->RAM[size * y + x] = 1;
+            else
+                cpu->RAM[size * y + x] = 0;
         }
     }
+    SHOW_RAM_DATA
+    cpu->ip++;
+})
 
-    for (int y = 0; y < size; y++)
+DEF_CMD(SQUARE_PICTURE, 23, 0, {
+    int size = sqrt(cpu->vram_size);//rax
+    int size_of_square = 4;//rbx
+
+    for (int y = 0; y < size; y++)//rcx
     {
-        for (int x = 0; x < size; x++)
+        for (int x = 0; x < size; x++)//rdx
         {
-            printf("%s", cpu->RAM[size * y + x]? "***": "...");
+            if (x % size_of_square > 0 and y % size_of_square > 0)
+                cpu->RAM[size * y + x] = 1;
+            else
+                cpu->RAM[size * y + x] = 0;
         }
-        printf("\n");
     }
+    SHOW_RAM_DATA
+    cpu->ip++;
+})
+
+DEF_CMD(SHOW_RAM, 24, 0, {
+    int size = sqrt(cpu->vram_size);
+    SHOW_RAM_DATA
+    cpu->ip++;
+})
+
+DEF_CMD(MOD, 25, 0, {
+    POP_TWO()
+    PUSH_VALUE(firstValue % secondValue);
+    cpu->ip++;
+})
+
+DEF_CMD(SET_RAM, 26, 0, {
+    POP_TWO()
+    cpu->RAM[firstValue / precision] = secondValue / precision;
     cpu->ip++;
 })
