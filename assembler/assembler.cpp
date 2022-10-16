@@ -2,8 +2,14 @@
 
 size_t readFile(FILE *fp, Program *program)
 {
-    assert(fp != nullptr);
-    assert(program != nullptr);
+    if (fp == nullptr)
+    {
+        return FILENAME_IS_NULLPTR;
+    }
+    if (program == nullptr)
+    {
+        return PROGRAM_IS_NULLPTR;
+    }
 
     size_t lenOfFile = 0;
     char *txt = nullptr;
@@ -43,8 +49,15 @@ size_t readFile(FILE *fp, Program *program)
 
 void addInfo(uint8_t **code)
 {
-    assert(code != nullptr);
-    assert(*code != nullptr);
+    if (code == nullptr)
+    {
+        return;
+    }
+
+    if (*code == nullptr)
+    {
+        return;
+    }
 
     *(size_t *) *code = COMPILATION_CONST;
     *code = (uint8_t *) ((size_t *) *code + 1);
@@ -57,6 +70,16 @@ void addInfo(uint8_t **code)
 
 void skipSpaces(Program *program, size_t line, int *commandSize)
 {
+    if (program == nullptr)
+    {
+        return;
+    }
+
+    if (commandSize == nullptr)
+    {
+        return;
+    }
+
     while (*(program->lines[line] + *commandSize) == ' '
         or *(program->lines[line] + *commandSize) == '\0'
         or *(program->lines[line] + *commandSize) == '\n')
@@ -72,6 +95,27 @@ void detectBrackets(Program *program,
                     size_t line,
                     size_t *error)
 {
+    if (program == nullptr)
+    {
+        if (error)
+            *error |= PROGRAM_IS_NULLPTR;
+        return;
+    }
+
+    if (code == nullptr)
+    {
+        if (error)
+            *error |= CODE_IS_NULLPTR;
+        return;
+    }
+
+    if (buffer == nullptr)
+    {
+        if (error)
+            *error |= BUFFER_IS_NULLPTR;
+        return;
+    }
+
     if (*(program->lines[line] + commandSize) == '[')
     {
         int bracket = commandSize;
@@ -105,7 +149,7 @@ void detectBrackets(Program *program,
     }
 }
 
-void detectPlus()
+void detectRexPlusArg()
 {
 
 };
@@ -118,6 +162,27 @@ void processArgs(uint8_t **code,
                  int value,
                  size_t *error)
 {
+    if (code == nullptr)
+    {
+        if (error)
+            *error |= CODE_IS_NULLPTR;
+        return;
+    }
+
+    if (*code == nullptr)
+    {
+        if (error)
+            *error |= CODE_IS_NULLPTR;
+        return;
+    }
+
+    if (buffer == nullptr)
+    {
+        if (error)
+            *error |= BUFFER_IS_NULLPTR;
+        return;
+    }
+
     reg_compile(command_code, "rax", 1)
     else reg_compile(command_code, "rbx", 2)
     else reg_compile(command_code, "rcx", 3)
@@ -126,7 +191,8 @@ void processArgs(uint8_t **code,
                      "%d",
                      &value))
     {
-        *error |= ASSEMBLER_COMPILATION_FAILED;
+        if (error)
+            *error |= ASSEMBLER_COMPILATION_FAILED;
         return;
     }
     else
@@ -150,6 +216,48 @@ void putArgs(Program *program,
              NamesTable *table,
              size_t *error)
 {
+    if (program == nullptr)
+    {
+        if (error)
+            *error |= PROGRAM_IS_NULLPTR;
+        return;
+    }
+
+    if (code == nullptr)
+    {
+        if (error)
+            *error |= CODE_IS_NULLPTR;
+        return;
+    }
+
+    if (*code == nullptr)
+    {
+        if (error)
+            *error |= CODE_IS_NULLPTR;
+        return;
+    }
+
+    if (commandSize == nullptr)
+    {
+        if (error)
+            *error |= COMMAND_SIZE_IS_NULLPTR;
+        return;
+    }
+
+    if (lenOfCode == nullptr)
+    {
+        if (error)
+            *error |= LEN_OF_CODE_IS_NULLPTR;
+        return;
+    }
+
+    if (table == nullptr)
+    {
+        if (error)
+            *error |= NAME_TABLE_IS_NULLPTR;
+        return;
+    }
+
     char buffer[BUFFER_SIZE] = "";
     int value = 0;
 
@@ -208,8 +316,19 @@ uint8_t *compile(Program *program,
                  NamesTable *table,
                  size_t *error)
 {
-    assert(program != nullptr);
-    assert(error != nullptr);
+    if (program == nullptr)
+    {
+        if (error)
+            *error |= PROGRAM_IS_NULLPTR;
+        return nullptr;
+    }
+
+    if (table == nullptr)
+    {
+        if (error)
+            *error |= NAME_TABLE_IS_NULLPTR;
+        return nullptr;
+    }
 
     size_t line = 0;
     char cmd[BUFFER_SIZE] = "";
@@ -220,7 +339,8 @@ uint8_t *compile(Program *program,
         2 * program->length * sizeof(int), 1);
     if (code == nullptr)
     {
-        *error |= ASSEMBLER_CANT_ALLOCATE_MEMORY_FOR_PROGRAM;
+        if (error)
+            *error |= ASSEMBLER_CANT_ALLOCATE_MEMORY_FOR_PROGRAM;
         return nullptr;
     }
 
@@ -237,7 +357,8 @@ uint8_t *compile(Program *program,
                     cmd,
                     &commandSize))
         {
-            *error |= ASSEMBLER_COMPILATION_FAILED;
+            if (error)
+                *error |= ASSEMBLER_COMPILATION_FAILED;
             return nullptr;
         }
         // label definition
@@ -248,7 +369,8 @@ uint8_t *compile(Program *program,
 #include "../common/cmd.h"
         else
         {
-            *error |= ASSEMBLER_COMPILATION_FAILED;
+            if (error)
+                *error |= ASSEMBLER_COMPILATION_FAILED;
             return nullptr;
         }
         line++;
@@ -263,7 +385,8 @@ uint8_t *compile(Program *program,
                                                  * sizeof(newMemory[0]));
     if (newMemory == nullptr)
     {
-        *error = ASSEMBLER_CANT_SHRINK_TO_FIT;
+        if (error)
+            *error = ASSEMBLER_CANT_SHRINK_TO_FIT;
         return code;
     }
     return code;
@@ -300,6 +423,10 @@ void fillNameTable(NamesTable *table,
 int getIpFromTable(NamesTable *table,
                    char name[BUFFER_SIZE])
 {
+    if (table == nullptr)
+    {
+        return -1;
+    }
     for (int i = 0; i < BUFFER_SIZE; i++)
     {
         if (strcasecmp(table->names_table[i], name) == 0)
@@ -313,6 +440,13 @@ int getIpFromTable(NamesTable *table,
 uint8_t *compileWithNamesTable(Program *program,
                                size_t *error)
 {
+    if (program == nullptr)
+    {
+        if (error)
+            *error |= PROGRAM_IS_NULLPTR;
+        return nullptr;
+    }
+
     NamesTable table = {};
     // [id][name]
 
@@ -327,8 +461,14 @@ uint8_t *compileWithNamesTable(Program *program,
 
 size_t saveFile(uint8_t *code, const char *filename)
 {
-    assert(code != nullptr);
-    assert(filename != nullptr);
+    if (code == nullptr)
+    {
+        return CODE_IS_NULLPTR;
+    }
+    if (filename == nullptr)
+    {
+        return FILENAME_IS_NULLPTR;
+    }
 
     FILE *fp = fopen(filename, "w");
 
