@@ -5,8 +5,12 @@
 
 enum DISASSEMBLER_ERRORS
 {
-    UNKNOWN_COMMAND_CODE = 1 << 6,
-    UNKNOWN_REG          = 1 << 7,
+    UNKNOWN_COMMAND_CODE    = 1 << 6,
+    UNKNOWN_REG             = 1 << 7,
+    CODE_IS_NULLPTR         = 1 << 8,
+    FILE_IS_NULLPTR         = 1 << 9,
+    COMMAND_NAME_IS_NULLPTR = 1 << 10,
+    IP_IS_NULLPTR           = 1 << 11,
 };
 
 /**

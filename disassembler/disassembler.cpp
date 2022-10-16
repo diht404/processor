@@ -2,6 +2,26 @@
 
 size_t printArg(Code *code, FILE *fp, const char *command_name, size_t *ip)
 {
+    if (code == nullptr)
+    {
+        return CODE_IS_NULLPTR;
+    }
+
+    if (fp == nullptr)
+    {
+        return FILE_IS_NULLPTR;
+    }
+
+    if (command_name == nullptr)
+    {
+        return COMMAND_NAME_IS_NULLPTR;
+    }
+
+    if (ip == nullptr)
+    {
+        return IP_IS_NULLPTR;
+    }
+
     uint8_t cmd = code->code[*ip];
     (*ip)++;
     int value = *(int *) (code->code + *ip);
@@ -42,8 +62,15 @@ case COMMAND_CODES::CMD_##name:          \
 
 size_t disassemle(Code *code, FILE *fp)
 {
-    assert(code != nullptr);
-    assert(fp != nullptr);
+    if (code == nullptr)
+    {
+        return CODE_IS_NULLPTR;
+    }
+
+    if (fp == nullptr)
+    {
+        return FILE_IS_NULLPTR;
+    }
 
     size_t ip = 0;
     while (ip < code->len)
