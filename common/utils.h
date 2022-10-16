@@ -11,7 +11,6 @@ CMD_##name = num,
 enum COMMAND_CODES
 {
 #include "cmd.h"
-#include "config.h"
 };
 
 #undef DEF_CMD
