@@ -10,11 +10,9 @@ const uint8_t IMM_MASK = 0x20;
 const int EPS = 8;
 const float SQUEEZE = 1.5;
 
-
-const size_t  COMPILATION_CONST = 0xDEADF00D;
-const size_t  VERSION_CONST     = 10;
-const char    REGS_NAMES[5][4]  = {"r0x", "rax", "rbx", "rcx", "rdx"};
-const uint8_t BUFFER_SIZE       = 128;
-
+const size_t COMPILATION_CONST = 0xDEADF00D;
+const size_t VERSION_CONST = 10;
+const char REGS_NAMES[5][4] = {"r0x", "rax", "rbx", "rcx", "rdx"};
+const uint8_t BUFFER_SIZE = 128;
 
 #endif //STACK_COMMON_CONSTS_H
