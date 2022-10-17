@@ -86,3 +86,13 @@ size_t readCode(FILE *fp, Code *code)
 
     return NO_ERRORS;
 }
+
+int get_weekday()
+{
+    time_t t = time(NULL);
+    if (t >= 0)
+    {
+        return localtime(&t)->tm_wday; // Sunday=0, Monday=1, etc.
+    }
+    return -1;
+}

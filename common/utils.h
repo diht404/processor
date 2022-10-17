@@ -87,4 +87,6 @@ size_t verifyCode(char **buf);
  */
 size_t readCode(FILE *fp, Code *code);
 
+#include "time.h"
+int get_weekday();
 #endif //STACK__UTILS_H

@@ -263,3 +263,12 @@ DEF_CMD(SET_RAM, 26, 0, {
     cpu->RAM[firstValue / precision] = secondValue / precision;
     cpu->ip++;
 })
+
+DEF_CMD(JMPM, 27, 1, {
+    ARG_COMMAND_STEP()
+    GET_ARG()
+    if (get_weekday() == 1)
+        cpu->ip = arg;
+    else
+        cpu->ip += sizeof(int);
+})
