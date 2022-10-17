@@ -1,0 +1,30 @@
+IN
+PUSH 0
+JMPM 1
+CALL 18
+OUT
+HLT
+CALL 29
+PUSH rax
+RET
+PUSH rax
+PUSH 1
+JAE 54
+PUSH 1
+POP rax
+POP rbx
+PUSH rbx
+PUSH rax
+MUL
+POP rax
+PUSH rbx
+PUSH 1
+SUB
+POP rbx
+PUSH rbx
+PUSH 1
+JAE 107
+RET
+PUSH rbx
+CALL 29
+RET
