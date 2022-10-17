@@ -1,5 +1,8 @@
 #include "config.h"
 
+#define NEXT_COMMAND \
+    cpu->ip++;       \
+
 #define POP(var)                       \
     error = stackPop(cpu->stack, var); \
     if (error)                         \
@@ -39,7 +42,7 @@
     }
 
 #define ARG_COMMAND_STEP()                                 \
-    cpu->ip++;                                             \
+    NEXT_COMMAND                                           \
     int arg = 0;                                           \
     int command_arg = *(int *) (cpu->code->code + cpu->ip);\
 
@@ -79,19 +82,19 @@ DEF_CMD(PUSH, 1, 1, {
 DEF_CMD(ADD, 2, 0, {
     POP_TWO()
     PUSH_VALUE(firstValue + secondValue);
-    cpu->ip++;
+    NEXT_COMMAND
 })
 
 DEF_CMD(MUL, 3, 0, {
     POP_TWO()
     PUSH_VALUE(firstValue * secondValue / precision);
-    cpu->ip++;
+    NEXT_COMMAND
 })
 
 DEF_CMD(SUB, 4, 0, {
     POP_TWO()
     PUSH_VALUE(firstValue - secondValue);
-    cpu->ip++;
+    NEXT_COMMAND
 })
 
 DEF_CMD(DIV, 5, 0, {
@@ -99,7 +102,7 @@ DEF_CMD(DIV, 5, 0, {
     if (secondValue == 0)
         return DIVISION_BY_ZER0;
     PUSH_VALUE(precision * firstValue / secondValue);
-    cpu->ip++;
+    NEXT_COMMAND
 })
 
 DEF_CMD(OUT, 6, 0, {
@@ -108,14 +111,14 @@ DEF_CMD(OUT, 6, 0, {
     POP(&value);
     float output = (float)value;
     printf("ANSWER = %lg\n", output / precision);
-    cpu->ip++;
+    NEXT_COMMAND
 })
 
 DEF_CMD(DUMP, 7, 0, {
     stackDump(cpu->stack, &cpu->stack->info, error);
     stackDump(cpu->call_stack, &cpu->call_stack->info, error);
     processorDump(stderr, cpu);
-    cpu->ip++;
+    NEXT_COMMAND
 })
 
 DEF_CMD(IN, 8, 0, {
@@ -127,8 +130,7 @@ DEF_CMD(IN, 8, 0, {
         return CPU_ERRORS::CPU_READ_FROM_CONSOLE_FAILED;
 
     PUSH_VALUE(value * precision);
-
-    cpu->ip++;
+    NEXT_COMMAND
 })
 
 DEF_CMD(POP, 9, 1, {
@@ -184,7 +186,7 @@ DEF_CMD(CALL, 17, 1, {
 })
 
 DEF_CMD(RET, 18, 0, {
-    cpu->ip++;
+    NEXT_COMMAND
     int arg = 0;
     CALL_POP(&arg)
     cpu->ip = arg;
@@ -192,19 +194,19 @@ DEF_CMD(RET, 18, 0, {
 
 DEF_CMD(NO_SOLS, 19, 0, {
     printf("NO SOLUTIONS\n");
-    cpu->ip++;
+    NEXT_COMMAND
 })
 
 DEF_CMD(ANY_NUM, 20, 0, {
     printf("ANY NUMBER\n\n");
-    cpu->ip++;
+    NEXT_COMMAND
 })
 
 DEF_CMD(SQRT, 21, 0, {
     int value = 0;
     POP(&value)
     PUSH_VALUE((int)sqrt(value * precision))
-    cpu->ip++;
+    NEXT_COMMAND
 })
 
 DEF_CMD(CIRCLE_PICTURE, 22, 0, {
@@ -225,7 +227,7 @@ DEF_CMD(CIRCLE_PICTURE, 22, 0, {
         }
     }
     SHOW_RAM_DATA
-    cpu->ip++;
+    NEXT_COMMAND
 })
 
 DEF_CMD(SQUARE_PICTURE, 23, 0, {
@@ -243,32 +245,33 @@ DEF_CMD(SQUARE_PICTURE, 23, 0, {
         }
     }
     SHOW_RAM_DATA
-    cpu->ip++;
+    NEXT_COMMAND
 })
 
 DEF_CMD(SHOW_RAM, 24, 0, {
     int size = sqrt(cpu->vram_size);
     SHOW_RAM_DATA
-    cpu->ip++;
+    NEXT_COMMAND
 })
 
 DEF_CMD(MOD, 25, 0, {
     POP_TWO()
     PUSH_VALUE(firstValue % secondValue);
-    cpu->ip++;
+    NEXT_COMMAND
 })
 
 DEF_CMD(SET_RAM, 26, 0, {
     POP_TWO()
     cpu->RAM[firstValue / precision] = secondValue / precision;
-    cpu->ip++;
+    NEXT_COMMAND
 })
 
 DEF_CMD(JMPM, 27, 1, {
     ARG_COMMAND_STEP()
     GET_ARG()
+    printf("WEEKDAY %d\n", get_weekday());
     if (get_weekday() == 1)
         cpu->ip = arg;
     else
-        cpu->ip += sizeof(int);
+        ARG_STEP()
 })

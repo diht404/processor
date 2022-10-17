@@ -4,6 +4,7 @@
 #include "../stack/stack.h"
 #include <sys/stat.h>
 #include <unistd.h>
+#include "time.h"
 
 #define DEF_CMD(name, num, arg, cpu_code) \
 CMD_##name = num,
@@ -87,6 +88,5 @@ size_t verifyCode(char **buf);
  */
 size_t readCode(FILE *fp, Code *code);
 
-#include "time.h"
 int get_weekday();
 #endif //STACK__UTILS_H
