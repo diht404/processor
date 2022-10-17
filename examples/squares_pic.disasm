@@ -1,0 +1,57 @@
+CALL 6
+HLT
+PUSH 20
+POP rax
+PUSH 4
+POP rbx
+PUSH 0
+POP rcx
+PUSH 0
+POP rdx
+CALL 135
+PUSH rcx
+PUSH 1
+ADD
+POP rcx
+PUSH rcx
+PUSH rax
+JB 46
+PUSH 0
+POP rcx
+PUSH rdx
+PUSH 1
+ADD
+POP rdx
+PUSH rdx
+PUSH rax
+JB 46
+PUSH 0
+POP rdx
+SHOW_RAM
+RET
+PUSH rdx
+PUSH rbx
+MOD
+PUSH 0
+JBE 201
+PUSH rcx
+PUSH rbx
+MOD
+PUSH 0
+JBE 201
+PUSH rax
+PUSH rcx
+MUL
+PUSH rdx
+ADD
+PUSH 1
+SET_RAM
+RET
+PUSH rax
+PUSH rcx
+MUL
+PUSH rdx
+ADD
+PUSH 0
+SET_RAM
+RET
