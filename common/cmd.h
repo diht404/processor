@@ -19,7 +19,7 @@
         return error;                       \
     }
 
-#define ram  \
+#define RAM_MEM  \
     cpu->RAM \
 
 #define REGS  \
@@ -59,7 +59,7 @@
     if (args & RAM_MASK)                                   \
     {                                                      \
         sleep(0);                                          \
-        arg = ram[arg];                                    \
+        arg = RAM_MEM[arg];                                \
     }                                                      \
     }
 
@@ -81,7 +81,7 @@
     {                                                        \
         for (int x = 0; x < size; x++)                       \
         {                                                    \
-            printf("%s", ram[size * y + x]? "* ": ". ");     \
+            printf("%s", RAM_MEM[size * y + x]? "* ": ". "); \
         }                                                    \
         printf("\n");                                        \
     }                                                        \
@@ -102,14 +102,13 @@ DEF_CMD(PUSH, 1, 1, {
     if (args & RAM_MASK)
     {
         sleep(0);
-        arg = ram[arg / precision];
+        arg = RAM_MEM[arg / precision];
     }
     PUSH_VALUE(arg)
     ARG_STEP()
 })
 
 DEF_CMD(ADD, 2, 0, {
-
     int firstValue  = 0;
     int secondValue = 0;
     POP_TWO()
@@ -118,7 +117,6 @@ DEF_CMD(ADD, 2, 0, {
 })
 
 DEF_CMD(MUL, 3, 0, {
-
     int firstValue  = 0;
     int secondValue = 0;
     POP_TWO()
@@ -127,7 +125,6 @@ DEF_CMD(MUL, 3, 0, {
 })
 
 DEF_CMD(SUB, 4, 0, {
-
     int firstValue  = 0;
     int secondValue = 0;
     POP_TWO()
@@ -136,7 +133,6 @@ DEF_CMD(SUB, 4, 0, {
 })
 
 DEF_CMD(DIV, 5, 0, {
-
     int firstValue  = 0;
     int secondValue = 0;
     POP_TWO()
@@ -189,7 +185,7 @@ DEF_CMD(POP, 9, 1, {
     {
         POP(&arg)
         sleep(0);
-        ram[command_arg] = arg;
+        RAM_MEM[command_arg] = arg;
     }
     ARG_STEP()
 })
@@ -272,9 +268,9 @@ DEF_CMD(CIRCLE_PICTURE, 22, 0, {
                     (y - radius) * (y - radius) -
                     radius * radius / SQUEEZE
                     ) < EPS)
-                    ram[size * y + x] = 1;
+                RAM_MEM[size * y + x] = 1;
             else
-                ram[size * y + x] = 0;
+                RAM_MEM[size * y + x] = 0;
         }
     }
     SHOW_RAM_DATA
@@ -290,9 +286,9 @@ DEF_CMD(SQUARE_PICTURE, 23, 0, {
         for (int x = 0; x < size; x++)//rdx
         {
             if (x % size_of_square > 0 and y % size_of_square > 0)
-                ram[size * y + x] = 1;
+                RAM_MEM[size * y + x] = 1;
             else
-                ram[size * y + x] = 0;
+                RAM_MEM[size * y + x] = 0;
         }
     }
     SHOW_RAM_DATA
@@ -317,7 +313,7 @@ DEF_CMD(SET_RAM, 26, 0, {
     int firstValue  = 0;
     int secondValue = 0;
     POP_TWO()
-    ram[firstValue / precision] = secondValue / precision;
+    RAM_MEM[firstValue / precision] = secondValue / precision;
     NEXT_COMMAND
 })
 
