@@ -13,6 +13,15 @@
     if (error)                              \
         return error;
 
+#define ram  \
+    cpu->RAM \
+
+#define REGS  \
+    cpu->regs \
+
+#define SET_ARG   \
+    cpu->ip = arg;\
+
 #define POP_TWO()       \
     int firstValue  = 0;\
     int secondValue = 0;\
@@ -34,11 +43,11 @@
     if (args & IMM_MASK)                                   \
         arg += command_arg;                                \
     if (args & REG_MASK)                                   \
-        arg += cpu->regs[command_arg];                     \
+        arg += REGS[command_arg];                          \
     if (args & RAM_MASK)                                   \
     {                                                      \
         sleep(0);                                          \
-        arg = cpu->RAM[arg];                               \
+        arg = ram[arg];                                    \
     }
 
 #define ARG_COMMAND_STEP()                                 \
@@ -55,7 +64,7 @@
     {                                                        \
         for (int x = 0; x < size; x++)                       \
         {                                                    \
-            printf("%s", cpu->RAM[size * y + x]? "* ": ". ");\
+            printf("%s", ram[size * y + x]? "* ": ". ");     \
         }                                                    \
         printf("\n");                                        \
     }
@@ -69,11 +78,11 @@ DEF_CMD(PUSH, 1, 1, {
     if (args & IMM_MASK)
         arg += command_arg * precision;
     if (args & REG_MASK)
-        arg += cpu->regs[command_arg];
+        arg += REGS[command_arg];
     if (args & RAM_MASK)
     {
         sleep(0);
-        arg = cpu->RAM[arg / precision];
+        arg = ram[arg / precision];
     }
     PUSH_VALUE(arg)
     ARG_STEP()
@@ -139,14 +148,14 @@ DEF_CMD(POP, 9, 1, {
     if (args & REG_MASK)
     {
         POP(&arg)
-        cpu->regs[command_arg] = arg;
+        REGS[command_arg] = arg;
     }
 
     if (args & RAM_MASK)
     {
         POP(&arg)
         sleep(0);
-        cpu->RAM[command_arg] = arg;
+        ram[command_arg] = arg;
     }
     ARG_STEP()
 })
@@ -154,7 +163,7 @@ DEF_CMD(POP, 9, 1, {
 DEF_CMD(JMP, 10, 1, {
     ARG_COMMAND_STEP()
     GET_ARG()
-    cpu->ip = arg;
+    SET_ARG
 })
 
 #define CONDITION_JMP(operation)          \
@@ -165,7 +174,7 @@ DEF_CMD(JMP, 10, 1, {
     if (firstValue operation secondValue) \
     {                                     \
         GET_ARG()                         \
-        cpu->ip = arg;                    \
+        SET_ARG                           \
     }                                     \
     else                                  \
         ARG_STEP()                        \
@@ -182,14 +191,14 @@ DEF_CMD(CALL, 17, 1, {
     ARG_COMMAND_STEP()
     GET_ARG()
     CALL_PUSH(cpu->ip + sizeof(int));
-    cpu->ip = arg;
+    SET_ARG
 })
 
 DEF_CMD(RET, 18, 0, {
     NEXT_COMMAND
     int arg = 0;
     CALL_POP(&arg)
-    cpu->ip = arg;
+    SET_ARG
 })
 
 DEF_CMD(NO_SOLS, 19, 0, {
@@ -221,9 +230,9 @@ DEF_CMD(CIRCLE_PICTURE, 22, 0, {
                     (y - radius) * (y - radius) -
                     radius * radius / SQUEEZE
                     ) < EPS)
-                cpu->RAM[size * y + x] = 1;
+                    ram[size * y + x] = 1;
             else
-                cpu->RAM[size * y + x] = 0;
+                ram[size * y + x] = 0;
         }
     }
     SHOW_RAM_DATA
@@ -239,9 +248,9 @@ DEF_CMD(SQUARE_PICTURE, 23, 0, {
         for (int x = 0; x < size; x++)//rdx
         {
             if (x % size_of_square > 0 and y % size_of_square > 0)
-                cpu->RAM[size * y + x] = 1;
+                ram[size * y + x] = 1;
             else
-                cpu->RAM[size * y + x] = 0;
+                ram[size * y + x] = 0;
         }
     }
     SHOW_RAM_DATA
@@ -262,7 +271,7 @@ DEF_CMD(MOD, 25, 0, {
 
 DEF_CMD(SET_RAM, 26, 0, {
     POP_TWO()
-    cpu->RAM[firstValue / precision] = secondValue / precision;
+    ram[firstValue / precision] = secondValue / precision;
     NEXT_COMMAND
 })
 
@@ -271,7 +280,7 @@ DEF_CMD(JMPM, 27, 1, {
     GET_ARG()
     printf("WEEKDAY %d\n", get_weekday());
     if (get_weekday() == 1)
-        cpu->ip = arg;
+        SET_ARG
     else
         ARG_STEP()
 })
