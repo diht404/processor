@@ -1,17 +1,23 @@
 #include "config.h"
 
 #define NEXT_COMMAND \
+    {                \
     cpu->ip++;       \
+    }                \
 
 #define POP(var)                       \
+    {                                  \
     error = stackPop(cpu->stack, var); \
     if (error)                         \
-        return error;
+        return error;                  \
+    }
 
 #define CALL_POP(var)                       \
+    {                                       \
     error = stackPop(cpu->call_stack, var); \
     if (error)                              \
-        return error;
+        return error;                       \
+    }
 
 #define ram  \
     cpu->RAM \
@@ -19,27 +25,33 @@
 #define REGS  \
     cpu->regs \
 
-#define SET_ARG   \
-    cpu->ip = arg;\
+#define SET_ARG       \
+    {                 \
+        cpu->ip = arg;\
+    }
 
-#define POP_TWO()       \
-    int firstValue  = 0;\
-    int secondValue = 0;\
-                        \
-    POP(&secondValue);  \
-    POP(&firstValue);   \
+#define POP_TWO()           \
+    {                       \
+        POP(&secondValue);  \
+        POP(&firstValue);   \
+    }
 
 #define PUSH_VALUE(value)                 \
+    {                                     \
     error = stackPush(cpu->stack, value); \
     if (error)                            \
-        return error;
+        return error;                     \
+    }
 
 #define CALL_PUSH(value)                       \
+    {                                          \
     error = stackPush(cpu->call_stack, value); \
     if (error)                                 \
-        return error;
+        return error;                          \
+    }
 
 #define GET_ARG()                                          \
+    {                                                      \
     if (args & IMM_MASK)                                   \
         arg += command_arg;                                \
     if (args & REG_MASK)                                   \
@@ -48,17 +60,22 @@
     {                                                      \
         sleep(0);                                          \
         arg = ram[arg];                                    \
+    }                                                      \
     }
 
 #define ARG_COMMAND_STEP()                                 \
-    NEXT_COMMAND                                           \
-    int arg = 0;                                           \
-    int command_arg = *(int *) (cpu->code->code + cpu->ip);\
+    {                                                      \
+        NEXT_COMMAND                                       \
+        command_arg = *(int *) (cpu->code->code + cpu->ip);\
+    }
 
-#define ARG_STEP()          \
-    cpu->ip += sizeof(int);
+#define ARG_STEP()              \
+    {                           \
+        cpu->ip += sizeof(int); \
+    }
 
 #define SHOW_RAM_DATA                                        \
+    {                                                        \
     printf("\n");                                            \
     for (int y = 0; y < size; y++)                           \
     {                                                        \
@@ -67,6 +84,7 @@
             printf("%s", ram[size * y + x]? "* ": ". ");     \
         }                                                    \
         printf("\n");                                        \
+    }                                                        \
     }
 
 DEF_CMD(HLT, 0, 0, {
@@ -74,6 +92,8 @@ DEF_CMD(HLT, 0, 0, {
 })
 
 DEF_CMD(PUSH, 1, 1, {
+    int arg = 0;
+    int command_arg = 0;
     ARG_COMMAND_STEP()
     if (args & IMM_MASK)
         arg += command_arg * precision;
@@ -89,24 +109,36 @@ DEF_CMD(PUSH, 1, 1, {
 })
 
 DEF_CMD(ADD, 2, 0, {
+
+    int firstValue  = 0;
+    int secondValue = 0;
     POP_TWO()
     PUSH_VALUE(firstValue + secondValue);
     NEXT_COMMAND
 })
 
 DEF_CMD(MUL, 3, 0, {
+
+    int firstValue  = 0;
+    int secondValue = 0;
     POP_TWO()
     PUSH_VALUE(firstValue * secondValue / precision);
     NEXT_COMMAND
 })
 
 DEF_CMD(SUB, 4, 0, {
+
+    int firstValue  = 0;
+    int secondValue = 0;
     POP_TWO()
     PUSH_VALUE(firstValue - secondValue);
     NEXT_COMMAND
 })
 
 DEF_CMD(DIV, 5, 0, {
+
+    int firstValue  = 0;
+    int secondValue = 0;
     POP_TWO()
     if (secondValue == 0)
         return DIVISION_BY_ZER0;
@@ -143,6 +175,8 @@ DEF_CMD(IN, 8, 0, {
 })
 
 DEF_CMD(POP, 9, 1, {
+    int arg = 0;
+    int command_arg = 0;
     ARG_COMMAND_STEP()
 
     if (args & REG_MASK)
@@ -161,6 +195,8 @@ DEF_CMD(POP, 9, 1, {
 })
 
 DEF_CMD(JMP, 10, 1, {
+    int arg = 0;
+    int command_arg = 0;
     ARG_COMMAND_STEP()
     GET_ARG()
     SET_ARG
@@ -168,7 +204,11 @@ DEF_CMD(JMP, 10, 1, {
 
 #define CONDITION_JMP(operation)          \
 {                                         \
+    int arg = 0;                          \
+    int command_arg = 0;                  \
     ARG_COMMAND_STEP()                    \
+    int firstValue  = 0;                  \
+    int secondValue = 0;                  \
     POP_TWO()                             \
                                           \
     if (firstValue operation secondValue) \
@@ -188,6 +228,8 @@ DEF_CMD(JE, 15, 1, CONDITION_JMP(==))
 DEF_CMD(JNE, 16, 1, CONDITION_JMP(!=))
 
 DEF_CMD(CALL, 17, 1, {
+    int arg = 0;
+    int command_arg = 0;
     ARG_COMMAND_STEP()
     GET_ARG()
     CALL_PUSH(cpu->ip + sizeof(int));
@@ -264,18 +306,24 @@ DEF_CMD(SHOW_RAM, 24, 0, {
 })
 
 DEF_CMD(MOD, 25, 0, {
+    int firstValue  = 0;
+    int secondValue = 0;
     POP_TWO()
     PUSH_VALUE(firstValue % secondValue);
     NEXT_COMMAND
 })
 
 DEF_CMD(SET_RAM, 26, 0, {
+    int firstValue  = 0;
+    int secondValue = 0;
     POP_TWO()
     ram[firstValue / precision] = secondValue / precision;
     NEXT_COMMAND
 })
 
 DEF_CMD(JMPM, 27, 1, {
+    int arg = 0;
+    int command_arg = 0;
     ARG_COMMAND_STEP()
     GET_ARG()
     printf("WEEKDAY %d\n", get_weekday());
