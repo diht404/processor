@@ -5,8 +5,8 @@
 #define flags ""
 //#define asm_file "squares_pic"
 //#define asm_file "print_squares"
-#define asm_file "quadratic"
-//#define asm_file "factorial"
+//#define asm_file "quadratic"
+#define asm_file "factorial"
 //#define asm_file "data"
 
 int main()
