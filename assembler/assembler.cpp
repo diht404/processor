@@ -73,9 +73,8 @@ uint8_t *compile(Program *program,
         return nullptr;
     }
 
-    addInfo(&code);
-
     int lenOfCode = 0;
+    code = (uint8_t *)((size_t *)code + 3);
 
     while (line < program->length)
     {
@@ -106,8 +105,9 @@ uint8_t *compile(Program *program,
     }
     code -= lenOfCode;
 
-    *(((size_t *) code) - 1) = lenOfCode;
+//    *(((size_t *) code) - 1) = lenOfCode;
     code = (uint8_t *) (((size_t *) code) - 3);
+    addInfo(&code, lenOfCode);
 
     uint8_t *newMemory = (uint8_t *) realloc(code,
                                              constLen * 3 + lenOfCode
@@ -386,7 +386,7 @@ void skipSpaces(Program *program, size_t line, int *commandSize)
     }
 }
 
-void addInfo(uint8_t **code)
+void addInfo(uint8_t **code, int lenOfCode)
 {
     if (code == nullptr)
     {
@@ -404,7 +404,8 @@ void addInfo(uint8_t **code)
     *(size_t *) *code = VERSION_CONST;
     *code = (uint8_t *) ((size_t *) *code + 1);
 
-    *code = (uint8_t *) ((size_t *) *code + 1);
+    *(size_t *) *code = lenOfCode;
+    *code = (uint8_t *) ((size_t *) *code - 2);
 }
 
 size_t readFile(FILE *fp, Program *program)

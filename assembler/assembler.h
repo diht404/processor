@@ -61,7 +61,7 @@ size_t readFile(FILE *fp, Program *program);
  *
  * @param code array with code
  */
-void addInfo(uint8_t **code);
+void addInfo(uint8_t **code, int lenOfCode);
 
 /**
  * @brief skips spaces in code
