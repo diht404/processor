@@ -7,8 +7,7 @@ case COMMAND_CODES::CMD_##name:           \
 
 size_t run(CPU *cpu)
 {
-    if (cpu == nullptr)
-        return CPU_IS_NULLPTR;
+    CHECK_NULLPTR_ERROR(cpu, CPU_IS_NULLPTR)
 
     Stack stack_run = {};
     Stack stack_call_run = {};
@@ -63,8 +62,7 @@ size_t processorDump(FILE *fp, CPU *cpu)
     if (fp == nullptr)
         fp = stderr;
 
-    if (cpu == nullptr)
-        return CPU_IS_NULLPTR;
+    CHECK_NULLPTR_ERROR(cpu, CPU_IS_NULLPTR)
 
     for (size_t i = 0; i < cpu->code->len; i++)
     {
