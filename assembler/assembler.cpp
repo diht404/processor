@@ -1,4 +1,3 @@
-#include <cctype>
 #include "assembler.h"
 
 void compileWithNamesTable(AsmProgram *program,
@@ -20,22 +19,22 @@ void compileWithNamesTable(AsmProgram *program,
     compile(program, code, error);
 }
 
-#define DEF_CMD(name, num, arg, cpu_code)  \
-else if (strcasecmp(cmd, #name) == 0)      \
-{                                          \
-    if (!arg)                              \
+#define DEF_CMD(name, num, arg, cpu_code)        \
+else if (strcasecmp(cmd, #name) == 0)            \
+{                                                \
+    if (!arg)                                    \
     {                                            \
         *code->code = COMMAND_CODES::CMD_##name; \
         lenOfCode++;                             \
         code->code++;                            \
-    }                                      \
-    else putArgs(program,                  \
-            line,                          \
-            code,                          \
-            &commandSize,                  \
-            &lenOfCode,                    \
-            COMMAND_CODES::CMD_##name,     \
-            error);                        \
+    }                                            \
+    else putArgs(program,                        \
+            line,                                \
+            code,                                \
+            &commandSize,                        \
+            &lenOfCode,                          \
+            COMMAND_CODES::CMD_##name,           \
+            error);                              \
 }
 
 void compile(AsmProgram *program,
@@ -85,7 +84,7 @@ void compile(AsmProgram *program,
         // label definition
         if (cmd[0] == ':')
         {
-            fillNameTable(code, cmd, lenOfCode);
+            fillNameTable(&code->nameTable, cmd, lenOfCode);
         }
 #include "../common/cmd.h"
         else
@@ -110,14 +109,34 @@ void compile(AsmProgram *program,
 }
 #undef DEF_CMD
 
-void fillNameTable(Code *code,
+void skipSpaces(AsmProgram *program, size_t line, int *tokenPtr)
+{
+    if (program == nullptr)
+    {
+        return;
+    }
+
+    if (tokenPtr == nullptr)
+    {
+        return;
+    }
+
+    while (*(program->lines[line] + *tokenPtr) == ' '
+        or *(program->lines[line] + *tokenPtr) == '\0'
+        or *(program->lines[line] + *tokenPtr) == '\n')
+    {
+        (*tokenPtr)++;
+    }
+}
+
+void fillNameTable(NameTable *nameTable,
                    char name[BUFFER_SIZE],
                    int ip)
 {
     bool exist = false;
     for (int i = 0; i < BUFFER_SIZE; i++)
     {
-        if (strcasecmp(code->nameTable.name_table[i], name) == 0)
+        if (strcasecmp(nameTable->name_table[i], name) == 0)
         {
             exist = true;
             break;
@@ -127,10 +146,10 @@ void fillNameTable(Code *code,
     {
         for (int i = 0; i < BUFFER_SIZE; i++)
         {
-            if (strcasecmp(code->nameTable.name_table[i], "") == 0)
+            if (strcasecmp(nameTable->name_table[i], "") == 0)
             {
-                memcpy(code->nameTable.name_table[i], name, BUFFER_SIZE);
-                code->nameTable.positions[i] = ip;
+                memcpy(nameTable->name_table[i], name, BUFFER_SIZE);
+                nameTable->positions[i] = ip;
                 return;
             }
         }
@@ -276,23 +295,22 @@ void detectBrackets(AsmProgram *program,
     }
 }
 
-int getIpFromTable(NameTable *table,
+int getIpFromTable(NameTable *nameTable,
                    char name[BUFFER_SIZE])
 {
-    if (table == nullptr)
+    if (nameTable == nullptr)
     {
         return -1;
     }
     for (int i = 0; i < BUFFER_SIZE; i++)
     {
-        if (strcasecmp(table->name_table[i], name) == 0)
+        if (strcasecmp(nameTable->name_table[i], name) == 0)
         {
-            return table->positions[i];
+            return nameTable->positions[i];
         }
     }
     return -1;
 }
-
 
 void processArgs(Code *code,
                  int command_code,
@@ -343,26 +361,6 @@ void processArgs(Code *code,
 
         *lenOfCode += sizeof(int);
         code->code += sizeof(int);
-    }
-}
-
-void skipSpaces(AsmProgram *program, size_t line, int *tokenPtr)
-{
-    if (program == nullptr)
-    {
-        return;
-    }
-
-    if (tokenPtr == nullptr)
-    {
-        return;
-    }
-
-    while (*(program->lines[line] + *tokenPtr) == ' '
-        or *(program->lines[line] + *tokenPtr) == '\0'
-        or *(program->lines[line] + *tokenPtr) == '\n')
-    {
-        (*tokenPtr)++;
     }
 }
 

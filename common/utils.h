@@ -1,5 +1,5 @@
-#ifndef STACK__UTILS_H
-#define STACK__UTILS_H
+#ifndef CPU__UTILS_H
+#define CPU__UTILS_H
 
 #include "../stack/stack.h"
 #include <sys/stat.h>
@@ -104,4 +104,4 @@ void freeCode(Code *code);
  * @return current week day
  */
 int get_weekday();
-#endif //STACK__UTILS_H
+#endif //CPU__UTILS_H

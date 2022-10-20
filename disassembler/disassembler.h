@@ -1,5 +1,5 @@
-#ifndef STACK__DISASSEMBLER_H
-#define STACK__DISASSEMBLER_H
+#ifndef CPU__DISASSEMBLER_H
+#define CPU__DISASSEMBLER_H
 
 #include "../common/utils.h"
 
@@ -40,4 +40,4 @@ size_t printArg(Code *code, FILE *fp, const char *command_name, size_t *ip);
  */
 void handleDisasmError(size_t error);
 
-#endif //STACK__DISASSEMBLER_H
+#endif //CPU__DISASSEMBLER_H

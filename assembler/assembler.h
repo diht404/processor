@@ -1,5 +1,5 @@
-#ifndef STACK__ASSEMBLER_H
-#define STACK__ASSEMBLER_H
+#ifndef CPU__ASSEMBLER_H
+#define CPU__ASSEMBLER_H
 
 #include "../common/utils.h"
 
@@ -44,78 +44,6 @@ struct AsmProgram
     }
 
 /**
- * @brief reads file to struct AsmProgram
- *
- * @param fp - opened file
- * @param program - struct AsmProgram with file
- * @return error code
- */
-size_t readFile(FILE *fp, AsmProgram *program);
-
-/**
- * @brief skips spaces in code
- *
- * @param program struct with code
- * @param line line of code
- * @param tokenPtr len of command in symbols
- */
-void skipSpaces(AsmProgram *program, size_t line, int *tokenPtr);
-
-/**
- * @brief process code if there is [] in line of code
- *
- * @param program struct with code
- * @param code array with code
- * @param commandSize len of command in symbols
- * @param buffer buffer for storing code extracted from []
- * @param line line of code
- * @param error error code
- */
-void detectBrackets(AsmProgram *program,
-                    Code *code,
-                    int commandSize,
-                    char *buffer,
-                    size_t line,
-                    size_t *error);
-
-/**
- * @brief process push args
- *
- * @param code array with code
- * @param command command to process
- * @param buffer buffer for storing code extracted from []
- * @param lenOfCode length of array with code
- * @param value value to push
- * @param error error code
- */
-void processArgs(Code *code,
-                 int command_code,
-                 char *buffer,
-                 int *lenOfCode,
-                 int value,
-                 size_t *error);
-
-/**
- * @brief puts args to code
- *
- * @param program struct with code
- * @param line line index of code
- * @param code array with code
- * @param commandSize length of command
- * @param lenOfCode length of array with code
- * @param command_code code of command
- * @param table names table
- * @param error error code
- */
-void putArgs(AsmProgram *program,
-             size_t line,
-             Code *code,
-             int *commandSize,
-             int *lenOfCode,
-             int command_code,
-             size_t *error);
-
-/**
  * @brief compiles code with names table
  *
  * @param program array with program to compile
@@ -136,25 +64,104 @@ void compileWithNamesTable(AsmProgram *program,
 void compile(AsmProgram *program, Code *code, size_t *error);
 
 /**
+ * @brief skips spaces in code
+ *
+ * @param program struct with code
+ * @param line line of code
+ * @param tokenPtr len of command in symbols
+ */
+void skipSpaces(AsmProgram *program, size_t line, int *tokenPtr);
+
+/**
  * @brief fills names table and search index of label in table
  *
  * @param names_table table with names of labels
  * @param name name of label
  * @param ip index of label
  */
-void fillNameTable(Code *code,
+void fillNameTable(NameTable *nameTable,
                    char name[BUFFER_SIZE],
                    int ip);
 
 /**
- * @brief finds id of label in names table
+ * @brief puts args to code
  *
- * @param names_table table with names of labels
- * @param name name of label
- * @return index of label in name table or -1 if not success
+ * @param program struct with code
+ * @param line line index of code
+ * @param code array with code
+ * @param commandSize length of command
+ * @param lenOfCode length of array with code
+ * @param command_code code of command
+ * @param error error code
  */
-int getIpFromTable(NameTable *table,
+void putArgs(AsmProgram *program,
+             size_t line,
+             Code *code,
+             int *commandSize,
+             int *lenOfCode,
+             int command_code,
+             size_t *error);
+
+/**
+ * @brief process code if there is [] in line of code
+ *
+ * @param program struct with code
+ * @param code array with code
+ * @param commandSize len of command in symbols
+ * @param buffer buffer for storing code extracted from []
+ * @param line line of code
+ * @param error error code
+ */
+void detectBrackets(AsmProgram *program,
+                    Code *code,
+                    int commandSize,
+                    char *buffer,
+                    size_t line,
+                    size_t *error);
+
+/**
+ * @brief finds id of label in names nameTable
+ *
+ * @param names_table nameTable with names of labels
+ * @param name name of label
+ * @return index of label in name nameTable or -1 if not success
+ */
+int getIpFromTable(NameTable *nameTable,
                    char name[BUFFER_SIZE]);
+
+/**
+ * @brief process push args
+ *
+ * @param code array with code
+ * @param command command to process
+ * @param buffer buffer for storing code extracted from []
+ * @param lenOfCode length of array with code
+ * @param value value to push
+ * @param error error code
+ */
+void processArgs(Code *code,
+                 int command_code,
+                 char *buffer,
+                 int *lenOfCode,
+                 int value,
+                 size_t *error);
+
+/**
+ * @brief Adds info about code: the compilation const, version, and code length
+ *
+ * @param code array with code
+ * @param lenOfCode length of code in bytes
+ */
+void addInfo(Code *code, int lenOfCode);
+
+/**
+ * @brief reads file to struct AsmProgram
+ *
+ * @param fp - opened file
+ * @param program - struct AsmProgram with file
+ * @return error code
+ */
+size_t readFile(FILE *fp, AsmProgram *program);
 
 /**
  * @brief Saves array with compiled code to file
@@ -175,18 +182,10 @@ size_t saveFile(Code *code, const char *filename);
 size_t saveHeader(CodeHeader *header, FILE *fp);
 
 /**
- * @brief Adds info about code: the compilation const, version, and code length
- *
- * @param code array with code
- * @param lenOfCode length of code in bytes
- */
-void addInfo(Code *code, int lenOfCode);
-
-/**
  * @brief process error
  *
  * @param error error code
  */
 void handleAsmError(size_t error);
 
-#endif //STACK__ASSEMBLER_H
+#endif //CPU__ASSEMBLER_H
