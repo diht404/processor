@@ -62,7 +62,7 @@ case COMMAND_CODES::CMD_##name:                 \
     break;                                      \
 }
 
-size_t disassemle(Code *code, FILE *fp)
+size_t disassemble(Code *code, FILE *fp)
 {
     if (code == nullptr)
     {

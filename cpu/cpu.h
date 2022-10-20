@@ -44,4 +44,6 @@ size_t processorDump(FILE *fp, CPU *cpu);
  */
 void processCpuError(size_t error, CPU *cpu);
 
+void show_ram_data(CPU *cpu, int size);
+
 #endif //STACK__CPU_H

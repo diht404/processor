@@ -1,57 +1,57 @@
 #include "config.h"
 
-#define NEXT_COMMAND \
-    {                \
-    cpu->ip++;       \
-    }                \
+#define NEXT_COMMAND                                           \
+    {                                                          \
+        cpu->ip++;                                             \
+    }                                                          \
 
-#define POP(var)                       \
-    {                                  \
-    error = stackPop(cpu->stack, var); \
-    if (error)                         \
-        return error;                  \
+#define POP(var)                                               \
+    {                                                          \
+        error = stackPop(cpu->stack, var);                     \
+        if (error)                                             \
+            return error;                                      \
     }
 
-#define CALL_POP(var)                       \
-    {                                       \
-    error = stackPop(cpu->call_stack, var); \
-    if (error)                              \
-        return error;                       \
+#define CALL_POP(var)                                          \
+    {                                                          \
+        error = stackPop(cpu->call_stack, var);                \
+        if (error)                                             \
+            return error;                                      \
     }
 
-#define RAM_MEM  \
-    (cpu->RAM)   \
+#define RAM_MEM                                                \
+    (cpu->RAM)                                                 \
 
-#define REGS    \
-    (cpu->regs) \
+#define REGS                                                   \
+    (cpu->regs)                                                \
 
-#define SET_ARG       \
-    {                 \
-        cpu->ip = arg;\
+#define SET_ARG                                                \
+    {                                                          \
+        cpu->ip = arg;                                         \
     }
 
-#define POP_TWO()           \
-    {                       \
-        POP(&secondValue);  \
-        POP(&firstValue);   \
+#define POP_TWO()                                              \
+    {                                                          \
+        POP(&secondValue);                                     \
+        POP(&firstValue);                                      \
     }
 
-#define PUSH_VALUE(value)                 \
-    {                                     \
-    error = stackPush(cpu->stack, value); \
-    if (error)                            \
-        return error;                     \
+#define PUSH_VALUE(value)                                      \
+    {                                                          \
+        error = stackPush(cpu->stack, value);                  \
+        if (error)                                             \
+            return error;                                      \
     }
 
-#define CALL_PUSH(value)                       \
-    {                                          \
-    error = stackPush(cpu->call_stack, value); \
-    if (error)                                 \
-        return error;                          \
+#define CALL_PUSH(value)                                       \
+    {                                                          \
+        error = stackPush(cpu->call_stack, value);             \
+        if (error)                                             \
+            return error;                                      \
     }
 
-#define GET_ARG()                                          \
-    {                                                      \
+#define GET_ARG()                                              \
+    {                                                          \
         if (args & IMM_MASK)                                   \
             arg += command_arg;                                \
         if (args & REG_MASK)                                   \
@@ -63,34 +63,16 @@
         }                                                      \
     }
 
-#define ARG_COMMAND_STEP()                                 \
-    {                                                      \
-        NEXT_COMMAND                                       \
-        command_arg = *(int *) (cpu->code->code + cpu->ip);\
+#define ARG_COMMAND_STEP()                                     \
+    {                                                          \
+        NEXT_COMMAND                                           \
+        command_arg = *(int *) (cpu->code->code + cpu->ip);    \
     }
 
-#define ARG_STEP()              \
-    {                           \
-        cpu->ip += sizeof(int); \
+#define ARG_STEP()                                             \
+    {                                                          \
+        cpu->ip += sizeof(int);                                \
     }
-
-#ifndef DEF_CMD
-
-void show_ram_data(CPU *cpu, int size)
-{
-    printf("\n");
-    for (int y = 0; y < size; y++)
-    {
-        for (int x = 0; x < size; x++)
-        {
-            printf("%s", RAM_MEM[size * y + x]? "* ": ". ");
-        }
-        printf("\n");
-    }
-}
-#endif
-
-#ifdef DEF_CMD
 
 DEF_CMD(HLT, 0, 0, {
     return error;
@@ -278,7 +260,6 @@ DEF_CMD(CIRCLE_PICTURE, 22, 0, {
                 RAM_MEM[size * y + x] = 0;
         }
     }
-//SHOW_RAM_DATA
     show_ram_data(cpu, size);
     NEXT_COMMAND
 })
@@ -297,14 +278,12 @@ DEF_CMD(SQUARE_PICTURE, 23, 0, {
                 RAM_MEM[size * y + x] = 0;
         }
     }
-//    SHOW_RAM_DATA;
     show_ram_data(cpu, size);
     NEXT_COMMAND
 })
 
 DEF_CMD(SHOW_RAM, 24, 0, {
     int size = sqrt(cpu->vram_size);
-//SHOW_RAM_DATA
     show_ram_data(cpu, size);
     NEXT_COMMAND
 })
@@ -336,5 +315,3 @@ DEF_CMD(JMPM, 27, 1, {
     else
         ARG_STEP()
 })
-
-#endif

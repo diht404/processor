@@ -1,11 +1,17 @@
 #include "cpu.h"
 
-#ifdef DEF_CMD
-#error DEF_CMD_DEFINED
-#endif
-
-#include "../common/cmd.h"
-
+void show_ram_data(CPU *cpu, int size)
+{
+    printf("\n");
+    for (int y = 0; y < size; y++)
+    {
+        for (int x = 0; x < size; x++)
+        {
+            printf("%s", RAM_MEM[size * y + x]? "* ": ". ");
+        }
+        printf("\n");
+    }
+}
 
 size_t processorDump(FILE *fp, CPU *cpu)
 {

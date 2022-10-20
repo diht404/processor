@@ -31,7 +31,7 @@ size_t printArg(Code *code, FILE *fp, const char *command_name, size_t *ip);
  * @param fp file to write
  * @return
  */
-size_t disassemle(Code *code, FILE *fp);
+size_t disassemble(Code *code, FILE *fp);
 
 /**
  * @brief process error

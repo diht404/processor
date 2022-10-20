@@ -1,6 +1,8 @@
 #ifndef STACK__ASSEMBLER_H
 #define STACK__ASSEMBLER_H
 
+// #pragma once
+
 #include "../common/utils.h"
 
 enum ASSEMBLER_ERRORS
@@ -18,6 +20,12 @@ enum ASSEMBLER_ERRORS
     NAME_TABLE_IS_NULLPTR                      = 1 << 14,
     FILENAME_IS_NULLPTR                        = 1 << 15,
     FILE_IS_NULLPTR                            = 1 << 16,
+    // ASSEMBLER_CODE_1 = 0x101,
+    // ASSEMBLER_CODE_1 = 0x102,
+    // ASSEMBLER_CODE_1 = 0x103,
+    // ASSEMBLER_CODE_1 = 0x104,
+    // ASSEMBLER_CODE_1 = 0x105,
+
 };
 
 /**

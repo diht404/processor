@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
     readCode(fp, &code);
 
     FILE *fp_out = fopen(output_filename, "w");
-    error = disassemle(&code, fp_out);
+    error = disassemble(&code, fp_out);
     if (error)
         processDisasmError(error);
     fclose(fp);

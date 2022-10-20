@@ -1,3 +1,4 @@
+#include <cctype>
 #include "assembler.h"
 
 uint8_t *compileWithNamesTable(Program *program,
@@ -285,7 +286,7 @@ void detectBrackets(Program *program,
         }
         memcpy(buffer,
                program->lines[line] + bracket + 1,
-               commandSize - bracket - 1);
+               (size_t)(commandSize - bracket - 1));
         *code |= RAM_MASK;
     }
     else
