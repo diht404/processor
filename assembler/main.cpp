@@ -19,7 +19,7 @@ int main(int argc, char *argv[])
     handleAsmError(error);
 
     Code code = {};
-    compileWithNamesTable(&text, &code, &error);
+    error = compileWithNamesTable(&text, &code);
     handleAsmError(error);
 
     error = saveFile(&code, output_filename);

@@ -47,11 +47,10 @@ struct AsmProgram
  * @brief compiles code with names table
  *
  * @param program array with program to compile
- * @param error error code
+ * @return error code
  */
-void compileWithNamesTable(AsmProgram *program,
-                           Code *code,
-                           size_t *error);
+size_t compileWithNamesTable(AsmProgram *program,
+                             Code *code);
 
 /**
  * @brief Compiles code
@@ -59,9 +58,9 @@ void compileWithNamesTable(AsmProgram *program,
  * @param program array with program to compile
  * @param code struct with code
  * @param error error code
- * @return compiled code
+ * @return error code
  */
-void compile(AsmProgram *program, Code *code, size_t *error);
+size_t compile(AsmProgram *program, Code *code);
 
 /**
  * @brief skips spaces in code
@@ -92,15 +91,14 @@ void fillNameTable(NameTable *nameTable,
  * @param commandSize length of command
  * @param lenOfCode length of array with code
  * @param command_code code of command
- * @param error error code
+ * @return error code
  */
-void putArgs(AsmProgram *program,
+size_t putArgs(AsmProgram *program,
              size_t line,
              Code *code,
              int *commandSize,
              int *lenOfCode,
-             int command_code,
-             size_t *error);
+             int command_code);
 
 /**
  * @brief process code if there is [] in line of code
@@ -110,14 +108,13 @@ void putArgs(AsmProgram *program,
  * @param commandSize len of command in symbols
  * @param buffer buffer for storing code extracted from []
  * @param line line of code
- * @param error error code
+ * @return error code
  */
-void detectBrackets(AsmProgram *program,
+size_t detectBrackets(AsmProgram *program,
                     Code *code,
                     int commandSize,
                     char *buffer,
-                    size_t line,
-                    size_t *error);
+                    size_t line);
 
 /**
  * @brief finds id of label in names nameTable
@@ -137,14 +134,13 @@ int getIpFromTable(NameTable *nameTable,
  * @param buffer buffer for storing code extracted from []
  * @param lenOfCode length of array with code
  * @param value value to push
- * @param error error code
+ * @return error code
  */
-void processArgs(Code *code,
+size_t processArgs(Code *code,
                  int command_code,
                  char *buffer,
                  int *lenOfCode,
-                 int value,
-                 size_t *error);
+                 int value);
 
 /**
  * @brief Adds info about code: the compilation const, version, and code length

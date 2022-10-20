@@ -104,4 +104,11 @@ void freeCode(Code *code);
  * @return current week day
  */
 int get_weekday();
+
+#define CHECK_NULLPTR_ERROR(value, error) \
+    {                                     \
+        if (value == nullptr)             \
+            return error;                 \
+    }
+
 #endif //CPU__UTILS_H

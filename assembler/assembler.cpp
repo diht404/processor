@@ -1,59 +1,48 @@
 #include "assembler.h"
 
-void compileWithNamesTable(AsmProgram *program,
-                           Code *code,
-                           size_t *error)
+size_t compileWithNamesTable(AsmProgram *program,
+                             Code *code)
 {
-    if (program == nullptr)
-    {
-        if (error)
-            *error |= PROGRAM_IS_NULLPTR;
-        return;
-    }
+    size_t error = NO_ERRORS;
+
+    CHECK_NULLPTR_ERROR(program, PROGRAM_IS_NULLPTR)
 
     NameTable table = {};
     code->nameTable = table;
 
-    compile(program, code, error);
+    error = compile(program, code);
+    if (error)
+        return error;
     // add names from names table
-    compile(program, code, error);
+    error = compile(program, code);
+    return error;
 }
 
-#define DEF_CMD(name, num, arg, cpu_code)        \
-else if (strcasecmp(cmd, #name) == 0)            \
-{                                                \
-    if (!arg)                                    \
-    {                                            \
-        *code->code = COMMAND_CODES::CMD_##name; \
-        lenOfCode++;                             \
-        code->code++;                            \
-    }                                            \
-    else putArgs(program,                        \
-            line,                                \
-            code,                                \
-            &commandSize,                        \
-            &lenOfCode,                          \
-            COMMAND_CODES::CMD_##name,           \
-            error);                              \
+#define DEF_CMD(name, num, arg, cpu_code)           \
+else if (strcasecmp(cmd, #name) == 0)               \
+{                                                   \
+    if (!arg)                                       \
+    {                                               \
+        *code->code = COMMAND_CODES::CMD_##name;    \
+        lenOfCode++;                                \
+        code->code++;                               \
+    }                                               \
+    else                                            \
+        error = putArgs(program,                    \
+                        line,                       \
+                        code,                       \
+                        &commandSize,               \
+                        &lenOfCode,                 \
+                        COMMAND_CODES::CMD_##name); \
 }
 
-void compile(AsmProgram *program,
-             Code *code,
-             size_t *error)
+size_t compile(AsmProgram *program,
+               Code *code)
 {
-    if (program == nullptr)
-    {
-        if (error)
-            *error |= PROGRAM_IS_NULLPTR;
-        return;
-    }
+    size_t error = NO_ERRORS;
 
-    if (code == nullptr)
-    {
-        if (error)
-            *error |= CODE_IS_NULLPTR;
-        return;
-    }
+    CHECK_NULLPTR_ERROR(program, PROGRAM_IS_NULLPTR)
+    CHECK_NULLPTR_ERROR(code, CODE_IS_NULLPTR)
 
     size_t line = 0;
     char cmd[BUFFER_SIZE] = "";
@@ -61,9 +50,8 @@ void compile(AsmProgram *program,
     code->code = (uint8_t *) calloc(2 * program->length * sizeof(int), 1);
     if (code->code == nullptr)
     {
-        if (error)
-            *error |= ASSEMBLER_CANT_ALLOCATE_MEMORY_FOR_PROGRAM;
-        return;
+        error |= ASSEMBLER_CANT_ALLOCATE_MEMORY_FOR_PROGRAM;
+        return error;
     }
 
     int lenOfCode = 0;
@@ -78,8 +66,8 @@ void compile(AsmProgram *program,
                     &commandSize))
         {
             if (error)
-                *error |= ASSEMBLER_COMPILATION_FAILED;
-            return;
+                error |= ASSEMBLER_COMPILATION_FAILED;
+            return error;
         }
         // label definition
         if (cmd[0] == ':')
@@ -90,8 +78,8 @@ void compile(AsmProgram *program,
         else
         {
             if (error)
-                *error |= ASSEMBLER_COMPILATION_FAILED;
-            return;
+                error |= ASSEMBLER_COMPILATION_FAILED;
+            return error;
         }
         line++;
     }
@@ -103,9 +91,11 @@ void compile(AsmProgram *program,
     if (newMemory == nullptr)
     {
         if (error)
-            *error = ASSEMBLER_CANT_SHRINK_TO_FIT;
+            error = ASSEMBLER_CANT_SHRINK_TO_FIT;
+        return error;
     }
     code->code = newMemory;
+    return error;
 }
 #undef DEF_CMD
 
@@ -156,62 +146,33 @@ void fillNameTable(NameTable *nameTable,
     }
 }
 
-void putArgs(AsmProgram *program,
+size_t putArgs(AsmProgram *program,
              size_t line,
              Code *code,
              int *commandSize,
              int *lenOfCode,
-             int command_code,
-             size_t *error)
+             int command_code)
 {
-    if (program == nullptr)
-    {
-        if (error)
-            *error |= PROGRAM_IS_NULLPTR;
-        return;
-    }
+    size_t error = NO_ERRORS;
 
-    if (code == nullptr)
-    {
-        if (error)
-            *error |= CODE_IS_NULLPTR;
-        return;
-    }
-
-    if (code->code == nullptr)
-    {
-        if (error)
-            *error |= CODE_IS_NULLPTR;
-        return;
-    }
-
-    if (commandSize == nullptr)
-    {
-        if (error)
-            *error |= TOKEN_PTR_IS_NULLPTR;
-        return;
-    }
-
-    if (lenOfCode == nullptr)
-    {
-        if (error)
-            *error |= LEN_OF_CODE_IS_NULLPTR;
-        return;
-    }
+    CHECK_NULLPTR_ERROR(program, PROGRAM_IS_NULLPTR)
+    CHECK_NULLPTR_ERROR(code, CODE_IS_NULLPTR)
+    CHECK_NULLPTR_ERROR(code->code, PROGRAM_IS_NULLPTR)
+    CHECK_NULLPTR_ERROR(commandSize, TOKEN_PTR_IS_NULLPTR)
+    CHECK_NULLPTR_ERROR(lenOfCode, LEN_OF_CODE_IS_NULLPTR)
 
     char buffer[BUFFER_SIZE] = "";
     int value = 0;
 
     skipSpaces(program, line, commandSize);
 
-    detectBrackets(program,
-                   code,
-                   *commandSize,
-                   buffer,
-                   line,
-                   error);
-    if (*error)
-        return;
+    error |= detectBrackets(program,
+                             code,
+                             *commandSize,
+                             buffer,
+                             line);
+    if (error)
+        return error;
 
     if (buffer[0] == ':')
     {
@@ -226,41 +187,25 @@ void putArgs(AsmProgram *program,
         code->code += sizeof(int);
     }
     else
-        processArgs(code,
-                    command_code,
-                    buffer,
-                    lenOfCode,
-                    value,
-                    error);
+        error |= processArgs(code,
+                             command_code,
+                             buffer,
+                             lenOfCode,
+                             value);
+    return error;
 }
 
-void detectBrackets(AsmProgram *program,
+size_t detectBrackets(AsmProgram *program,
                     Code *code,
                     int commandSize,
                     char *buffer,
-                    size_t line,
-                    size_t *error)
+                    size_t line)
 {
-    if (program == nullptr)
-    {
-        if (error)
-            *error |= PROGRAM_IS_NULLPTR;
-        return;
-    }
+    size_t error = NO_ERRORS;
 
-    if (code == nullptr)
-    {
-        if (error)
-            *error |= CODE_IS_NULLPTR;
-        return;
-    }
-
-    if (buffer == nullptr)
-    {
-        if (error)
-            *error |= BUFFER_IS_NULLPTR;
-        return;
-    }
+    CHECK_NULLPTR_ERROR(program, PROGRAM_IS_NULLPTR)
+    CHECK_NULLPTR_ERROR(code, CODE_IS_NULLPTR)
+    CHECK_NULLPTR_ERROR(buffer, BUFFER_IS_NULLPTR)
 
     if (*(program->lines[line] + commandSize) == '[')
     {
@@ -279,8 +224,7 @@ void detectBrackets(AsmProgram *program,
         }
         if (!correct)
         {
-            *error |= INCORRECT_BRACKETS;
-            return;
+            return INCORRECT_BRACKETS;
         }
         memcpy(buffer,
                program->lines[line] + bracket + 1,
@@ -293,6 +237,7 @@ void detectBrackets(AsmProgram *program,
                (program->lines[line] + commandSize),
                BUFFER_SIZE);
     }
+    return error;
 }
 
 int getIpFromTable(NameTable *nameTable,
@@ -312,33 +257,18 @@ int getIpFromTable(NameTable *nameTable,
     return -1;
 }
 
-void processArgs(Code *code,
+size_t processArgs(Code *code,
                  int command_code,
                  char *buffer,
                  int *lenOfCode,
-                 int value,
-                 size_t *error)
+                 int value)
 {
-    if (code == nullptr)
-    {
-        if (error)
-            *error |= CODE_IS_NULLPTR;
-        return;
-    }
+    size_t error = NO_ERRORS;
 
-    if (code->code == nullptr)
-    {
-        if (error)
-            *error |= CODE_IS_NULLPTR;
-        return;
-    }
-
-    if (buffer == nullptr)
-    {
-        if (error)
-            *error |= BUFFER_IS_NULLPTR;
-        return;
-    }
+    CHECK_NULLPTR_ERROR(code, CODE_IS_NULLPTR)
+    CHECK_NULLPTR_ERROR(code->code, CODE_IS_NULLPTR)
+    CHECK_NULLPTR_ERROR(buffer, BUFFER_IS_NULLPTR)
+    CHECK_NULLPTR_ERROR(code, CODE_IS_NULLPTR)
 
     reg_compile(command_code, "rax", 1)
     else reg_compile(command_code, "rbx", 2)
@@ -348,9 +278,7 @@ void processArgs(Code *code,
                      "%d",
                      &value))
     {
-        if (error)
-            *error |= ASSEMBLER_COMPILATION_FAILED;
-        return;
+        return ASSEMBLER_COMPILATION_FAILED;
     }
     else
     {
@@ -362,6 +290,7 @@ void processArgs(Code *code,
         *lenOfCode += sizeof(int);
         code->code += sizeof(int);
     }
+    return error;
 }
 
 void addInfo(Code *code, int lenOfCode)
@@ -378,15 +307,8 @@ void addInfo(Code *code, int lenOfCode)
 
 size_t readFile(FILE *fp, AsmProgram *program)
 {
-    if (fp == nullptr)
-    {
-        return FILENAME_IS_NULLPTR;
-    }
-
-    if (program == nullptr)
-    {
-        return PROGRAM_IS_NULLPTR;
-    }
+    CHECK_NULLPTR_ERROR(fp, FILE_IS_NULLPTR)
+    CHECK_NULLPTR_ERROR(program, PROGRAM_IS_NULLPTR)
 
     size_t lenOfFile = 0;
     char *txt = nullptr;
@@ -426,14 +348,8 @@ size_t readFile(FILE *fp, AsmProgram *program)
 
 size_t saveFile(Code *code, const char *filename)
 {
-    if (code == nullptr)
-    {
-        return CODE_IS_NULLPTR;
-    }
-    if (filename == nullptr)
-    {
-        return FILENAME_IS_NULLPTR;
-    }
+    CHECK_NULLPTR_ERROR(code, CODE_IS_NULLPTR)
+    CHECK_NULLPTR_ERROR(filename, FILENAME_IS_NULLPTR)
 
     FILE *fp = fopen(filename, "w");
 
@@ -448,10 +364,8 @@ size_t saveFile(Code *code, const char *filename)
 
 size_t saveHeader(CodeHeader *header, FILE *fp)
 {
-    if (header == nullptr)
-        return HEADER_IS_NULLPTR;
-    if (fp == nullptr)
-        return FILE_IS_NULLPTR;
+    CHECK_NULLPTR_ERROR(header, HEADER_IS_NULLPTR)
+    CHECK_NULLPTR_ERROR(fp, FILE_IS_NULLPTR)
 
     fwrite(&header->compilation_const, sizeof(size_t), 1, fp);
     fwrite(&header->version, sizeof(size_t), 1, fp);
