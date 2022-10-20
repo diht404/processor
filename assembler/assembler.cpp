@@ -169,7 +169,7 @@ void putArgs(AsmProgram *program,
     if (commandSize == nullptr)
     {
         if (error)
-            *error |= COMMAND_SIZE_IS_NULLPTR;
+            *error |= TOKEN_PTR_IS_NULLPTR;
         return;
     }
 
@@ -346,23 +346,23 @@ void processArgs(Code *code,
     }
 }
 
-void skipSpaces(AsmProgram *program, size_t line, int *commandSize)
+void skipSpaces(AsmProgram *program, size_t line, int *tokenPtr)
 {
     if (program == nullptr)
     {
         return;
     }
 
-    if (commandSize == nullptr)
+    if (tokenPtr == nullptr)
     {
         return;
     }
 
-    while (*(program->lines[line] + *commandSize) == ' '
-        or *(program->lines[line] + *commandSize) == '\0'
-        or *(program->lines[line] + *commandSize) == '\n')
+    while (*(program->lines[line] + *tokenPtr) == ' '
+        or *(program->lines[line] + *tokenPtr) == '\0'
+        or *(program->lines[line] + *tokenPtr) == '\n')
     {
-        (*commandSize)++;
+        (*tokenPtr)++;
     }
 }
 
@@ -486,7 +486,7 @@ void handleAsmError(size_t error)
         fprintf(fp, "Buffer is nullptr.\n");
     if (error & PROGRAM_IS_NULLPTR)
         fprintf(fp, "AsmProgram is nullptr.\n");
-    if (error & COMMAND_SIZE_IS_NULLPTR)
+    if (error & TOKEN_PTR_IS_NULLPTR)
         fprintf(fp, "Command size is nullptr.\n");
     if (error & LEN_OF_CODE_IS_NULLPTR)
         fprintf(fp, "Length of code is nullptr.\n");

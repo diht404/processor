@@ -96,3 +96,8 @@ int get_weekday()
     }
     return -1;
 }
+
+void freeCode(Code *code)
+{
+    free(code->code);
+}

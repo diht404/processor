@@ -25,7 +25,7 @@ int main(int argc, char *argv[])
     error = saveFile(&code, output_filename);
     handleAsmError(error);
 
-    free(code.code);
+    freeCode(&code);
     fclose(fp);
     return 0;
 }

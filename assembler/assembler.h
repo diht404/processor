@@ -13,7 +13,7 @@ enum ASSEMBLER_ERRORS
     CODE_IS_NULLPTR                            = 1 << 9,
     BUFFER_IS_NULLPTR                          = 1 << 10,
     PROGRAM_IS_NULLPTR                         = 1 << 11,
-    COMMAND_SIZE_IS_NULLPTR                    = 1 << 12,
+    TOKEN_PTR_IS_NULLPTR                       = 1 << 12,
     LEN_OF_CODE_IS_NULLPTR                     = 1 << 13,
     NAME_TABLE_IS_NULLPTR                      = 1 << 14,
     FILENAME_IS_NULLPTR                        = 1 << 15,
@@ -57,9 +57,9 @@ size_t readFile(FILE *fp, AsmProgram *program);
  *
  * @param program struct with code
  * @param line line of code
- * @param commandSize len of command in symbols
+ * @param tokenPtr len of command in symbols
  */
-void skipSpaces(AsmProgram *program, size_t line, int *commandSize);
+void skipSpaces(AsmProgram *program, size_t line, int *tokenPtr);
 
 /**
  * @brief process code if there is [] in line of code

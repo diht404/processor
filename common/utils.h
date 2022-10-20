@@ -91,5 +91,17 @@ size_t verifyCode(char **buf);
  */
 size_t readCode(FILE *fp, Code *code);
 
+/**
+ * @brief calculates current day
+ *
+ * @return current week day
+ */
 int get_weekday();
+
+/**
+ * @brief frees memory for struct code
+ *
+ * @param code
+ */
+void freeCode(Code *code);
 #endif //STACK__UTILS_H
