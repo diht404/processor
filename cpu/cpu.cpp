@@ -1,5 +1,12 @@
 #include "cpu.h"
 
+#ifdef DEF_CMD
+#error DEF_CMD_DEFINED
+#endif
+
+#include "../common/cmd.h"
+
+
 size_t processorDump(FILE *fp, CPU *cpu)
 {
     if (fp == nullptr)

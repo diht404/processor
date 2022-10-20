@@ -20,10 +20,10 @@
     }
 
 #define RAM_MEM  \
-    cpu->RAM \
+    (cpu->RAM)   \
 
-#define REGS  \
-    cpu->regs \
+#define REGS    \
+    (cpu->regs) \
 
 #define SET_ARG       \
     {                 \
@@ -52,15 +52,15 @@
 
 #define GET_ARG()                                          \
     {                                                      \
-    if (args & IMM_MASK)                                   \
-        arg += command_arg;                                \
-    if (args & REG_MASK)                                   \
-        arg += REGS[command_arg];                          \
-    if (args & RAM_MASK)                                   \
-    {                                                      \
-        sleep(0);                                          \
-        arg = RAM_MEM[arg];                                \
-    }                                                      \
+        if (args & IMM_MASK)                                   \
+            arg += command_arg;                                \
+        if (args & REG_MASK)                                   \
+            arg += REGS[command_arg];                          \
+        if (args & RAM_MASK)                                   \
+        {                                                      \
+            sleep(0);                                          \
+            arg = RAM_MEM[arg];                                \
+        }                                                      \
     }
 
 #define ARG_COMMAND_STEP()                                 \
@@ -74,18 +74,23 @@
         cpu->ip += sizeof(int); \
     }
 
-#define SHOW_RAM_DATA                                        \
-    {                                                        \
-    printf("\n");                                            \
-    for (int y = 0; y < size; y++)                           \
-    {                                                        \
-        for (int x = 0; x < size; x++)                       \
-        {                                                    \
-            printf("%s", RAM_MEM[size * y + x]? "* ": ". "); \
-        }                                                    \
-        printf("\n");                                        \
-    }                                                        \
+#ifndef DEF_CMD
+
+void show_ram_data(CPU *cpu, int size)
+{
+    printf("\n");
+    for (int y = 0; y < size; y++)
+    {
+        for (int x = 0; x < size; x++)
+        {
+            printf("%s", RAM_MEM[size * y + x]? "* ": ". ");
+        }
+        printf("\n");
     }
+}
+#endif
+
+#ifdef DEF_CMD
 
 DEF_CMD(HLT, 0, 0, {
     return error;
@@ -273,7 +278,8 @@ DEF_CMD(CIRCLE_PICTURE, 22, 0, {
                 RAM_MEM[size * y + x] = 0;
         }
     }
-    SHOW_RAM_DATA
+//SHOW_RAM_DATA
+    show_ram_data(cpu, size);
     NEXT_COMMAND
 })
 
@@ -291,13 +297,15 @@ DEF_CMD(SQUARE_PICTURE, 23, 0, {
                 RAM_MEM[size * y + x] = 0;
         }
     }
-    SHOW_RAM_DATA
+//    SHOW_RAM_DATA;
+    show_ram_data(cpu, size);
     NEXT_COMMAND
 })
 
 DEF_CMD(SHOW_RAM, 24, 0, {
     int size = sqrt(cpu->vram_size);
-    SHOW_RAM_DATA
+//SHOW_RAM_DATA
+    show_ram_data(cpu, size);
     NEXT_COMMAND
 })
 
@@ -328,3 +336,5 @@ DEF_CMD(JMPM, 27, 1, {
     else
         ARG_STEP()
 })
+
+#endif
