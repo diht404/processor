@@ -89,10 +89,22 @@ hlt
 :b_zero_c_not_zero
     push rcx
     push rax
+    mul
+    push 0
+    jb :is_sols
+        no_sols
+        ret
+    :is_sols
+    push rcx
+    push -1
+    mul
+    push rax
     div
     sqrt
     out
     push rcx
+    push -1
+    mul
     push rax
     div
     sqrt

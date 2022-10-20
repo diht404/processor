@@ -27,10 +27,25 @@ enum UTILS_ERRORS
     INCORRECT_VERSION             = 1 << 4,
 };
 
+struct NameTable
+{
+    char name_table[BUFFER_SIZE][BUFFER_SIZE] = {};
+    int positions[BUFFER_SIZE] = {};
+};
+
+struct CodeHeader
+{
+    size_t compilation_const = 0;
+    size_t version = 0;
+    size_t length = 0;
+};
+
 struct Code
 {
-    uint8_t *code;
-    size_t len;
+    uint8_t *code = nullptr;
+    size_t len = 0;
+    NameTable nameTable = {};
+    CodeHeader codeHeader = {};
 };
 
 /**

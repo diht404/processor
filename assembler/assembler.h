@@ -1,8 +1,6 @@
 #ifndef STACK__ASSEMBLER_H
 #define STACK__ASSEMBLER_H
 
-// #pragma once
-
 #include "../common/utils.h"
 
 enum ASSEMBLER_ERRORS
@@ -20,57 +18,39 @@ enum ASSEMBLER_ERRORS
     NAME_TABLE_IS_NULLPTR                      = 1 << 14,
     FILENAME_IS_NULLPTR                        = 1 << 15,
     FILE_IS_NULLPTR                            = 1 << 16,
-    // ASSEMBLER_CODE_1 = 0x101,
-    // ASSEMBLER_CODE_1 = 0x102,
-    // ASSEMBLER_CODE_1 = 0x103,
-    // ASSEMBLER_CODE_1 = 0x104,
-    // ASSEMBLER_CODE_1 = 0x105,
-
+    HEADER_IS_NULLPTR                          = 1 << 17,
 };
 
 /**
  * @brief Struct for storing array of strings, its' length and pointer
  * to memory block with not sorted text(array of string)
  */
-struct Program
+struct AsmProgram
 {
     char **lines = nullptr;
     size_t length = 0;
 };
 
-struct NamesTable
-{
-    char names_table[BUFFER_SIZE][BUFFER_SIZE] = {};
-    int positions[BUFFER_SIZE] = {};
-};
 
 #define reg_compile(cmd_arg, reg_name, number) \
     if (strcasecmp(buffer, (reg_name)) == 0)   \
     {                                          \
-        **code = (cmd_arg) | REG_MASK;         \
+        *code->code = (cmd_arg) | REG_MASK;    \
         (*lenOfCode)++;                        \
-        (*code)++;                             \
-        **(int **) code = (number);            \
+        code->code++;                          \
+        *(int *) code->code = (number);        \
         *lenOfCode += sizeof(int);             \
-        *code += sizeof(int);                  \
+        code->code += sizeof(int);             \
     }
 
 /**
- * @brief reads file to struct Program
+ * @brief reads file to struct AsmProgram
  *
  * @param fp - opened file
- * @param program - struct Program with file
+ * @param program - struct AsmProgram with file
  * @return error code
  */
-size_t readFile(FILE *fp, Program *program);
-
-/**
- * @brief Adds info about code: the compilation const, version, and code length
- *
- * @param code array with code
- * @param lenOfCode length of code in bytes
- */
-void addInfo(uint8_t **code, int lenOfCode);
+size_t readFile(FILE *fp, AsmProgram *program);
 
 /**
  * @brief skips spaces in code
@@ -79,7 +59,7 @@ void addInfo(uint8_t **code, int lenOfCode);
  * @param line line of code
  * @param commandSize len of command in symbols
  */
-void skipSpaces(Program *program, size_t line, int *commandSize);
+void skipSpaces(AsmProgram *program, size_t line, int *commandSize);
 
 /**
  * @brief process code if there is [] in line of code
@@ -91,8 +71,8 @@ void skipSpaces(Program *program, size_t line, int *commandSize);
  * @param line line of code
  * @param error error code
  */
-void detectBrackets(Program *program,
-                    uint8_t *code,
+void detectBrackets(AsmProgram *program,
+                    Code *code,
                     int commandSize,
                     char *buffer,
                     size_t line,
@@ -108,7 +88,7 @@ void detectBrackets(Program *program,
  * @param value value to push
  * @param error error code
  */
-void processArgs(uint8_t **code,
+void processArgs(Code *code,
                  int command_code,
                  char *buffer,
                  int *lenOfCode,
@@ -127,24 +107,33 @@ void processArgs(uint8_t **code,
  * @param table names table
  * @param error error code
  */
-void putArgs(Program *program,
+void putArgs(AsmProgram *program,
              size_t line,
-             uint8_t **code,
+             Code *code,
              int *commandSize,
              int *lenOfCode,
              int command_code,
-             NamesTable *table,
              size_t *error);
+
+/**
+ * @brief compiles code with names table
+ *
+ * @param program array with program to compile
+ * @param error error code
+ */
+void compileWithNamesTable(AsmProgram *program,
+                           Code *code,
+                           size_t *error);
 
 /**
  * @brief Compiles code
  *
  * @param program array with program to compile
- * @param table names table
+ * @param code struct with code
  * @param error error code
  * @return compiled code
  */
-uint8_t *compile(Program *program, NamesTable *table, size_t *error);
+void compile(AsmProgram *program, Code *code, size_t *error);
 
 /**
  * @brief fills names table and search index of label in table
@@ -153,7 +142,7 @@ uint8_t *compile(Program *program, NamesTable *table, size_t *error);
  * @param name name of label
  * @param ip index of label
  */
-void fillNameTable(NamesTable *table,
+void fillNameTable(Code *code,
                    char name[BUFFER_SIZE],
                    int ip);
 
@@ -164,18 +153,8 @@ void fillNameTable(NamesTable *table,
  * @param name name of label
  * @return index of label in name table or -1 if not success
  */
-int getIpFromTable(NamesTable *table,
+int getIpFromTable(NameTable *table,
                    char name[BUFFER_SIZE]);
-
-/**
- * @brief compiles code with names table
- *
- * @param program array with program to compile
- * @param error error code
- * @return compiled code
- */
-uint8_t *compileWithNamesTable(Program *program,
-                               size_t *error);
 
 /**
  * @brief Saves array with compiled code to file
@@ -184,7 +163,24 @@ uint8_t *compileWithNamesTable(Program *program,
  * @param filename name of file to write
  * @return error code
  */
-size_t saveFile(uint8_t *code, const char *filename);
+size_t saveFile(Code *code, const char *filename);
+
+/**
+ * @brief saves header of file
+ *
+ * @param header header to save
+ * @param fp file to save to
+ * @return
+ */
+size_t saveHeader(CodeHeader *header, FILE *fp);
+
+/**
+ * @brief Adds info about code: the compilation const, version, and code length
+ *
+ * @param code array with code
+ * @param lenOfCode length of code in bytes
+ */
+void addInfo(Code *code, int lenOfCode);
 
 /**
  * @brief process error

@@ -14,17 +14,18 @@ int main(int argc, char *argv[])
 
     FILE *fp = fopen(input_filename, "r");
 
-    Program text = {};
+    AsmProgram text = {};
     error = readFile(fp, &text);
     handleAsmError(error);
 
-    uint8_t *code = compileWithNamesTable(&text, &error);
+    Code code = {};
+    compileWithNamesTable(&text, &code, &error);
     handleAsmError(error);
 
-    error = saveFile(code, output_filename);
+    error = saveFile(&code, output_filename);
     handleAsmError(error);
 
-    free(code);
+    free(code.code);
     fclose(fp);
     return 0;
 }
