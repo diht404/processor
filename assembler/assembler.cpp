@@ -13,7 +13,7 @@ size_t compileWithNamesTable(AsmProgram *program,
     error = compile(program, code);
     if (error)
         return error;
-    // add names from names table
+    // add names from name table
     error = compile(program, code);
     return error;
 }
