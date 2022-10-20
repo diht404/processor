@@ -49,13 +49,13 @@ struct Code
 };
 
 /**
- * @brief return length of file in bytes
+ * @brief Reads code from binary file
  *
- * @param fp - opened file
- * @param lenOfFile - length of file
- * @return error code
+ * @param fp file to read from
+ * @param code struct to read code
+ * @return
  */
-int getLenOfFile(FILE *fp, size_t *lenOfFile);
+size_t readCode(FILE *fp, Code *code);
 
 /**
  * reads file to buffer
@@ -65,6 +65,15 @@ int getLenOfFile(FILE *fp, size_t *lenOfFile);
  * @return error code
  */
 size_t readFileToBuf(FILE *fp, size_t *lenOfFile, char **txt);
+
+/**
+ * @brief return length of file in bytes
+ *
+ * @param fp - opened file
+ * @param lenOfFile - length of file
+ * @return error code
+ */
+int getLenOfFile(FILE *fp, size_t *lenOfFile);
 
 /**
  * @brief counts lines in buffer
@@ -83,13 +92,11 @@ size_t countLines(const char *txt, size_t lenOfFile);
 size_t verifyCode(char **buf);
 
 /**
- * @brief Reads code from binary file
+ * @brief frees memory for struct code
  *
- * @param fp file to read from
- * @param code struct to read code
- * @return
+ * @param code
  */
-size_t readCode(FILE *fp, Code *code);
+void freeCode(Code *code);
 
 /**
  * @brief calculates current day
@@ -97,11 +104,4 @@ size_t readCode(FILE *fp, Code *code);
  * @return current week day
  */
 int get_weekday();
-
-/**
- * @brief frees memory for struct code
- *
- * @param code
- */
-void freeCode(Code *code);
 #endif //STACK__UTILS_H

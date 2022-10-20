@@ -1,15 +1,24 @@
 #include "utils.h"
 
-int getLenOfFile(FILE *fp, size_t *lenOfFile)
+size_t readCode(FILE *fp, Code *code)
 {
     assert(fp != nullptr);
-    assert(lenOfFile != nullptr);
+    assert(code != nullptr);
 
-    struct stat buff = {};
-    if (fstat(fileno(fp), &buff) != 0)
-        return CANT_GET_FILE_INFO;
+    size_t lenOfFile = 0;
+    char *buf = nullptr;
+    size_t error = readFileToBuf(fp, &lenOfFile, &buf);
 
-    *lenOfFile = buff.st_size;
+    if (error)
+        return error;
+
+    error = verifyCode(&buf);
+    if (error)
+        return error;
+
+    code->len = *((size_t *) (buf) + 2);
+    code->code = (uint8_t *) ((size_t *) (buf) + 3);
+
     return NO_ERRORS;
 }
 
@@ -30,6 +39,19 @@ size_t readFileToBuf(FILE *fp, size_t *lenOfFile, char **txt)
     }
     fread(*txt, sizeof(char), *lenOfFile, fp);
     return error;
+}
+
+int getLenOfFile(FILE *fp, size_t *lenOfFile)
+{
+    assert(fp != nullptr);
+    assert(lenOfFile != nullptr);
+
+    struct stat buff = {};
+    if (fstat(fileno(fp), &buff) != 0)
+        return CANT_GET_FILE_INFO;
+
+    *lenOfFile = buff.st_size;
+    return NO_ERRORS;
 }
 
 size_t countLines(const char *txt, size_t lenOfFile)
@@ -65,26 +87,9 @@ size_t verifyCode(char **buf)
     return NO_ERRORS;
 }
 
-size_t readCode(FILE *fp, Code *code)
+void freeCode(Code *code)
 {
-    assert(fp != nullptr);
-    assert(code != nullptr);
-
-    size_t lenOfFile = 0;
-    char *buf = nullptr;
-    size_t error = readFileToBuf(fp, &lenOfFile, &buf);
-
-    if (error)
-        return error;
-
-    error = verifyCode(&buf);
-    if (error)
-        return error;
-
-    code->len = *((size_t *) (buf) + 2);
-    code->code = (uint8_t *) ((size_t *) (buf) + 3);
-
-    return NO_ERRORS;
+    free(code->code);
 }
 
 int get_weekday()
@@ -95,9 +100,4 @@ int get_weekday()
         return localtime(&t)->tm_wday; // Sunday=0, Monday=1, etc.
     }
     return -1;
-}
-
-void freeCode(Code *code)
-{
-    free(code->code);
 }
