@@ -38,7 +38,8 @@ size_t disassemble(Code *code, FILE *fp)
 }
 #undef DEF_CMD
 
-size_t printArg(Code *code, FILE *fp, const char *command_name, size_t *ip)
+size_t printArg(Code *code,
+                FILE *fp, const char *command_name, size_t *ip)
 {
     CHECK_NULLPTR_ERROR(code, CODE_IS_NULLPTR)
     CHECK_NULLPTR_ERROR(fp, FILE_IS_NULLPTR)
@@ -54,22 +55,30 @@ size_t printArg(Code *code, FILE *fp, const char *command_name, size_t *ip)
         if (cmd & REG_MASK)
         {
             if (value > 0 and value < 5)
-                fprintf(fp, "%s %s\n", command_name, REGS_NAMES[value]);
+                fprintf(fp,
+                        "%s %s\n",
+                        command_name,
+                        REGS_NAMES[value]);
             else
                 return UNKNOWN_REG;
         }
         if (cmd & IMM_MASK)
         {
             if (cmd & RAM_MASK)
-                fprintf(fp, "%s [%d]\n", command_name, value);
+                fprintf(fp,
+                        "%s [%d]\n",
+                        command_name,
+                        value);
             else
-                fprintf(fp, "%s %d\n", command_name, value);
+                fprintf(fp,
+                        "%s %d\n",
+                        command_name,
+                        value);
         }
     }
     *ip += sizeof(int);
     return NO_ERRORS;
 }
-
 
 void handleDisassemblerError(size_t error)
 {

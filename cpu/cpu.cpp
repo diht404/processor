@@ -51,7 +51,7 @@ void show_ram_data(CPU *cpu, int size)
     {
         for (int x = 0; x < size; x++)
         {
-            printf("%s", RAM_MEM[size * y + x]? "* ": ". ");
+            printf("%s", RAM_MEM[size * y + x] ? "* " : ". ");
         }
         printf("\n");
     }

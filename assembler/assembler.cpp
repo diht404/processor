@@ -47,7 +47,8 @@ size_t compile(AsmProgram *program,
     size_t line = 0;
     char cmd[BUFFER_SIZE] = "";
 
-    code->code = (uint8_t *) calloc(2 * program->length * sizeof(int), 1);
+    code->code =
+        (uint8_t *) calloc(2 * program->length * sizeof(int), 1);
     if (code->code == nullptr)
     {
         error |= ASSEMBLER_CANT_ALLOCATE_MEMORY_FOR_PROGRAM;
@@ -87,7 +88,8 @@ size_t compile(AsmProgram *program,
 
     addInfo(code, lenOfCode);
     uint8_t *newMemory = (uint8_t *) realloc(code->code,
-                                             lenOfCode * sizeof(newMemory[0]));
+                                             lenOfCode
+                                                 * sizeof(newMemory[0]));
     if (newMemory == nullptr)
     {
         if (error)
@@ -147,11 +149,11 @@ void fillNameTable(NameTable *nameTable,
 }
 
 size_t putArgs(AsmProgram *program,
-             size_t line,
-             Code *code,
-             int *commandSize,
-             int *lenOfCode,
-             int command_code)
+               size_t line,
+               Code *code,
+               int *commandSize,
+               int *lenOfCode,
+               int command_code)
 {
     size_t error = NO_ERRORS;
 
@@ -167,10 +169,10 @@ size_t putArgs(AsmProgram *program,
     skipSpaces(program, line, commandSize);
 
     error |= detectBrackets(program,
-                             code,
-                             *commandSize,
-                             buffer,
-                             line);
+                            code,
+                            *commandSize,
+                            buffer,
+                            line);
     if (error)
         return error;
 
@@ -196,10 +198,10 @@ size_t putArgs(AsmProgram *program,
 }
 
 size_t detectBrackets(AsmProgram *program,
-                    Code *code,
-                    int commandSize,
-                    char *buffer,
-                    size_t line)
+                      Code *code,
+                      int commandSize,
+                      char *buffer,
+                      size_t line)
 {
     size_t error = NO_ERRORS;
 
@@ -228,7 +230,7 @@ size_t detectBrackets(AsmProgram *program,
         }
         memcpy(buffer,
                program->lines[line] + bracket + 1,
-               (size_t)(commandSize - bracket - 1));
+               (size_t) (commandSize - bracket - 1));
         *code->code |= RAM_MASK;
     }
     else
@@ -258,10 +260,10 @@ int getIpFromTable(NameTable *nameTable,
 }
 
 size_t processArgs(Code *code,
-                 int command_code,
-                 char *buffer,
-                 int *lenOfCode,
-                 int value)
+                   int command_code,
+                   char *buffer,
+                   int *lenOfCode,
+                   int value)
 {
     size_t error = NO_ERRORS;
 
@@ -302,7 +304,7 @@ void addInfo(Code *code, int lenOfCode)
 
     code->codeHeader.compilation_const = COMPILATION_CONST;
     code->codeHeader.version = VERSION_CONST;
-    code->codeHeader.length = (size_t)lenOfCode;
+    code->codeHeader.length = (size_t) lenOfCode;
 }
 
 size_t readFile(FILE *fp, AsmProgram *program)
@@ -355,7 +357,7 @@ size_t saveFile(Code *code, const char *filename)
 
     saveHeader(&code->codeHeader, fp);
 
-    size_t numElements =  code->codeHeader.length;
+    size_t numElements = code->codeHeader.length;
     fwrite(code->code, sizeof(uint8_t), numElements, fp);
 
     fclose(fp);

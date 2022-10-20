@@ -107,7 +107,7 @@ int get_weekday();
 
 #define CHECK_NULLPTR_ERROR(value, error) \
     {                                     \
-        assert(error && #value);          \
+        assert((int)error && #value);     \
         if (value == nullptr)             \
             return error;                 \
     }
