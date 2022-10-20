@@ -92,7 +92,7 @@ size_t printArg(Code *code, FILE *fp, const char *command_name, size_t *ip)
 }
 
 
-void handleDisasmError(size_t error)
+void handleDisassemblerError(size_t error)
 {
     FILE *fp = stderr;
     if (!error)

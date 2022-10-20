@@ -38,6 +38,6 @@ size_t printArg(Code *code, FILE *fp, const char *command_name, size_t *ip);
  *
  * @param error error code
  */
-void handleDisasmError(size_t error);
+void handleDisassemblerError(size_t error);
 
 #endif //CPU__DISASSEMBLER_H
