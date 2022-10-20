@@ -30,10 +30,10 @@
         cpu->ip = arg;                                         \
     }
 
-#define POP_TWO()                                              \
+#define POP_TWO(firstValue, secondValue)                       \
     {                                                          \
-        POP(&secondValue);                                     \
-        POP(&firstValue);                                      \
+        POP(secondValue);                                     \
+        POP(firstValue);                                      \
     }
 
 #define PUSH_VALUE(value)                                      \
@@ -98,7 +98,7 @@ DEF_CMD(PUSH, 1, 1, {
 DEF_CMD(ADD, 2, 0, {
     int firstValue  = 0;
     int secondValue = 0;
-    POP_TWO()
+    POP_TWO(&firstValue, &secondValue)
     PUSH_VALUE(firstValue + secondValue);
     NEXT_COMMAND
 })
@@ -106,7 +106,7 @@ DEF_CMD(ADD, 2, 0, {
 DEF_CMD(MUL, 3, 0, {
     int firstValue  = 0;
     int secondValue = 0;
-    POP_TWO()
+    POP_TWO(&firstValue, &secondValue)
     PUSH_VALUE(firstValue * secondValue / precision);
     NEXT_COMMAND
 })
@@ -114,7 +114,7 @@ DEF_CMD(MUL, 3, 0, {
 DEF_CMD(SUB, 4, 0, {
     int firstValue  = 0;
     int secondValue = 0;
-    POP_TWO()
+    POP_TWO(&firstValue, &secondValue)
     PUSH_VALUE(firstValue - secondValue);
     NEXT_COMMAND
 })
@@ -122,7 +122,7 @@ DEF_CMD(SUB, 4, 0, {
 DEF_CMD(DIV, 5, 0, {
     int firstValue  = 0;
     int secondValue = 0;
-    POP_TWO()
+    POP_TWO(&firstValue, &secondValue)
     if (secondValue == 0)
         return DIVISION_BY_ZER0;
     PUSH_VALUE(precision * firstValue / secondValue);
@@ -192,7 +192,7 @@ DEF_CMD(JMP, 10, 1, {
     ARG_COMMAND_STEP()                    \
     int firstValue  = 0;                  \
     int secondValue = 0;                  \
-    POP_TWO()                             \
+    POP_TWO(&firstValue, &secondValue)    \
                                           \
     if (firstValue operation secondValue) \
     {                                     \
@@ -291,7 +291,7 @@ DEF_CMD(SHOW_RAM, 24, 0, {
 DEF_CMD(MOD, 25, 0, {
     int firstValue  = 0;
     int secondValue = 0;
-    POP_TWO()
+    POP_TWO(&firstValue, &secondValue)
     PUSH_VALUE(firstValue % secondValue);
     NEXT_COMMAND
 })
@@ -299,7 +299,7 @@ DEF_CMD(MOD, 25, 0, {
 DEF_CMD(SET_RAM, 26, 0, {
     int firstValue  = 0;
     int secondValue = 0;
-    POP_TWO()
+    POP_TWO(&firstValue, &secondValue)
     RAM_MEM[firstValue / precision] = secondValue / precision;
     NEXT_COMMAND
 })
