@@ -60,6 +60,7 @@ size_t readFile(FILE *fp, Program *program);
  * @brief Adds info about code: the compilation const, version, and code length
  *
  * @param code array with code
+ * @param lenOfCode length of code in bytes
  */
 void addInfo(uint8_t **code, int lenOfCode);
 
