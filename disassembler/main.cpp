@@ -25,7 +25,7 @@ int main(int argc, char *argv[])
     FILE *fp_out = fopen(output_filename, "w");
     error = disassemble(&code, fp_out);
     if (error)
-        processDisasmError(error);
+        handleDisasmError(error);
     fclose(fp);
 
     return 0;

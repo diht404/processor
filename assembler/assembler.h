@@ -191,6 +191,6 @@ size_t saveFile(uint8_t *code, const char *filename);
  *
  * @param error error code
  */
-void processAsmError(size_t error);
+void handleAsmError(size_t error);
 
 #endif //STACK__ASSEMBLER_H

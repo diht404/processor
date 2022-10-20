@@ -79,7 +79,7 @@ size_t processorDump(FILE *fp, CPU *cpu)
     return CPU_NO_ERRORS;
 }
 
-void processCpuError(size_t error, CPU *cpu)
+void handleCpuError(size_t error, CPU *cpu)
 {
     FILE *fp = stderr;
     if (!error)

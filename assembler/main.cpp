@@ -16,13 +16,13 @@ int main(int argc, char *argv[])
 
     Program text = {};
     error = readFile(fp, &text);
-    processAsmError(error);
+    handleAsmError(error);
 
     uint8_t *code = compileWithNamesTable(&text, &error);
-    processAsmError(error);
+    handleAsmError(error);
 
     error = saveFile(code, output_filename);
-    processAsmError(error);
+    handleAsmError(error);
 
     free(code);
     fclose(fp);

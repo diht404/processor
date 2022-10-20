@@ -38,6 +38,6 @@ size_t printArg(Code *code, FILE *fp, const char *command_name, size_t *ip);
  *
  * @param error error code
  */
-void processDisasmError(size_t error);
+void handleDisasmError(size_t error);
 
 #endif //STACK__DISASSEMBLER_H

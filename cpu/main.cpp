@@ -30,13 +30,13 @@ int main(int argc, char *argv[])
     error = readCode(fp, &code);
     if (error)
     {
-        processCpuError(error, &cpu);
+        handleCpuError(error, &cpu);
     }
 
     error = run(&cpu);
     if (error)
     {
-        processCpuError(error, &cpu);
+        handleCpuError(error, &cpu);
     }
     fclose(fp);
     return 0;

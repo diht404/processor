@@ -49,7 +49,7 @@ size_t processorDump(FILE *fp, CPU *cpu);
  * @param error error code
  * @param cpu cpu with error
  */
-void processCpuError(size_t error, CPU *cpu);
+void handleCpuError(size_t error, CPU *cpu);
 
 /**
  * @brief prints RAM data

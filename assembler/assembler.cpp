@@ -479,7 +479,7 @@ size_t saveFile(uint8_t *code, const char *filename)
     return NO_ERRORS;
 }
 
-void processAsmError(size_t error)
+void handleAsmError(size_t error)
 {
     FILE *fp = stderr;
     if (!error)
