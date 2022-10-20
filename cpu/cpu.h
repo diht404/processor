@@ -34,6 +34,13 @@ struct CPU
  */
 size_t run(CPU *cpu);
 
+/**
+ * @brief dumps processor
+ *
+ * @param fp file to write dump
+ * @param cpu cpu to dump
+ * @return error code
+ */
 size_t processorDump(FILE *fp, CPU *cpu);
 
 /**
@@ -44,6 +51,12 @@ size_t processorDump(FILE *fp, CPU *cpu);
  */
 void processCpuError(size_t error, CPU *cpu);
 
+/**
+ * @brief prints RAM data
+ *
+ * @param cpu cpu with RAM
+ * @param size size of square to show
+ */
 void show_ram_data(CPU *cpu, int size);
 
 #endif //STACK__CPU_H

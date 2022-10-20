@@ -1,39 +1,5 @@
 #include "cpu.h"
 
-void show_ram_data(CPU *cpu, int size)
-{
-    printf("\n");
-    for (int y = 0; y < size; y++)
-    {
-        for (int x = 0; x < size; x++)
-        {
-            printf("%s", RAM_MEM[size * y + x]? "* ": ". ");
-        }
-        printf("\n");
-    }
-}
-
-size_t processorDump(FILE *fp, CPU *cpu)
-{
-    if (fp == nullptr)
-        fp = stderr;
-
-    if (cpu == nullptr)
-        return CPU_IS_NULLPTR;
-
-    for (size_t i = 0; i < cpu->code->len; i++)
-    {
-        if (cpu->ip == i)
-        {
-            fprintf(fp, "{{{ %d }}} ", cpu->code->code[i]);
-            continue;
-        }
-        fprintf(fp, "%d ", cpu->code->code[i]);
-    }
-    fprintf(fp, "\n");
-    return CPU_NO_ERRORS;
-}
-
 #define DEF_CMD(name, num, arg, cpu_code) \
 case COMMAND_CODES::CMD_##name:           \
     cpu_code                              \
@@ -78,6 +44,40 @@ size_t run(CPU *cpu)
 }
 
 #undef DEF_CMD
+
+void show_ram_data(CPU *cpu, int size)
+{
+    printf("\n");
+    for (int y = 0; y < size; y++)
+    {
+        for (int x = 0; x < size; x++)
+        {
+            printf("%s", RAM_MEM[size * y + x]? "* ": ". ");
+        }
+        printf("\n");
+    }
+}
+
+size_t processorDump(FILE *fp, CPU *cpu)
+{
+    if (fp == nullptr)
+        fp = stderr;
+
+    if (cpu == nullptr)
+        return CPU_IS_NULLPTR;
+
+    for (size_t i = 0; i < cpu->code->len; i++)
+    {
+        if (cpu->ip == i)
+        {
+            fprintf(fp, "{{{ %d }}} ", cpu->code->code[i]);
+            continue;
+        }
+        fprintf(fp, "%d ", cpu->code->code[i]);
+    }
+    fprintf(fp, "\n");
+    return CPU_NO_ERRORS;
+}
 
 void processCpuError(size_t error, CPU *cpu)
 {

@@ -1,5 +1,49 @@
 #include "disassembler.h"
 
+#define DEF_CMD(name, num, arg, cpu_code)       \
+case COMMAND_CODES::CMD_##name:                 \
+{                                               \
+    if (arg)                                    \
+    {                                           \
+        error = printArg(code, fp, #name, &ip); \
+        if (error)                              \
+            return error;                       \
+        break;                                  \
+    }                                           \
+    fprintf(fp, #name"\n");                     \
+    ip++;                                       \
+    break;                                      \
+}
+
+size_t disassemble(Code *code, FILE *fp)
+{
+    if (code == nullptr)
+    {
+        return CODE_IS_NULLPTR;
+    }
+
+    if (fp == nullptr)
+    {
+        return FILE_IS_NULLPTR;
+    }
+
+    size_t error = NO_ERRORS;
+    size_t ip = 0;
+    while (ip < code->len)
+    {
+        switch (code->code[ip] & CMD_MASK)
+        {
+#include "../common/cmd.h"
+            default:
+            {
+                return UNKNOWN_COMMAND_CODE;
+            }
+        }
+    }
+    return NO_ERRORS;
+}
+#undef DEF_CMD
+
 size_t printArg(Code *code, FILE *fp, const char *command_name, size_t *ip)
 {
     if (code == nullptr)
@@ -47,49 +91,6 @@ size_t printArg(Code *code, FILE *fp, const char *command_name, size_t *ip)
     return NO_ERRORS;
 }
 
-#define DEF_CMD(name, num, arg, cpu_code)       \
-case COMMAND_CODES::CMD_##name:                 \
-{                                               \
-    if (arg)                                    \
-    {                                           \
-        error = printArg(code, fp, #name, &ip); \
-        if (error)                              \
-            return error;                       \
-        break;                                  \
-    }                                           \
-    fprintf(fp, #name"\n");                     \
-    ip++;                                       \
-    break;                                      \
-}
-
-size_t disassemble(Code *code, FILE *fp)
-{
-    if (code == nullptr)
-    {
-        return CODE_IS_NULLPTR;
-    }
-
-    if (fp == nullptr)
-    {
-        return FILE_IS_NULLPTR;
-    }
-
-    size_t error = NO_ERRORS;
-    size_t ip = 0;
-    while (ip < code->len)
-    {
-        switch (code->code[ip] & CMD_MASK)
-        {
-#include "../common/cmd.h"
-            default:
-            {
-                return UNKNOWN_COMMAND_CODE;
-            }
-        }
-    }
-    return NO_ERRORS;
-}
-#undef DEF_CMD
 
 void processDisasmError(size_t error)
 {

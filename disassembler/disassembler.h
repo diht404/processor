@@ -14,6 +14,15 @@ enum DISASSEMBLER_ERRORS
 };
 
 /**
+ * @brief disassembles code and writes to file
+ *
+ * @param code array with code
+ * @param fp file to write
+ * @return
+ */
+size_t disassemble(Code *code, FILE *fp);
+
+/**
  * @brief prints to file commands with arguments
  *
  * @param code array with code
@@ -23,15 +32,6 @@ enum DISASSEMBLER_ERRORS
  * @return
  */
 size_t printArg(Code *code, FILE *fp, const char *command_name, size_t *ip);
-
-/**
- * @brief disassembles code and writes to file
- *
- * @param code array with code
- * @param fp file to write
- * @return
- */
-size_t disassemble(Code *code, FILE *fp);
 
 /**
  * @brief process error
