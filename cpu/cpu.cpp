@@ -9,21 +9,13 @@ size_t run(CPU *cpu)
 {
     CHECK_NULLPTR_ERROR(cpu, CPU_IS_NULLPTR)
 
-    Stack stack_run = {};
-    Stack stack_call_run = {};
     size_t error = NO_ERRORS;
 
     if (cpu->stack == nullptr)
-    {
-        cpu->stack = &stack_run;
-        stackCtor(cpu->stack, 1, &error)
-    }
+        return STACK_NULLPTR;
 
     if (cpu->call_stack == nullptr)
-    {
-        cpu->call_stack = &stack_call_run;
-        stackCtor(cpu->call_stack, 1, &error)
-    }
+        return STACK_NULLPTR;
 
     while (cpu->ip < cpu->code->len)
     {

@@ -93,12 +93,12 @@ void fillNameTable(NameTable *nameTable,
  * @param command_code code of command
  * @return error code
  */
-size_t putArgs(AsmProgram *program,
-             size_t line,
-             Code *code,
-             int *commandSize,
-             int *lenOfCode,
-             int command_code);
+size_t putCommandAndArgsToCodeArray(AsmProgram *program,
+                                    size_t line,
+                                    Code *code,
+                                    int *commandSize,
+                                    int *lenOfCode,
+                                    int command_code);
 
 /**
  * @brief process code if there is [] in line of code

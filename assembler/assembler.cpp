@@ -28,7 +28,8 @@ else if (strcasecmp(cmd, #name) == 0)               \
         code->code++;                               \
     }                                               \
     else                                            \
-        error = putArgs(program,                    \
+        error = putCommandAndArgsToCodeArray(       \
+                        program,                    \
                         line,                       \
                         code,                       \
                         &commandSize,               \
@@ -148,12 +149,12 @@ void fillNameTable(NameTable *nameTable,
     }
 }
 
-size_t putArgs(AsmProgram *program,
-               size_t line,
-               Code *code,
-               int *commandSize,
-               int *lenOfCode,
-               int command_code)
+size_t putCommandAndArgsToCodeArray(AsmProgram *program,
+                                    size_t line,
+                                    Code *code,
+                                    int *commandSize,
+                                    int *lenOfCode,
+                                    int command_code)
 {
     size_t error = NO_ERRORS;
 
