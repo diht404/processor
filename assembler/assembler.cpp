@@ -273,13 +273,18 @@ size_t processArgs(Code *code,
     CHECK_NULLPTR_ERROR(buffer, BUFFER_IS_NULLPTR)
     CHECK_NULLPTR_ERROR(code, CODE_IS_NULLPTR)
 
-    reg_compile(command_code, "rax", 1)
-    else reg_compile(command_code, "rbx", 2)
-    else reg_compile(command_code, "rcx", 3)
-    else reg_compile(command_code, "rdx", 4)
-    else if (!sscanf(buffer,
-                     "%d",
-                     &value))
+    bool success = false;
+    compileRegs(code,
+                command_code,
+                buffer,
+                lenOfCode,
+                &success);
+    if (success)
+        return error;
+
+    if (!sscanf(buffer,
+                "%d",
+                &value))
     {
         return ASSEMBLER_COMPILATION_FAILED;
     }
@@ -294,6 +299,36 @@ size_t processArgs(Code *code,
         code->code += sizeof(int);
     }
     return error;
+}
+
+size_t compileRegs(Code *code,
+                   int command_code,
+                   char *buffer,
+                   int *lenOfCode,
+                   bool *success)
+{
+    size_t error = NO_ERRORS;
+
+    CHECK_NULLPTR_ERROR(code, CODE_IS_NULLPTR)
+    CHECK_NULLPTR_ERROR(code->code, CODE_IS_NULLPTR)
+    CHECK_NULLPTR_ERROR(buffer, BUFFER_IS_NULLPTR)
+    CHECK_NULLPTR_ERROR(code, CODE_IS_NULLPTR)
+
+    for (int i = 1; i < sizeof(REGS_NAMES) / sizeof(REGS_NAMES[0]); i++)
+    {
+        if (strcasecmp(buffer, REGS_NAMES[i]) == 0)
+        {
+            *code->code = (command_code) | REG_MASK;
+            (*lenOfCode)++;
+            code->code++;
+            *(int *) code->code = i;
+            *lenOfCode += sizeof(int);
+            code->code += sizeof(int);
+            *success = true;
+            return error;
+        }
+    }
+    return NO_ERRORS;
 }
 
 void addInfo(Code *code, int lenOfCode)

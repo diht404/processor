@@ -31,18 +31,6 @@ struct AsmProgram
     size_t length = 0;
 };
 
-
-#define reg_compile(cmd_arg, reg_name, number) \
-    if (strcasecmp(buffer, (reg_name)) == 0)   \
-    {                                          \
-        *code->code = (cmd_arg) | REG_MASK;    \
-        (*lenOfCode)++;                        \
-        code->code++;                          \
-        *(int *) code->code = (number);        \
-        *lenOfCode += sizeof(int);             \
-        code->code += sizeof(int);             \
-    }
-
 /**
  * @brief compiles code with names table
  *
@@ -141,6 +129,22 @@ size_t processArgs(Code *code,
                  char *buffer,
                  int *lenOfCode,
                  int value);
+
+/**
+ * @brief compiles registers
+ *
+ * @param code array with code
+ * @param command command to process
+ * @param buffer buffer for storing code extracted from []
+ * @param lenOfCode length of array with code
+ * @param success true if registers was compiled successfully and false if not
+ * @return error code
+ */
+size_t compileRegs(Code *code,
+                   int command_code,
+                   char *buffer,
+                   int *lenOfCode,
+                   bool *success);
 
 /**
  * @brief Adds info about code: the compilation const, version, and code length
