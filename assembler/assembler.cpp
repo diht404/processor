@@ -369,9 +369,7 @@ size_t saveHeader(CodeHeader *header, FILE *fp)
     CHECK_NULLPTR_ERROR(header, HEADER_IS_NULLPTR)
     CHECK_NULLPTR_ERROR(fp, FILE_IS_NULLPTR)
 
-    fwrite(&header->compilation_const, sizeof(size_t), 1, fp);
-    fwrite(&header->version, sizeof(size_t), 1, fp);
-    fwrite(&header->length, sizeof(size_t), 1, fp);
+    fwrite(header, sizeof(*header), 1, fp);
 
     return NO_ERRORS;
 }

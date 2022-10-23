@@ -35,9 +35,9 @@ struct NameTable
 
 struct CodeHeader
 {
-    size_t compilation_const = 0;
-    size_t version = 0;
-    size_t length = 0;
+    uint32_t compilation_const = 0;
+    uint32_t version = 0;
+    uint32_t length = 0;
 };
 
 struct Code

@@ -16,8 +16,8 @@ size_t readCode(FILE *fp, Code *code)
     if (error)
         return error;
 
-    code->len = *((size_t *) (buf) + 2);
-    code->code = (uint8_t *) ((size_t *) (buf) + 3);
+    code->len = *((uint32_t *) (buf) + 2);
+    code->code = (uint8_t *) ((uint32_t *) (buf) + 3);
 
     return NO_ERRORS;
 }
@@ -69,17 +69,17 @@ size_t countLines(const char *txt, size_t lenOfFile)
 
 size_t verifyCode(char **buf)
 {
-    size_t compilationConst = *(size_t *) (*buf);
+    uint32_t compilationConst = *(uint32_t *) (*buf);
 
     if (compilationConst != COMPILATION_CONST)
     {
-        printf("Expected: %zu Got: %zu\n",
+        printf("Expected: %u Got: %u\n",
                COMPILATION_CONST,
                compilationConst);
         return NOT_EXECUTABLE_FILE;
     }
 
-    size_t version = *((size_t *) (*buf) + 1);
+    uint32_t version = *((uint32_t *) (*buf) + 1);
 
     if (version != VERSION_CONST)
         return INCORRECT_VERSION;
