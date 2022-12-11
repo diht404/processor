@@ -89,17 +89,27 @@ DEF_CMD(POP, 9, 1, {
     int command_arg = 0;
     ARG_COMMAND_STEP()
 
-    if (args & REG_MASK)
+    if ((args & REG_MASK) && (args & RAM_MASK))
     {
-        POP(&arg)
-        REGS[command_arg] = arg;
+        arg = REGS[command_arg];
+        int value = 0;
+        POP(&value)
+        RAM_MEM[arg / precision] = value;
     }
-
-    if (args & RAM_MASK)
+    else
     {
-        POP(&arg)
-        sleep(0);
-        RAM_MEM[command_arg] = arg;
+        if (args & REG_MASK)
+        {
+            POP(&arg)
+            REGS[command_arg] = arg;
+        }
+
+        if (args & RAM_MASK)
+        {
+            POP(&arg)
+            sleep(0);
+            RAM_MEM[command_arg] = arg;
+        }
     }
     ARG_STEP()
 })

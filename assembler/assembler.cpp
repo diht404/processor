@@ -318,7 +318,7 @@ size_t compileRegs(Code *code,
     {
         if (strcasecmp(buffer, REGS_NAMES[i]) == 0)
         {
-            *code->code = (command_code) | REG_MASK;
+            *code->code |= (command_code) | REG_MASK;
             (*lenOfCode)++;
             code->code++;
             *(int *) code->code = i;
