@@ -58,7 +58,7 @@ size_t countLines(const char *txt, size_t lenOfFile)
 {
     assert(txt != nullptr);
 
-    size_t numLines = 1;
+    size_t numLines = 0;
     for (size_t i = 0; i < lenOfFile; i++)
     {
         if (txt[i] == '\n')
