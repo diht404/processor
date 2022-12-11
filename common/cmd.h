@@ -242,3 +242,24 @@ DEF_CMD(JMPM, 27, 1, {
     else
         ARG_STEP()
 })
+
+DEF_CMD(A, 28, 0, {
+    int firstValue  = 0;
+    int secondValue = 0;
+    POP_TWO(&firstValue, &secondValue)
+    PUSH_VALUE(firstValue > secondValue);
+    NEXT_COMMAND})
+
+DEF_CMD(AE, 29, 0, {
+    int firstValue  = 0;
+    int secondValue = 0;
+    POP_TWO(&firstValue, &secondValue)
+    PUSH_VALUE(firstValue >= secondValue);
+    NEXT_COMMAND})
+
+DEF_CMD(E, 30, 0, {
+    int firstValue  = 0;
+    int secondValue = 0;
+    POP_TWO(&firstValue, &secondValue)
+    PUSH_VALUE(firstValue == secondValue);
+    NEXT_COMMAND})
