@@ -241,35 +241,49 @@ DEF_CMD(SET_RAM, 26, 0, {
     NEXT_COMMAND
 })
 
-DEF_CMD(JMPM, 27, 1, {
-    int arg = 0;
-    int command_arg = 0;
-    ARG_COMMAND_STEP()
-    GET_ARG()
-    printf("WEEKDAY %d\n", get_weekday());
-    if (get_weekday() == 1)
-        SET_ARG
-    else
-        ARG_STEP()
-})
+//DEF_CMD(JMPM, 27, 1, {
+//    int arg = 0;
+//    int command_arg = 0;
+//    ARG_COMMAND_STEP()
+//    GET_ARG()
+//    printf("WEEKDAY %d\n", get_weekday());
+//    if (get_weekday() == 1)
+//        SET_ARG
+//    else
+//        ARG_STEP()
+//})
 
-DEF_CMD(A, 28, 0, {
+DEF_CMD(A, 27, 0, {
     int firstValue  = 0;
     int secondValue = 0;
     POP_TWO(&firstValue, &secondValue)
     PUSH_VALUE(firstValue > secondValue);
     NEXT_COMMAND})
 
-DEF_CMD(AE, 29, 0, {
+DEF_CMD(AE, 28, 0, {
     int firstValue  = 0;
     int secondValue = 0;
     POP_TWO(&firstValue, &secondValue)
     PUSH_VALUE(firstValue >= secondValue);
     NEXT_COMMAND})
 
-DEF_CMD(E, 30, 0, {
+DEF_CMD(E, 29, 0, {
     int firstValue  = 0;
     int secondValue = 0;
     POP_TWO(&firstValue, &secondValue)
     PUSH_VALUE(firstValue == secondValue);
     NEXT_COMMAND})
+
+DEF_CMD(SIN, 30, 0, {
+    int value = 0;
+    POP(&value)
+    PUSH_VALUE(precision * sin(((double)value) / precision))
+    NEXT_COMMAND
+    })
+
+DEF_CMD(COS, 31, 0, {
+    int value = 0;
+    POP(&value)
+    PUSH_VALUE(precision * cos(((double)value) / precision))
+    NEXT_COMMAND
+    })
