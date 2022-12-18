@@ -11,16 +11,14 @@
 
 int main()
 {
-    system("g++ " flags "assembler/main.cpp assembler/assembler.cpp common/utils.cpp stack/stack.cpp "
-           "stack/stack_logs.cpp stack/stack_verification.cpp -o assembler/assembler");
-    system("g++ " flags "disassembler/main.cpp disassembler/disassembler.cpp common/utils.cpp stack/stack.cpp "
-           "stack/stack_logs.cpp stack/stack_verification.cpp -o disassembler/disassembler");
-    system("g++ " flags "cpu/main.cpp cpu/cpu.cpp common/utils.cpp stack/stack.cpp "
-           "stack/stack_logs.cpp stack/stack_verification.cpp -o cpu/cpu");
-    system("./assembler/assembler examples/" asm_file".asm examples/" asm_file".code");
-    system("./disassembler/disassembler examples/" asm_file".code examples/" asm_file".disasm");
-    system("./cpu/cpu examples/" asm_file".code");
+//    system("cmake --build . --target assembler_run");
+//    system("cmake --build . --target disassembler_run");
+//    system("cmake --build . --target cpu_run");
+//
+    system("./assembler/assembler_run examples/" asm_file".asm examples/" asm_file".code");
+    system("./disassembler/disassembler_run examples/" asm_file".code examples/" asm_file".disasm");
+    system("./cpu/cpu_run examples/" asm_file".code");
     system("rm ./examples/" asm_file".code");
-    system("rm ./assembler/assembler ./disassembler/disassembler ./cpu/cpu ./main");
+//    system("rm ./assembler/assembler_run ./disassembler/disassembler_run ./cpu/cpu_run ./main");
     return 0;
 }

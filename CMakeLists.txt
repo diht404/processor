@@ -15,3 +15,6 @@ add_executable(disassembler_run disassembler/main.cpp disassembler/disassembler.
 add_executable(cpu_run cpu/main.cpp cpu/cpu.cpp common/utils.cpp
         stack/stack.cpp stack/stack_logs.cpp stack/stack_verification.cpp)
 add_executable(sfml_test sfml_test.cpp)
+set_target_properties(assembler_run PROPERTIES RUNTIME_OUTPUT_DIRECTORY "assembler")
+set_target_properties(disassembler_run PROPERTIES RUNTIME_OUTPUT_DIRECTORY "disassembler")
+set_target_properties(cpu_run PROPERTIES RUNTIME_OUTPUT_DIRECTORY "cpu")
