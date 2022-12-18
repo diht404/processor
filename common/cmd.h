@@ -180,26 +180,14 @@ DEF_CMD(SQRT, 21, 0, {
     NEXT_COMMAND
 })
 
-DEF_CMD(CIRCLE_PICTURE, 22, 0, {
-    int size = sqrt(cpu->vram_size);
-    int radius = size / 2;
-
-    for (int y = 0; y < size; y++)
-    {
-        for (int x = 0; x < size; x++)
-        {
-            if (abs((x - radius) * (x - radius) +
-                    (y - radius) * (y - radius) -
-                    radius * radius / SQUEEZE
-                    ) < EPS)
-                RAM_MEM[size * y + x] = 1;
-            else
-                RAM_MEM[size * y + x] = 0;
-        }
-    }
-    show_ram_data(cpu, size);
+DEF_CMD(POW, 22, 0, {
+    int firstValue  = 0;
+    int secondValue = 0;
+    POP_TWO(&firstValue, &secondValue)
+    PUSH_VALUE(precision * (int)pow(((double)firstValue) / precision,
+                                    ((double)secondValue) / precision));
     NEXT_COMMAND
-})
+    })
 
 DEF_CMD(SQUARE_PICTURE, 23, 0, {
     int size = sqrt(cpu->vram_size);//rax

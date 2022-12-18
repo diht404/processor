@@ -11,10 +11,10 @@
 
 int main()
 {
-//    system("cmake --build . --target assembler_run");
-//    system("cmake --build . --target disassembler_run");
-//    system("cmake --build . --target cpu_run");
-//
+    system("cmake --build . --target assembler_run");
+    system("cmake --build . --target disassembler_run");
+    system("cmake --build . --target cpu_run");
+
     system("./assembler/assembler_run examples/" asm_file".asm examples/" asm_file".code");
     system("./disassembler/disassembler_run examples/" asm_file".code examples/" asm_file".disasm");
     system("./cpu/cpu_run examples/" asm_file".code");
