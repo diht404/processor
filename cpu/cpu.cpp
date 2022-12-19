@@ -36,14 +36,14 @@ size_t run(CPU *cpu)
 
 #undef DEF_CMD
 
-void show_ram_data(CPU *cpu, int size)
+void show_ram_data(CPU *cpu, int start, int size)
 {
     printf("\n");
     for (int y = 0; y < size; y++)
     {
         for (int x = 0; x < size; x++)
         {
-            printf("%s", RAM_MEM[size * y + x] ? "* " : ". ");
+            printf("%s", RAM_MEM[start + size * y + x] ? "* " : ". ");
         }
         printf("\n");
     }

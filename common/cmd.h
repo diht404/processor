@@ -203,13 +203,14 @@ DEF_CMD(SQUARE_PICTURE, 23, 0, {
                 RAM_MEM[size * y + x] = 0;
         }
     }
-    show_ram_data(cpu, size);
+    show_ram_data(cpu, 0, size);
     NEXT_COMMAND
 })
 
 DEF_CMD(SHOW_RAM, 24, 0, {
-    int size = sqrt(cpu->vram_size);
-    show_ram_data(cpu, size);
+    int start = 700;
+    int size = 20;
+    show_ram_data(cpu, start, size);
     NEXT_COMMAND
 })
 

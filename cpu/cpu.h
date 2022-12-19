@@ -21,7 +21,7 @@ struct CPU
     Stack *call_stack = nullptr;
     size_t ip = 0;
     int regs[5] = {0, 0, 0, 0, 0};
-    static const int vram_size = 20*20;
+    static const int vram_size = 100*100;
     int RAM[vram_size] = {0};
 };
 
@@ -55,8 +55,9 @@ void handleCpuError(size_t error, CPU *cpu);
  * @brief prints RAM data
  *
  * @param cpu cpu with RAM
+ * @param start first index of picture
  * @param size size of square to show
  */
-void show_ram_data(CPU *cpu, int size);
+void show_ram_data(CPU *cpu, int start, int size);
 
 #endif //CPU__CPU_H
