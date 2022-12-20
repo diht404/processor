@@ -208,7 +208,7 @@ DEF_CMD(SQUARE_PICTURE, 23, 0, {
 })
 
 DEF_CMD(SHOW_RAM, 24, 0, {
-    int start = 700;
+    int start = 1024;
     int size = 20;
     show_ram_data(cpu, start, size);
     NEXT_COMMAND
