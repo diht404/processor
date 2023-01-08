@@ -1,0 +1,7 @@
+PUSH 10
+POP rbx
+PUSH 9
+POP rbx
+PUSH rbx
+OUT
+HLT

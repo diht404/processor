@@ -232,7 +232,8 @@ size_t detectBrackets(AsmProgram *program,
         memcpy(buffer,
                program->lines[line] + bracket + 1,
                (size_t) (commandSize - bracket - 1));
-        *code->code |= RAM_MASK;
+        *((*code).code) |= RAM_MASK;
+//        fprintf(stderr, "ram detected %zu %d %d\n", line, *code->code & RAM_MASK, ARG_MASK);
     }
     else
     {
@@ -318,7 +319,7 @@ size_t compileRegs(Code *code,
     {
         if (strcasecmp(buffer, REGS_NAMES[i]) == 0)
         {
-            *code->code = (command_code) | REG_MASK;
+            *code->code |= (command_code) | REG_MASK;
             (*lenOfCode)++;
             code->code++;
             *(int *) code->code = i;
